@@ -1,0 +1,25 @@
+﻿@page "/create-coin"
+@attribute [Authorize]
+@inject ILogger<StrategyInstance> Logger
+@inject PortfolioHttpClient PortfolioHttpClient
+@inject HubConnection HubConnection
+@inject NavigationManager NavigationManager
+@implements IDisposable
+@using Syncfusion.Blazor.Navigations
+@using BlazorLiquidity.Shared
+@using Microsoft.AspNetCore.SignalR.Client
+
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+    }
+
+    public void Dispose()
+    {
+
+    }
+
+
+}

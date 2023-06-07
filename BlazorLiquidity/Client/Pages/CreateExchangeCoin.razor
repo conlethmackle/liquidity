@@ -1,0 +1,66 @@
+﻿@page "/create-exchangecoin"
+@attribute [Authorize]
+@using Syncfusion.Blazor.Inputs
+@using Microsoft.AspNetCore.Components
+@inject PortfolioHttpClient PortfolioHttpClient
+@inject NavigationManager NavigationManager
+
+
+
+<EditForm Model="@_exchangeCoin" OnValidSubmit="@HandleValidSubmit" >
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+ 
+    
+                           
+    <label for="Coin" >Generic Coin</label>
+                               
+    <InputSelect id="Coin" @bind-Value="_exchangeCoin.CoinId" >
+        @foreach (var c  in _coins)
+        {
+            <option value="@c.CoinId">@c.Name</option>
+        }
+    </InputSelect>
+    <br/>     
+    <br/>    
+                    
+    <label for="Venue" >Exchange Name</label>
+                               
+    <InputSelect id="Venue" @bind-Value="_exchangeCoin.VenueId" >
+        @foreach (var c  in _venues)
+        {
+            <option value="@c.VenueId">@c.VenueName</option>
+        }
+    </InputSelect>
+    <br/>    <br/>      
+    <SfTextBox id="Exchange" Placeholder='Exchange Coin Name' FloatLabelType='@FloatLabelType.Auto'  @bind-Value="_exchangeCoin.ExchangeCoinName"  />
+    <br/>    <br/>    
+    <SfButton Type="submit">OK</SfButton>
+                   
+</EditForm>
+
+@code {
+    private ExchangeCoinMappingsDTO _exchangeCoin = new ExchangeCoinMappingsDTO();
+    private VenueDTO _venue = new VenueDTO();
+    private List<VenueDTO> _venues = new List<VenueDTO>();
+    private List<CoinDTO> _coins = new List<CoinDTO>();
+    string coinPairs = null;
+    SfButton ToggleBtn;
+    
+    private bool _displayStuff = false;
+    //private List<CoinDTO> _coins = new List<CoinDTO>();
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        _coins = await PortfolioHttpClient.GetCoins();
+        _venues = await PortfolioHttpClient.GetVenues();
+    }
+
+
+    public async Task HandleValidSubmit()
+    {
+        await PortfolioHttpClient.CreateExchangeCoinPair(_exchangeCoin);
+        NavigationManager.NavigateTo("list-exchangecoins");
+    }
+}

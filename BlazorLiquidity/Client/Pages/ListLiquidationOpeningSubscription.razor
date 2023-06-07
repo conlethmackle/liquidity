@@ -1,0 +1,193 @@
+﻿@page "/liquidationopeningsubscription"
+@attribute [Authorize]
+@using BlazorLiquidity.Shared
+@using Common.Models.DTOs
+@inject PortfolioHttpClient PortfolioHttpClient
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Cards
+@using Syncfusion.Blazor.Buttons
+@inject NavigationManager NavigationManager
+
+
+@if (_subscriptions == null)
+{
+    <p>Loading ...</p>
+}
+else {
+    <h2 style="color:white">Liquidation Subscriptions</h2>
+
+    <br/>
+    <div id="ControlRegion">
+    <SfCard Orientation="CardOrientation.Vertical">
+        <CardHeader><div class="CustomHeader">Liquidation Opening Subscriptions</div></CardHeader>
+              
+        <SfButton @ref="AddNewButton" @onclick="OnAddNewInstance" CssClass="e-flat"  IsPrimary="true" Content="Add New Opening Subscription"></SfButton>
+                
+        <SfGrid ID="Grid" DataSource="@_subscriptions" @ref="Grid" AllowSelection="true" AllowTextWrap="true" GridLines="GridLine.Both"
+                Toolbar="@(new List<string>() {  "Edit", "Delete", "Cancel", "Update" })" Height="315" Width="2000">
+            <GridEditSettings AllowEditOnDblClick="true" AllowAdding="false" AllowEditing="true" AllowDeleting="true" Mode="EditMode.Dialog"></GridEditSettings>
+            <GridPageSettings PageSizes="true"></GridPageSettings>
+            <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Single"></GridSelectionSettings>
+            
+            <GridEvents  OnActionBegin="OnActionBegin"  TValue="LiquidationConfigurationDTO"></GridEvents>
+            <GridTextWrapSettings WrapMode="WrapMode.Both"></GridTextWrapSettings> 
+            <GridColumns>
+                
+                <GridColumn Field=SP.Name HeaderText="Account Name" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })" Width="50"></GridColumn>
+                    <GridColumn Field=StrategySPSubscriptionConfig.ConfigName HeaderText="Strategy Instance" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })" Width="50"></GridColumn>
+                    <GridColumn Field="Strategy.StrategyName" HeaderText="Strategy" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })" TextAlign="TextAlign.Left" Width="55"></GridColumn>
+                    <GridColumn Field="CoinPair.Name" HeaderText="Coin Pair" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })" TextAlign="TextAlign.Left" Width="30"></GridColumn>
+                    <GridColumn Field=@nameof(LiquidationConfigurationDTO.StrategySPSubscriptionConfigId) IsPrimaryKey="true" Visible="false" HeaderText="Strategy" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })" TextAlign="TextAlign.Left" Width="35"></GridColumn>
+                    <GridColumn Field=@nameof(LiquidationConfigurationDTO.Exchanges) HeaderText="Exchanges" AllowEditing="true" ValidationRules="@(new ValidationRules { Required = true })" Width="30"></GridColumn>
+                    <GridColumn Field=@nameof(LiquidationConfigurationDTO.SubscriptionPrice) HeaderText="Subscription Price" AllowEditing="true" ValidationRules="@(new ValidationRules { Required = true })" Width="30"></GridColumn>
+                    <GridColumn Field=@nameof(LiquidationConfigurationDTO.CoinAmount) HeaderText="Coin Quantity" AllowEditing="true" ValidationRules="@(new ValidationRules { Required = true })" Width="30"></GridColumn>
+                    <GridColumn Field=@nameof(LiquidationConfigurationDTO.NumDaysRemaining) HeaderText="Days Remaining" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })" Width="30"></GridColumn>
+                    <GridColumn Field=@nameof(LiquidationConfigurationDTO.Side) HeaderText="Side" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })" Width="20"></GridColumn>
+                    <GridColumn Field=@nameof(LiquidationConfigurationDTO.DailyLiquidationTarget) HeaderText="Daily Target" AllowEditing="true" ValidationRules="@(new ValidationRules { Required = true })" Width="30"></GridColumn>
+                    <GridColumn Field=@nameof(LiquidationConfigurationDTO.MaxOrderSize) Visible="false" HeaderText="Max Order Size" ValidationRules="@(new ValidationRules { Required = true })" Width="30"></GridColumn>
+                   
+                    <GridColumn Field=@nameof(LiquidationConfigurationDTO.PercentageSpreadFromFV) AllowEditing="true" HeaderText="% Spread from FairValue" ValidationRules="@(new ValidationRules { Required = true })" Width="35"></GridColumn>
+                    <GridColumn Field=@nameof(LiquidationConfigurationDTO.PercentageSpreadLowerThreshold) AllowEditing="true" HeaderText="Lower Threshold for FairValue" ValidationRules="@(new ValidationRules { Required = true })" Width="35"></GridColumn>
+                    <GridColumn Field=@nameof(LiquidationConfigurationDTO.BatchSize) AllowEditing="true" HeaderText="Order Batch Size" ValidationRules="@(new ValidationRules { Required = true })" Width="30"></GridColumn>
+                    <GridColumn Field=@nameof(LiquidationConfigurationDTO.EndDate) AllowEditing="true" HeaderText="End Date" ValidationRules="@(new ValidationRules { Required = false })" Width="50"></GridColumn>
+                    <GridColumn Field=@nameof(LiquidationConfigurationDTO.PriceDecimals) AllowEditing="true" HeaderText="Price Decimals" ValidationRules="@(new ValidationRules { Required = false })" Width="30"></GridColumn>
+                    <GridColumn Field=@nameof(LiquidationConfigurationDTO.AmountDecimals) AllowEditing="true" HeaderText="Amount Decimals" ValidationRules="@(new ValidationRules { Required = false })" Width="30"></GridColumn>
+                    <GridColumn Field=@nameof(LiquidationConfigurationDTO.OrderSize) AllowEditing="true" HeaderText="Order Size" ValidationRules="@(new ValidationRules { Required = false })" Width="30"></GridColumn>
+                    <GridColumn Field="LiquidationOrderLoadingConfiguration.Name" AllowEditing="true" HeaderText="Order Loading Type" ValidationRules="@(new ValidationRules { Required = false })" Width="30"></GridColumn>
+
+                                   
+                <GridColumn HeaderText="Manage" Width="50" HeaderTextAlign="TextAlign.Right">
+                    <GridCommandColumns>
+                        <GridCommandColumn Type="CommandButtonType.Save" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-save", CssClass = "e-flat" })"></GridCommandColumn>
+                        <GridCommandColumn Type="CommandButtonType.Cancel" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-cancel", CssClass = "e-flat" })"></GridCommandColumn>
+                        <GridCommandColumn Type="CommandButtonType.Edit" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-edit", CssClass = "e-flat" })"></GridCommandColumn>
+                        <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-delete", CssClass = "e-flat" })"></GridCommandColumn>
+                    </GridCommandColumns>
+                </GridColumn>
+            </GridColumns>
+        </SfGrid>
+                
+    </SfCard>
+    </div>
+}
+
+<style> 
+    .CustomHeader, 
+    .e-card .e-card-header .e-card-header-caption:first-child { 
+        padding-left: 0%; 
+        
+    } 
+
+ 
+    .lower {
+        background-color: red;
+    }
+
+    .higher {
+        background-color: green;
+    }
+
+    .same {
+        background-color: orange
+    }
+
+    .e-grid .e-headercell { 
+        background-color: #36486b; 
+    } 
+  
+    .e-headercell {         
+        color: white; 
+        font-size: 1.5rem; 
+        font-weight: bold; 
+    }
+    
+    .e-custom {
+        border-radius: 0;
+        height: 30px;
+        width: 80px;
+    }
+
+    .e-custom, .e-custom:hover, .e-custom:focus, .e-custom:active {
+        background-color: #ff6e40;
+        color: #fff;
+        font-size: 1.0rem; 
+        font-weight: bold;
+    }
+
+</style> 
+
+@code {
+    List<LiquidationConfigurationDTO> _subscriptions { get; set; }
+    SfGrid<LiquidationConfigurationDTO>? Grid { get; set; }
+    SfButton AddNewButton;
+    protected override async Task OnInitializedAsync()
+    {
+        _subscriptions = await PortfolioHttpClient.GetOpeningLiquidationSubscriptions();
+    }
+
+    public void OnAddNewInstance(MouseEventArgs args)
+    {
+        NavigationManager.NavigateTo($"create-opening-subscription");
+    }
+
+    
+
+    public async Task OnActionBegin(ActionEventArgs<LiquidationConfigurationDTO> args)
+    {
+        try
+        {
+            if (args == null)
+            {
+                Console.WriteLine("OnActionBegin args is null");
+                return;
+            }
+            if (args.Data == null)
+            {
+                Console.WriteLine($"OnActionBegin args.Data is null {args.Action} --");
+                return;
+            }
+  
+            if (args.RequestType.Equals((Syncfusion.Blazor.Grids.Action.Save)))
+            {
+                if (args.Action == "Add")
+                {
+                    args.Data.LongTimeInterval = args.Data.ShortTimeInterval * 4;
+                    await PortfolioHttpClient.CreateOpeningLiquidationSubscription(args.Data);
+                }
+                else if (args.Action == "Edit")
+                {
+                    Console.WriteLine("Got an edit");
+                    args.Data.LongTimeInterval = args.Data.ShortTimeInterval * 4;
+                    await PortfolioHttpClient.UpdateOpeningLiquidationSubscription(args.Data);
+                }
+         
+            }
+            else if (args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Delete))
+            {
+                Console.WriteLine("Deleting a record");
+                if (args.Action == "Delete")
+                {
+                    await PortfolioHttpClient.DeleteOpeningLiquidationSubscription(args.Data.Id);
+                
+                }
+            }
+            else if (args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Add))
+            {
+                Console.WriteLine("OnActionBegin Add Request Type");
+                if (args.Action == "Add")
+                {
+    //             await PortfolioHttpClient.CreatePortfolio(args.Data);
+                }
+            }
+
+            _subscriptions = await PortfolioHttpClient.GetOpeningLiquidationSubscriptions();
+            await Grid?.Refresh();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+       
+    }
+}

@@ -1,0 +1,39 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>HIM Liquidity Admin Portal</title>
+    <base href="/" />
+    <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
+    <link href="css/app.css" rel="stylesheet" />
+    <link href="SyncfusionLiquidity.Client.styles.css" rel="stylesheet" />
+    <link href="css/syncfusion-blazor-icons.css" rel="stylesheet" />
+    <link href="_content/Syncfusion.Blazor.Themes/bootstrap5.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="_content/Syncfusion.Blazor.Themes/fluent.css" />
+    <script src="_content/Syncfusion.Blazor.Core/scripts/syncfusion-blazor.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.20/lodash.min.js"></script>
+
+    <script src="_content/Microsoft.AspNetCore.Components.WebAssembly.Authentication/AuthenticationService.js"></script>
+</head>
+
+<body>
+    <div id="app">Loading Page...</div>
+
+    <div id="blazor-error-ui">
+        An unhandled error has occurred.
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+    <script src="_framework/blazor.webassembly.js"></script>
+	<script>
+        function isSidebar(x, y) {
+            var sidebarEle = document.elementFromPoint(x, y);
+            return (sidebarEle && sidebarEle.closest('.sidebar') != null) ? true : false;
+        }
+    </script>
+</body>
+
+</html>

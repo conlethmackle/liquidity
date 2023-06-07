@@ -1,0 +1,109 @@
+﻿@page "/market-order/{StrategyConfigId:int}"
+@attribute [Authorize]
+@using Microsoft.Extensions.Logging
+@using Common.Messages
+@using Common.Models.DTOs
+@using BlazorLiquidity.Shared
+@using Microsoft.AspNetCore.Components.Forms
+@inject PortfolioHttpClient PortfolioHttpClient
+@inject NavigationManager NavigationManager
+@implements IDisposable
+
+
+<EditForm Model="@orderDetails" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+  <div class="container-bg">
+        <div class="row">  
+            <div class="col-lg-8">
+        
+            <div class="card">
+                <div class="card text-white bg-dark mb-3">
+                <div class="card-header"><h3>Place Order</h3></div></div>
+                <div class="card text-black bg-light mb-2">
+                <div class="card-body">
+                    <div class="text-center">
+                        <table>
+                            <tr><td>
+                        <label for="symbol" >Symbol</label>
+                             </td><td>
+                        <InputText id="symbol"  placeholder="BTC/USDT" @bind-Value="orderDetails.Symbol"  />
+                            </td></tr>
+                        <tr><td>
+                        <label for="Side" >Side</label>
+                        </td>
+                        <td>
+                        <InputSelect id="Side"   @bind-Value="orderDetails.Side"  >
+                            <option value=true>Buy</option>
+                            <option value=false>Sell</option>
+                        </InputSelect>
+                        </td>  </tr>  
+                        <tr><td>
+                        <label for="Quantity" >Quantity</label>
+                        </td><td>
+                        <InputNumber id="Quantity" @bind-Value=orderDetails.Quantity/>
+                            </td></tr><tr><td>
+                            <label for="Venue" >Exchange</label>
+                            </td><td>
+                    <InputSelect id="Venue"   @bind-Value="orderDetails.Venue"  >
+                        <option value="Binance_Exchange">Binance</option> 
+                        <option value="Kucoin_Exchange">Kucoin</option> 
+                        <option value="Bitfinex_Exchange">Bitfinex</option> 
+                    </InputSelect>
+                    </td>
+                    </tr>
+                    <tr>
+                    <button type="submit">OK</button>
+                    </tr>
+                    
+                    </table>
+                 </div>
+               </div>
+            </div>
+          </div>
+          </div>
+          </div>
+     </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int StrategyConfigId { get; set; }
+
+    public OrderDetails orderDetails = new OrderDetails();
+    private LiquidationConfigurationDTO _strategyData { get; set; } = new ();
+    private async Task HandleValidSubmit()
+    {       
+        _strategyData =  await PortfolioHttpClient.GetLiquidationStrategyConfig(StrategyConfigId);
+        // Process the valid form
+
+        Random r = new Random();
+        int rInt = r.Next(20, 6000);
+        Console.WriteLine($"Place Market Order Venue = {orderDetails.Venue}");
+        Console.WriteLine($"Place Market Order instance = {_strategyData.StrategySPSubscriptionConfig.ConfigName}");
+        Console.WriteLine($"Place Market Order portfolio name = {_strategyData.SP.Name}");
+
+        orderDetails.ClientOrderId  = $"{rInt}";
+        orderDetails.OrderType = Common.Models.OrderTypeEnum.MARKET;
+        //orderDetails.Venue = _strategyData.StrategySPSubscriptionConfig.;
+        orderDetails.InstanceName = _strategyData.StrategySPSubscriptionConfig.ConfigName;
+        orderDetails.PortfolioName = _strategyData.SP.Name;
+     //   await PortfolioHttpClient.GetOpenOrders(orderDetails);
+        await PortfolioHttpClient.PlaceMarketOrder(orderDetails);
+        NavigationManager.NavigateTo($"portfolio-instance-list/{_strategyData.SP.Name}");
+    }
+
+    private void HandleInvalidSubmit()
+    {
+        
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+    }
+
+    public void Dispose()
+    {
+
+    }
+}

@@ -1,0 +1,57 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Pages\PortfolioStart.razor.css" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Pages\PortfolioStart.razor.css" />
+  </ItemGroup>
+
+  <ItemGroup>
+    
+    <PackageReference Include="Blazored.LocalStorage" Version="4.3.0" />
+    
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="6.0.8" />
+    
+    <PackageReference Include="Syncfusion.Blazor.Cards" Version="20.4.0.44" />
+    
+    <PackageReference Include="Syncfusion.Blazor.Charts" Version="20.4.0.50" />
+    
+    <PackageReference Include="Syncfusion.Blazor.PivotTable" Version="20.4.0.44" />
+    <PackageReference Include="Syncfusion.Blazor.Grid" Version="20.4.0.44" />
+    <PackageReference Include="Syncfusion.Blazor.DropDowns" Version="20.4.0.44" />
+    <PackageReference Include="Syncfusion.Blazor.Lists" Version="20.4.0.44" />
+    <PackageReference Include="Syncfusion.Blazor.Navigations" Version="20.4.0.44" />
+    <PackageReference Include="Syncfusion.Blazor.RangeNavigator" Version="20.4.0.44" />
+    <PackageReference Include="Syncfusion.Blazor.SplitButtons" Version="20.4.0.44" />
+    <PackageReference Include="Syncfusion.Blazor.Themes" Version="20.4.0.44" />
+    <PackageReference Include="Syncfusion.Blazor.Layouts" Version="20.4.0.44" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.8" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.2" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="6.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
+    <PackageReference Include="Microsoft.JSInterop.WebAssembly" Version="6.0.8" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0" />
+    <PackageReference Include="Serilog.Sinks.BrowserConsole" Version="1.0.0" />
+    <PackageReference Include="System.Net.Http.Json" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+   
+    <ProjectReference Include="..\Shared\BlazorLiquidity.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="wwwroot\appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

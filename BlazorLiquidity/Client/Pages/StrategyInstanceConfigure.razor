@@ -1,0 +1,164 @@
+﻿@page "/strategy-instance-configure/{StrategyConfigName}"
+@attribute [Authorize]
+@using BlazorLiquidity.Shared
+@using Common.Models.DTOs
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Cards
+@using Syncfusion.Blazor.Buttons
+@inject PortfolioHttpClient PortfolioHttpClient
+@inject NavigationManager NavigationManager
+
+<SfGrid  ID="Grid2" DataSource="@_exchangeDetails"  @ref="Grid2"  AllowSelection="true"
+             Toolbar="@(new List<string>() {  "Edit", "Delete", "Cancel", "Update"})" Height="200" Width="1050">    
+           
+        <GridEditSettings AllowEditOnDblClick="false" AllowAdding="true" AllowEditing="true" AllowDeleting="true" Mode="EditMode.Dialog">
+            <FooterTemplate>
+                <SfButton OnClick="@Save" IsPrimary="true">Save</SfButton>
+                <SfButton OnClick="@Cancel">Cancel</SfButton>
+            </FooterTemplate>
+        </GridEditSettings>
+        <GridPageSettings PageSizes="true"></GridPageSettings>
+        <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Single"></GridSelectionSettings>
+        <GridEvents OnToolbarClick="ToolbarClick" OnActionBegin="OnActionBeginExchangeDetails"  OnActionComplete="OnActionEndExchangeDetails"  OnRecordDoubleClick="OnRecordDoubleClickExchangeDetails" TValue="ExchangeDetailsDTO"></GridEvents>
+        <GridColumns>
+            <GridColumn Field=@nameof(ExchangeDetailsDTO.Name)  HeaderText="Exchange" ValidationRules="@(new ValidationRules { Required = true })" Width="100" ></GridColumn>
+            <GridColumn Field="ApiKey.Key" HeaderText="ApiKey" ValidationRules="@(new ValidationRules { Required = true })" TextAlign="TextAlign.Left"   Width="200"></GridColumn>
+            <GridColumn Field="ApiKey.Secret" HeaderText="Secret" ValidationRules="@(new ValidationRules { Required = true })" TextAlign="TextAlign.Left"   Width="200"></GridColumn>
+            <GridColumn Field="ApiKey.PassPhrase" HeaderText="PassPhrase" ValidationRules="@(new ValidationRules { Required = false })" TextAlign="TextAlign.Left" Width="100"></GridColumn>
+            <GridColumn Field="ApiKey.AccountName" HeaderText="AccountName" ValidationRules="@(new ValidationRules { Required = false })" TextAlign="TextAlign.Left" Width="100"></GridColumn>
+            <GridColumn Field="ApiKey.IsSubAccount" HeaderText="IsSubAccount" ValidationRules="@(new ValidationRules { Required = false })" TextAlign="TextAlign.Left" Width="50"></GridColumn>
+            <GridColumn Field="ApiKey.SubAccountName" HeaderText="SubAccountName" ValidationRules="@(new ValidationRules { Required = false })" TextAlign="TextAlign.Left" Width="100"></GridColumn>
+            <GridColumn Field="ApiKey.Password" HeaderText="Password" ValidationRules="@(new ValidationRules { Required = false })" TextAlign="TextAlign.Left" Width="100"></GridColumn>
+            <GridColumn HeaderText="Manage" Width="100" HeaderTextAlign="TextAlign.Right">
+                <GridCommandColumns>
+                    <GridCommandColumn  Type="CommandButtonType.Save" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-save", CssClass = "e-flat" })"></GridCommandColumn>
+                    <GridCommandColumn Type="CommandButtonType.Cancel" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-cancel", CssClass = "e-flat" })"></GridCommandColumn>
+                    <GridCommandColumn Type="CommandButtonType.Edit" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-edit", CssClass = "e-flat" })"></GridCommandColumn>
+                    <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-delete", CssClass = "e-flat" })"></GridCommandColumn>
+                </GridCommandColumns>
+            </GridColumn>
+        </GridColumns>
+    </SfGrid>
+
+
+
+@code {
+    [Parameter]
+    public string StrategyConfigName { get; set; }
+
+    SfGrid<ExchangeDetailsDTO>? Grid2 { get; set; }
+
+    private List<ExchangeDetailsDTO> _exchangeDetails { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var data = await PortfolioHttpClient.GetStrategyConfigData(StrategyConfigName);
+        _exchangeDetails = data.ExchangeDetails;
+    }
+
+    public void OnRecordDoubleClickExchangeDetails(Syncfusion.Blazor.Grids.RecordDoubleClickEventArgs<ExchangeDetailsDTO> args)
+    {
+    // NavigationManager.NavigateTo($"portfolio-instance-list/{args.RowData.}");
+        Console.WriteLine("In doubleclick");
+    }
+
+    public async Task OnActionEndExchangeDetails(ActionEventArgs<ExchangeDetailsDTO> args)
+    {
+        
+    }
+
+    public async Task OnActionBeginExchangeDetails(ActionEventArgs<ExchangeDetailsDTO> args)
+    {
+        try
+
+        {
+            if (args == null)
+            {
+                Console.WriteLine("OnActionBegin args is null");
+                return;
+            }
+            if (args.Data == null || args.Action == null || args.RequestType == null)
+            {
+                Console.WriteLine("OnActionBegin args.Data is null");
+                return;
+            }
+    //   Console.WriteLine($"OnActionBegin Just had an {args.Action} action on Id = {args.Data.Name}");
+            if (args.RequestType.Equals((Syncfusion.Blazor.Grids.Action.Save)))
+            {
+                if (args.Action == "Add")
+                {
+    //           await PortfolioHttpClient.CreatePortfolio(args.Data);
+                }
+                else if (args.Action == "Edit")
+                {
+                    Console.WriteLine("Got an edit");
+                    await PortfolioHttpClient.UpdateExchangeDetails(args.Data);
+                }
+
+            }
+            else if (args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Delete))
+            {
+                Console.WriteLine("Deleting a record");
+                if (args.Action == "Delete")
+                {
+                    Console.WriteLine("Shold be calling DeletePortfolio");
+                    await PortfolioHttpClient.DeleteExchangeDetails(args.Data.ExchangeDetailsId);
+                    Console.WriteLine("Should be finsihed calling DeletePortfolio");
+                }
+            }
+            else if (args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Add))
+            {
+                Console.WriteLine("OnActionBegin Add Request Type");
+                if (args.Action == "Add")
+                {
+    //             await PortfolioHttpClient.CreatePortfolio(args.Data);
+                }
+            }
+            var data = await PortfolioHttpClient.GetStrategyConfigData(StrategyConfigName);
+            _exchangeDetails = data.ExchangeDetails;
+            await Grid2?.CloseEditAsync();
+            await Grid2?.RefreshColumnsAsync();
+            
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Caught an error {e.Message}");
+        }
+    //  _portfolios = await PortfolioHttpClient.GetPortfolios();
+    //  await Grid?.Refresh();
+    }
+
+    public void ToolbarClick(Syncfusion.Blazor.Navigations.ClickEventArgs args)
+    {
+        Console.WriteLine("In toolbarclick");
+    }
+
+    public async Task Cancel()
+    {
+        try
+        {
+            
+            await Grid2.CloseEdit();     //Cancel editing action
+        }
+        catch (Exception e)
+        {
+          
+            throw;
+        }
+       
+    }
+    public async Task Save()
+    {
+        try
+        {
+          
+            await Grid2.EndEdit();       //Save the edited/added data to Grid
+        }
+        catch (Exception e)
+        {
+           
+            throw;
+        }
+        
+    }
+}

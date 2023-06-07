@@ -1,0 +1,141 @@
+﻿@page "/create-makerTakerFee"
+@attribute [Authorize]
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Buttons
+@using BlazorLiquidity.Shared
+@using Common.Models.DTOs
+@using Common.Models.Entities
+@using Microsoft.AspNetCore.Components
+@inject PortfolioHttpClient PortfolioHttpClient
+@inject NavigationManager NavigationManager
+<SfCard Orientation="CardOrientation.Vertical">
+    
+<CardHeader>
+    <div class="CustomHeader">Create Maker/Taker Fee E</div>
+</CardHeader>
+<br/>
+<EditForm Model="@_makerTakerFee" OnValidSubmit="@HandleValidSubmit" >
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+ 
+   
+                    
+    <label class="label" for="Venue" >Exchange Name</label>
+                               
+    <InputSelect id="Venue" @bind-Value="_makerTakerFee.VenueId" >
+        @foreach (var c  in _venues)
+        {
+            <option value="@c.VenueId">@c.VenueName</option>
+        }
+    </InputSelect>
+    <br/> <br/>
+    <label class="label" for="Mode" >Spot/Derivative</label>
+    <InputSelect id="Mode" @bind-Value="_makerTakerFee.Mode" >
+       
+        <option value=1>SPOT</option>
+        <option value=2>DERIVATIVE</option>
+    </InputSelect>
+    <br/>  <br/> 
+    <label class="label" for="MakerPercentageFee" >Maker Percentage Fee</label>
+    <InputNumber id="MakerPercentageFee" @bind-Value="_makerTakerFee.MakerPercentage" />
+    
+    <br/> <br/>
+    <label class="label" for="TakerPercentageFee" >Taker Percentage Fee</label>
+    <InputNumber id="TakerPercentageFee" @bind-Value="_makerTakerFee.TakerPercentage" />
+    
+    <br/> <br/>
+    <SfButton Type="submit">OK</SfButton>
+                   
+</EditForm>
+</SfCard>
+
+<style  type="text/css" class="cssStyles"> 
+   
+    .e-grid .e-altrow {
+        background-color: #aaaaaa;
+    }
+    .CustomHeader, 
+    .e-card .e-card-header .e-card-header-caption:first-child { 
+        padding-left: 0%; 
+        
+    } 
+
+    .label {
+        background-color: white;
+        color: black;
+    }
+ 
+    .lower {
+        background-color: red;
+    }
+
+    .higher {
+        background-color: green;
+    }
+
+    .same {
+        background-color: orange
+    }
+
+    .e-grid .e-headercell { 
+        background-color: #36486b; 
+    } 
+  
+    .e-headercell {         
+        color: white;
+        background-color: black;
+        
+        font-size: 40px;
+        font-weight: bold; 
+    }
+
+    .e-grid .e-rowcell {
+        font-size: 26px;
+        padding-bottom: 3px;
+        padding-top: 3px;
+    }
+
+    .e-headercelldiv {
+        font-size: 40px;
+        font-weight: bold;
+        padding-bottom: 6px;
+        padding-top: 6px;
+        background-color: black;
+    }
+    
+    .e-custom {
+        border-radius: 0;
+        height: 30px;
+        width: 80px;
+    }
+
+    .e-custom, .e-custom:hover, .e-custom:focus, .e-custom:active {
+        background-color: #ff6e40;
+        color: #fff;
+        font-size: 1.0rem; 
+        font-weight: bold;
+    }
+
+</style>
+
+@code {
+    private MakerTakerFeeDTO _makerTakerFee = new ();
+    private List<VenueDTO> _venues = new List<VenueDTO>();
+   
+    SfButton ToggleBtn;
+    private bool _displayStuff = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _venues = await PortfolioHttpClient.GetVenues();
+    }
+
+
+    public async Task HandleValidSubmit()
+    {
+        await PortfolioHttpClient.CreateMakerTakerFee(_makerTakerFee);
+        NavigationManager.NavigateTo("list-makerTakerFees");
+    }
+}
+
+

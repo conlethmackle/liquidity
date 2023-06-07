@@ -1,0 +1,220 @@
+﻿@page "/create-exchange-details2/{ConfigName}"
+@using Syncfusion.Blazor.Inputs
+@using Microsoft.AspNetCore.Components
+@using System.ComponentModel.Design
+@using System.Text.Json
+
+@inject PortfolioHttpClient PortfolioHttpClient
+@inject NavigationManager NavigationManager
+@attribute [Authorize]
+
+<SfCard Orientation="CardOrientation.Vertical">
+    
+    <CardHeader>
+        <div class="CustomHeader">Add New Exchange Config to @ConfigName</div></CardHeader>
+    <EditForm Model="@_exchange" OnValidSubmit="@HandleValidSubmit" >
+        <DataAnnotationsValidator/>
+        <ValidationSummary/>
+        <label for="Venue">Venue</label>
+
+        <InputSelect id="Venue" @bind-Value="_exchange.VenueId">
+            @foreach (var v  in _venues)
+            {
+                <option value="@v.VenueId">@v.VenueName</option>
+            }
+        </InputSelect>
+        <SfTextBox id="exchangeName" Placeholder='Exchange' FloatLabelType='@FloatLabelType.Auto' @bind-Value="_exchange.Name" Width="200" />
+        <SfTextBox id="coinPairs" Placeholder='Coin Pair - Enter in comma seperated format' FloatLabelType='@FloatLabelType.Auto' @bind-Value="_exchange.CoinPairs" Width="200" />
+        <SfButton Type="button" @ref="AddNewApiKeyBtn" @onclick="onAddNewApiKey" CssClass="e-flat" IsPrimary="true" Content="Add New ApiKey"></SfButton>
+        <SfButton Type="button" @ref="AddExistingApiKeyBtn" @onclick="onAddExistingApiKey" CssClass="e-flat" IsPrimary="true" Content="Use Existing ApiKey"></SfButton>
+        
+        <SfButton Type="button" @ref="AddNewOpeningBalanceBtn" @onclick="onAddOpeningBalance" CssClass="e-flat" IsPrimary="true" Content="Add New Opening Balance"></SfButton>
+        <SfButton Type="button" @ref="AddExistingOpeningBalanceBtn" @onclick="onAddExistingOpeningBalance" CssClass="e-flat" IsPrimary="true" Content="Use Existing Opening Balance"></SfButton>
+
+
+        @if (_createNewApiKey)
+        {
+            <SfTextBox id="ApiKey" Placeholder='ApiKey' FloatLabelType='@FloatLabelType.Auto' @bind-Value="_exchange.ApiKey.Key" Width="200"/>
+            <SfTextBox id="Secret" Placeholder='Secret' FloatLabelType='@FloatLabelType.Auto' @bind-Value="_exchange.ApiKey.Secret" Width="200"/>
+            <SfTextBox id="PassPhrase" Placeholder='PassPhrase' FloatLabelType='@FloatLabelType.Auto' @bind-Value="_exchange.ApiKey.PassPhrase" Width="200"/>
+            <SfTextBox id="Description" Placeholder='Description' FloatLabelType='@FloatLabelType.Auto' @bind-Value="_exchange.ApiKey.Description" Width="200"/>
+            <SfTextBox id="AccountName" Placeholder='Account Name' FloatLabelType='@FloatLabelType.Auto' @bind-Value="_exchange.ApiKey.AccountName" Width="200"/>
+            <label for="IsSubAccount">IsSubAccount</label>
+            <InputSelect id="IsSubAccount" @bind-Value="_exchange.ApiKey.IsSubAccount">
+                <option value=true>True</option>
+                <option value=false>False</option>
+            </InputSelect>
+
+            <SfTextBox id="SubAccountName" Placeholder='SubAccount Name' FloatLabelType='@FloatLabelType.Auto' @bind-Value="_exchange.ApiKey.SubAccountName" Width="200"/>
+            <SfTextBox Type="InputType.Password" Placeholder='Password' FloatLabelType='@FloatLabelType.Auto' id="Password" @bind-Value="_exchange.ApiKey.Password" Width="200"/>
+        }
+        else if (_addExistingApiKey)
+        {
+            <br />
+            <label for="ExistingApiKeys">Existing ApiKeys</label>
+            <InputSelect id="ExistingApiKeys" @bind-Value="_exchange.ApiKeyId">
+                <option value="">Choose one of the following</option>
+                @foreach (var a in _apiKeys)
+                {
+                    <option value="@a.ApiKeyId">@a.Description</option>
+                }
+            </InputSelect>
+        }
+        
+        @if (_createNewOpeningExchangeBalance)
+        {
+            <SfTextBox id="Description" Placeholder='Brief Description' FloatLabelType='@FloatLabelType.Auto' @bind-Value="_exchange.OpeningExchangeBalance.Description" Width="200"/>
+            <SfTextBox id="LiquidatingFromCurrency" Placeholder='Liquidated Coin' FloatLabelType='@FloatLabelType.Auto' @bind-Value="_exchange.OpeningExchangeBalance.LiquidatingFromCurrency" Width="200"/>
+            <SfNumericTextBox id="TotalToLiquidate" Placeholder='Total Amount to Liquidate' FloatLabelType='@FloatLabelType.Auto' @bind-Value="_exchange.OpeningExchangeBalance.AmountToBeLiquidated" Width="200"/>
+            <SfNumericTextBox id="LiquidatingFromOpeningBalance" Placeholder='Liquidated Coin Opening Balance' FloatLabelType='@FloatLabelType.Auto' @bind-Value="_exchange.OpeningExchangeBalance.LiquidatingFromOpeningBalance" Width="200"/>
+            <SfTextBox id="LiquidatingToCurrency" Placeholder='Liquidated to Currency/Stable' FloatLabelType='@FloatLabelType.Auto' @bind-Value="_exchange.OpeningExchangeBalance.LiquidatingToCurrency" Width="200"/>
+            <SfNumericTextBox id="LiquidatingToOpeningBalance" Placeholder='Liquidated to Currency Opening Balance' FloatLabelType='@FloatLabelType.Auto' @bind-Value="_exchange.OpeningExchangeBalance.LiquidatingToOpeningBalance" Width="200"/>
+        }
+        else if (_addExistingOpeningExchangeBalance)
+        {
+            <br />
+            <label for="ExistingOpeningBalances">Existing Opening Balances</label>
+            <InputSelect id="ExistingOpeningBalances" @bind-Value="_exchange.OpeningExchangeBalanceId">
+                <option value="">Choose one of the following</option>
+                @foreach (var a in _openingBalances)
+                {
+                    <option value="@a.OpeningExchangeBalanceId">@a.Description</option>
+                }
+            </InputSelect>
+        }
+
+        <br/>
+        <br/>
+        <SfButton Type="submit">OK</SfButton>
+    </EditForm>
+</SfCard>
+
+@code {
+
+    [Parameter]
+    public string ConfigName { get; set; }
+
+    private bool _createNewApiKey { get; set; } = false;
+    private bool _addExistingApiKey { get; set; } = false;
+    private bool _addExistingOpeningExchangeBalance { get; set; } = false;
+    private bool _createNewOpeningExchangeBalance { get; set; } = false;
+    SfButton AddNewApiKeyBtn;
+    SfButton AddExistingApiKeyBtn;
+    SfButton AddNewOpeningBalanceBtn;
+    SfButton AddExistingOpeningBalanceBtn;
+    private StrategyExchangeConfigDTO _data { get; set; } = new();
+    private List<VenueDTO> _venues = new List<VenueDTO>();
+    private ExchangeDetailsDTO _exchange = new ();
+    private List<ApiKeyDTO> _apiKeys = new();
+    private List<OpeningExchangeBalanceDTO> _openingBalances = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _data = await PortfolioHttpClient.GetStrategyConfigData(ConfigName);
+            _venues = await PortfolioHttpClient.GetVenues();
+            _apiKeys = await PortfolioHttpClient.GetApiKeys();
+            _openingBalances = await PortfolioHttpClient.GetOpeningExchangeBalances();
+            _exchange.StrategySPSubscriptionConfigId = _data.StrategySPSubscriptionConfigId;
+
+            Console.WriteLine($"*********************************Successfully got config data and venue stuff");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"*****************Error in CreateExchangeDetails {e.Message}");
+        }
+    }
+
+    private void onAddNewApiKey(MouseEventArgs args)
+    {
+        _exchange = new ExchangeDetailsDTO();
+        _exchange.ApiKey = new ApiKeyDTO();
+        _createNewApiKey = true;
+        _addExistingApiKey = false;
+    }
+
+    private void onAddExistingApiKey(MouseEventArgs args)
+    {
+        _addExistingApiKey = true;
+        _createNewApiKey = false;
+    }
+
+    private void onAddOpeningBalance(MouseEventArgs args)
+    {
+        _addExistingOpeningExchangeBalance = false;
+        _createNewOpeningExchangeBalance = true;
+    }
+
+    private void onAddExistingOpeningBalance(MouseEventArgs args)
+    {
+        _addExistingOpeningExchangeBalance = true;
+        _createNewOpeningExchangeBalance = false;
+    }
+
+    public async Task HandleValidSubmit()
+    {
+        try
+        {
+
+            Console.WriteLine("In HandleValidSubmit");
+            _exchange.StrategySPSubscriptionConfigId = _data.StrategySPSubscriptionConfigId;
+            _exchange.SPId = _data.SPId;
+            _exchange.DateCreated = DateTime.UtcNow;
+            _exchange.ApiKey.DateCreated = _exchange.DateCreated;
+            if (_addExistingApiKey)
+            {
+                _exchange.ApiKey = _apiKeys.Where(x => x.ApiKeyId == _exchange.ApiKeyId).FirstOrDefault();
+            }
+
+            if (_addExistingOpeningExchangeBalance)
+            {
+                _exchange.OpeningExchangeBalance = _openingBalances.Where(x => x.OpeningExchangeBalanceId == _exchange.OpeningExchangeBalanceId).FirstOrDefault();
+            }
+            if (_createNewOpeningExchangeBalance)
+            {
+                Console.WriteLine($"trying to crearte a new opening balance");
+                var resp = await PortfolioHttpClient.CreateExchangeOpeningBalance(_exchange.OpeningExchangeBalance);
+                if (resp.IsSuccessStatusCode)
+                {
+                    
+                    var data = await resp.Content.ReadAsStringAsync();
+                    Console.WriteLine($"The content I get back is {data}");
+                    var result = JsonSerializer.Deserialize<OpeningExchangeBalanceDTO>(data);
+                    if (result != null)
+                    {
+                        _exchange.OpeningExchangeBalanceId = result.OpeningExchangeBalanceId;
+                        Console.WriteLine($"Looks like it worked and Id = {result.OpeningExchangeBalanceId} AmountToBeLiquidated = {result.AmountToBeLiquidated}");
+                    }
+                    else
+                    {
+                        Console.WriteLine("The result is null");
+                    }
+                }
+            }
+
+            if (_createNewApiKey)
+            {
+                var resp = await PortfolioHttpClient.CreateApiKey(_exchange.ApiKey);
+                if (resp.IsSuccessStatusCode)
+                {
+                    var data = await resp.Content.ReadAsStringAsync();
+                    var result = JsonSerializer.Deserialize<ApiKeyDTO>(data);
+                    Console.WriteLine($"The id = {result.ApiKeyId}");
+                    _exchange.ApiKeyId = result.ApiKeyId;
+                    Console.WriteLine("Looks like it worked");
+                }
+            }
+            await PortfolioHttpClient.CreateExchangeDetailsEntry(_exchange);
+            NavigationManager.NavigateTo($"strategy-config-instance-detail/{_data.StrategySPSubscriptionConfigId}");
+            Console.WriteLine("Created CreateExchangeDetailsEntry");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+}
+
+

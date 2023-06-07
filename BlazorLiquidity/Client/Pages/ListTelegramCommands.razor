@@ -1,0 +1,100 @@
+﻿@page "/list-telegram-commands"
+@attribute [Authorize]
+@using BlazorLiquidity.Shared
+@using Common.Models.DTOs
+@inject PortfolioHttpClient PortfolioHttpClient
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Cards
+@using Syncfusion.Blazor.Buttons
+@inject NavigationManager NavigationManager
+
+
+@if (_commands == null)
+{
+    <p>Loading ...</p>
+}
+else {
+    <h2 style="color:white">Telegram Commands</h2>
+
+    <br/>
+    <div id="ControlRegion">
+    <SfCard Orientation="CardOrientation.Vertical">
+        <CardHeader><div class="CustomHeader">Telegram Commands</div></CardHeader>
+              
+        <SfButton @ref="AddNewButton" @onclick="OnAddNewInstance" CssClass="e-flat"  IsPrimary="true" Content="Add New Telegram Command"></SfButton>
+        <SfGrid ID="Grid" DataSource="@_commands" @ref="Grid" AllowSelection="true"
+                Toolbar="@(new List<string>() { "Add", "Edit", "Delete", "Cancel", "Update"})" Height="315" Width="900">
+            <GridEditSettings AllowEditOnDblClick="true" AllowAdding="false" AllowEditing="true" AllowDeleting="true" Mode="EditMode.Dialog"></GridEditSettings>
+            <GridPageSettings PageSizes="true"></GridPageSettings>
+            <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Single"></GridSelectionSettings>
+          
+            <GridPageSettings PageSizes="true"></GridPageSettings>
+            <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Single"></GridSelectionSettings>
+            <GridEvents  OnActionBegin="OnActionBegin"  TValue="TelegramCommandDTO"></GridEvents>
+            <GridColumns>
+                <GridColumn Field=@nameof(TelegramCommandDTO.TelegramCommandText) HeaderText="Command Name" ValidationRules="@(new ValidationRules { Required = true })" Width="150"></GridColumn>
+                <GridColumn Field=TelegramCommandType.Category HeaderText="Command Type" ValidationRules="@(new ValidationRules { Required = true })" Width="150"></GridColumn>
+                <GridColumn HeaderText="Manage" Width="100" HeaderTextAlign="TextAlign.Right">
+                    <GridCommandColumns>
+                        <GridCommandColumn Type="CommandButtonType.Save" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-save", CssClass = "e-flat" })"></GridCommandColumn>
+                        <GridCommandColumn Type="CommandButtonType.Cancel" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-cancel", CssClass = "e-flat" })"></GridCommandColumn>
+                        <GridCommandColumn Type="CommandButtonType.Edit" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-edit", CssClass = "e-flat" })"></GridCommandColumn>
+                        <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-delete", CssClass = "e-flat" })"></GridCommandColumn>
+                    </GridCommandColumns>
+                </GridColumn>
+            </GridColumns>
+        </SfGrid>
+    </SfCard>
+    </div>
+}
+
+
+@code {
+    List<TelegramCommandDTO> _commands { get; set; }
+    SfGrid<TelegramCommandDTO>? Grid { get; set; }
+    SfButton AddNewButton;
+    protected override async Task OnInitializedAsync()
+    {
+        _commands = await PortfolioHttpClient.GetTelegramCommands();
+    }
+
+    public void OnAddNewInstance(MouseEventArgs args)
+    {
+        NavigationManager.NavigateTo($"create-telegram-command");
+    }
+
+    public async Task OnActionBegin(ActionEventArgs<TelegramCommandDTO> args)
+    {
+        if (args == null)
+        {
+            Console.WriteLine("OnActionBegin args is null");
+            return;
+        }
+        if (args.Data == null)
+        {
+            Console.WriteLine("OnActionBegin args.Data is null");
+            return;
+        }
+  
+        if (args.RequestType.Equals((Syncfusion.Blazor.Grids.Action.Save)))
+        {
+            
+            if (args.Action == "Edit")
+            {
+                Console.WriteLine("Got an edit");
+                await PortfolioHttpClient.UpdateTelegramCommand(args.Data);
+            }
+        }
+        else if (args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Delete))
+        {
+            if (args.Action == "Delete")
+            {
+                await PortfolioHttpClient.DeleteTelegramCommand(args.Data.TelegramCommandId);
+            }
+        }
+
+        _commands = await PortfolioHttpClient.GetTelegramCommands();
+        await Grid?.Refresh();
+    }
+}
+

@@ -1,0 +1,204 @@
+﻿@page "/create-opening-subscription"
+@attribute [Authorize]
+@using Syncfusion.Blazor.Navigations
+@using Syncfusion.Blazor.Inputs
+@using Common.Models.DTOs
+@using Syncfusion.Blazor.Buttons
+@using System.Text.Json
+@using BlazorLiquidity.Shared
+@inject PortfolioHttpClient PortfolioHttpClient
+@inject NavigationManager NavigationManager
+@using Microsoft.AspNetCore.Components.Forms
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Calendars
+
+<SfCard Orientation="CardOrientation.Vertical">
+    
+<CardHeader>
+    <div class="CustomHeader">Create New Liquidation Config</div>
+</CardHeader>
+<br/>
+
+<EditForm Model="@_subscription" OnValidSubmit="@HandleValidSubmit" >
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+ 
+                              
+    <label class="label" for="PCoin" >CoinPair</label>
+                               
+    <InputSelect id="PCoin" @bind-Value="_subscription.CoinPairId">
+        <option value="0">Select Coin Pair</option>
+        @foreach (var c  in _coinPairs)
+        {
+            <option value="@c.CoinPairId">@c.Name</option>
+        }
+    </InputSelect>
+    <br/>        
+    <br/>            
+    <label class="label" for="SP" >Portfolio</label>
+                               
+    <InputSelect id="SP" @bind-Value="_subscription.SPId">
+        <option value="0">Select Portfolio</option>
+        @foreach (var c  in _sps)
+        {
+            <option value="@c.SPId">@c.Name</option>
+        }
+    </InputSelect>
+    <br/> <br/>   
+    <label class="label" for="ConfigInstance" >Config Instance</label>
+                               
+    <InputSelect id="ConfigInstance"  @bind-Value="_subscription.StrategySPSubscriptionConfigId">
+        <option value="0">Select Config Instance</option>
+        @foreach (var c  in _strategyConfigInstances)
+        {
+            <option value="@c.StrategySPSubscriptionConfigId">@c.ConfigName</option>
+        }
+    </InputSelect>
+    <br/> <br/>   
+    <InputSelect id="Strategies"  @bind-Value="_subscription.StrategyId">
+        <option value="0">Select Strategy Type</option>
+        @foreach (var c  in _strategies)
+        {
+            <option value="@c.StrategyId">@c.StrategyName</option>
+        }
+    </InputSelect>
+    
+    
+    <InputSelect id="OrderLoading"  @bind-Value="_subscription.LiquidationOrderLoadingConfigurationId">
+        <option value="0">Select Order Loading Method</option>
+        @foreach (var c  in _orderLoadingConfig)
+        {
+            <option value="@c.Id">@c.Name</option>
+        }
+    </InputSelect>
+
+    <br/>  <br/>  
+    <SfNumericTextBox id="SubscriptionPrice" TValue="decimal"  ValidateDecimalOnType=true Decimals=3 Format="n3" Placeholder="Subscription Price" FloatLabelType='@FloatLabelType.Auto' @bind-Value="_subscription.SubscriptionPrice"/>
+    <br/>   <br/> 
+    
+    <SfNumericTextBox id="AmountToLiquidate" TValue="decimal"  ValidateDecimalOnType=true Decimals=3 Format="n3" Placeholder="Total Coin to Liquidate" FloatLabelType='@FloatLabelType.Auto' @bind-Value="_subscription.CoinAmount"/>
+    <br/>   <br/> 
+    <SfNumericTextBox id="DailyTotalToLiquidate" TValue="decimal"  ValidateDecimalOnType=true Decimals=3 Format="n3" Placeholder="Daily Total to Liquidate" FloatLabelType='@FloatLabelType.Auto' @bind-Value="_subscription.DailyLiquidationTarget"/>
+
+    <br/>   <br/>
+   
+    <SfNumericTextBox id="MaxOrderSize" TValue="decimal"  ValidateDecimalOnType=true Decimals=3 Format="n3" Placeholder="Order Size" FloatLabelType='@FloatLabelType.Auto' @bind-Value="_subscription.OrderSize"/>
+    <br/>   <br/>
+    <SfNumericTextBox id="PercentageSpreadFromFV" TValue="decimal"  ValidateDecimalOnType=true Decimals=3 Format="n3" Placeholder="Percentage Spread From FairValue" FloatLabelType='@FloatLabelType.Auto' @bind-Value="_subscription.PercentageSpreadFromFV"/>
+    <br/>   <br/>
+    <SfNumericTextBox id="PercentageSpreadLowerThreshold" TValue="decimal"  ValidateDecimalOnType=true Decimals=3 Format="n3" Placeholder="Lower Threshold From FairValue" FloatLabelType='@FloatLabelType.Auto' @bind-Value="_subscription.PercentageSpreadLowerThreshold"/>
+    <br/>   <br/>
+    <SfNumericTextBox id="ShortTimeInterval" TValue="int"  Placeholder="Time Interval(Secs)" FloatLabelType='@FloatLabelType.Auto' @bind-Value="_subscription.ShortTimeInterval"/>
+    <br/>   <br/>
+    <SfNumericTextBox id="BatchSize" TValue="int"  Placeholder="Number of Orders in Batch" FloatLabelType='@FloatLabelType.Auto' @bind-Value="_subscription.BatchSize"/>
+    <br/>   <br/>
+    <SfNumericTextBox id="PriceDecimals" TValue="int"  Placeholder="Price Decimals" FloatLabelType='@FloatLabelType.Auto' @bind-Value="_subscription.PriceDecimals"/>
+    <br/>   <br/>
+    <SfNumericTextBox id="AmountDecimals" TValue="int"  Placeholder="Amount Decimals" FloatLabelType='@FloatLabelType.Auto' @bind-Value="_subscription.AmountDecimals"/>
+    <br/>   <br/>
+    <SfDatePicker TValue="DateTime" Placeholder="Choose an End Date" @bind-Value="_subscription.EndDate" />
+    <br/>   <br/>
+    
+    <SfButton Type="submit">OK</SfButton>
+                   
+</EditForm>
+</SfCard>
+
+<style  type="text/css" class="cssStyles"> 
+   
+    .e-grid .e-altrow {
+        background-color: #aaaaaa;
+    }
+    .CustomHeader, 
+    .e-card .e-card-header .e-card-header-caption:first-child { 
+        padding-left: 0%; 
+        
+    } 
+
+    .label {
+        background-color: white;
+        color: black;
+    }
+ 
+    .lower {
+        background-color: red;
+    }
+
+    .higher {
+        background-color: green;
+    }
+
+    .same {
+        background-color: orange
+    }
+
+    .e-grid .e-headercell { 
+        background-color: #36486b; 
+    } 
+  
+    .e-headercell {         
+        color: white;
+        background-color: black;
+        
+        font-size: 40px;
+        font-weight: bold; 
+    }
+
+    .e-grid .e-rowcell {
+        font-size: 26px;
+        padding-bottom: 3px;
+        padding-top: 3px;
+    }
+
+    .e-headercelldiv {
+        font-size: 40px;
+        font-weight: bold;
+        padding-bottom: 6px;
+        padding-top: 6px;
+        background-color: black;
+    }
+    
+    .e-custom {
+        border-radius: 0;
+        height: 30px;
+        width: 80px;
+    }
+
+    .e-custom, .e-custom:hover, .e-custom:focus, .e-custom:active {
+        background-color: #ff6e40;
+        color: #fff;
+        font-size: 1.0rem; 
+        font-weight: bold;
+    }
+
+</style>
+
+
+@code {
+    private LiquidationConfigurationDTO _subscription { get; set; } = new LiquidationConfigurationDTO();
+    private List<CoinPairDTO> _coinPairs = new List<CoinPairDTO>();
+    private List<CoinDTO> _coins = new List<CoinDTO>();
+    private List<SPDTO> _sps = new List<SPDTO>();
+    private List<StrategyExchangeConfigDTO> _strategyConfigInstances = new List<StrategyExchangeConfigDTO>();
+    private List<StrategyDTO> _strategies = new();
+    private List<LiquidationOrderLoadingConfigurationDTO> _orderLoadingConfig { get; set; } = new();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        _coinPairs = await PortfolioHttpClient.GetCoinPairs();
+        _coins = await PortfolioHttpClient.GetCoins();
+        _sps = await PortfolioHttpClient.GetPortfolios();
+        _strategyConfigInstances = await PortfolioHttpClient.GetAllStrategyConfigs();
+        _strategies = await PortfolioHttpClient.GetStrategies();
+        _orderLoadingConfig = await PortfolioHttpClient.GetLiquidationOrderLoadingConfiguration();
+
+    }
+
+    public async Task HandleValidSubmit()
+    {
+        _subscription.DateCreated =  _subscription.DateCreated.Date;
+        await PortfolioHttpClient.CreateOpeningLiquidationSubscription(_subscription);
+        NavigationManager.NavigateTo("liquidationopeningsubscription");
+    }
+}

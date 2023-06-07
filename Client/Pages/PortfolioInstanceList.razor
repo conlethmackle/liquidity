@@ -1,0 +1,72 @@
+﻿@page "/portfolio-instance-list/{SPName}"
+@using SyncfusionLiquidity.Shared
+@using Common.Models.DTOs
+@inject PortfolioHttpClient PortfolioHttpClient
+@using Syncfusion.Blazor
+@using Syncfusion.Blazor.Grids
+@using Syncfusion
+@using Syncfusion.Blazor.Buttons
+@using SyncfusionLiquidity.Shared
+@inject NavigationManager NavigationManager
+
+<style>
+
+    table, th, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+    th, td, h2, h3 {
+        background-color: grey;
+        padding: 15px;
+        color: white
+    }
+</style>
+
+@if (_configs == null)
+{
+    <p>Loading ...</p>
+}
+else
+{
+    <div class="container-bg">
+        <div class="container-fluid">
+            <div class="row">  
+                <div class="col-lg-4">
+
+                    <div class="text-center" >
+                      
+                        <table >
+                            @foreach(var p in _configs)
+                            {
+                                <tr>
+                                    <td><h3>@p.ConfigName</h3></td><td align="center"><button class="btn btn-primary mb-4" @onclick="(() => LoadStrategyInstance(p.StrategySPSubscriptionConfigId))">select</button></td>
+                                </tr>
+                            }
+                        </table>
+                    </div>
+           
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+@code
+{
+    [Parameter]
+    public string SPName { get; set; }
+
+    private List<StrategyExchangeConfigDTO> _configs = new ();
+   
+   
+    protected override async Task OnInitializedAsync()
+    {
+        _configs = await PortfolioHttpClient.GetStrategyConfigsForSP(SPName);
+    }
+
+    public void LoadStrategyInstance(int StrategyConfigId)
+    {
+        NavigationManager.NavigateTo($"strategyinstance/{StrategyConfigId}");
+    }
+}

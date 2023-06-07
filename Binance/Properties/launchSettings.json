@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Binance": {
+      "commandName": "Project",
+      "commandLineArgs": "Exchange=Binance_Exchange"
+    }
+  }
+}

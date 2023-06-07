@@ -1,0 +1,59 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="6.0.0" />
+	
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Client\SyncfusionLiquidity.Client.csproj" />
+    <ProjectReference Include="..\Shared\SyncfusionLiquidity.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Hubs\" />
+    <Folder Include="ErrorHandling\" />
+    <Folder Include="OrdersAndTrades\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="11.0.1" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="6.0.6" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Common" Version="6.0.6" />
+    <PackageReference Include="Serilog" Version="2.11.0" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+
+
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Serilog.Sinks.Console" Version="4.0.1" />
+
+
+
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\AccountBalanceManager\AccountBalanceManager.csproj" />
+    <ProjectReference Include="..\ConnectorStatus\ConnectorStatus.csproj" />
+    <ProjectReference Include="..\DataStore\DataStore.csproj" />
+    <ProjectReference Include="..\FairValueProcessing\FairValueProcessing.csproj" />
+    <ProjectReference Include="..\MessageBroker\MessageBroker.csproj" />
+    <ProjectReference Include="..\MultipleStrategyManager\MultipleStrategyManager.csproj" />
+    <ProjectReference Include="..\OrderAndTradeProcessing\OrderAndTradeProcessing.csproj" />
+    <ProjectReference Include="..\OrderBookProcessing\OrderBookProcessing.csproj" />
+    <ProjectReference Include="..\StrategyRunner\StrategyRunner.csproj" />
+   
+  </ItemGroup>
+
+</Project>

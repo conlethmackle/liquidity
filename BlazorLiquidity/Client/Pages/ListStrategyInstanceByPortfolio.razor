@@ -1,0 +1,145 @@
+﻿@page "/list-strategy-instances-by-portfolio"
+@using Common.Models.DTOs
+@using BlazorLiquidity.Shared
+@using Common.Models.Entities
+@using Microsoft.AspNetCore.Components
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Cards
+@inject PortfolioHttpClient PortfolioHttpClient
+@inject NavigationManager NavigationManager
+@using System.Text.Json
+@using Syncfusion.Blazor.Grids
+@using Action = Syncfusion.Blazor.Grids.Action
+@using FailureEventArgs = Syncfusion.Blazor.Grids.FailureEventArgs;
+
+<SfCard Orientation="CardOrientation.Vertical">
+    
+    <CardHeader>
+        <div class="CustomHeader"><b>Select Strategy Instances by Portfolio</b></div></CardHeader>
+    <EditForm Model="@_portfolioHolder" OnValidSubmit="@HandleValidSubmit" >
+        <DataAnnotationsValidator/>
+        <ValidationSummary/>
+
+        <label for="Porfolio"><b>Portfolio</b></label>
+        <InputSelect id="Porfolio" @bind-Value="_SPName">
+            <option value=""><b>Select A Portfolio</b></option>
+            @foreach (var p  in _sps)
+            {
+                <option value="@p.Name"><b>@p.Name</b></option>
+            }
+        </InputSelect>
+        <br/>
+        <SfButton Type="submit">OK</SfButton>
+
+    </EditForm>
+    
+
+</SfCard>
+@if (_displayStuff)
+{
+    <SfCard Orientation="CardOrientation.Vertical">
+        <CardHeader>
+            <div class="CustomHeader">Strategy Instances for @_SPName</div></CardHeader>
+
+        <SfGrid ID="Grid" DataSource="@_strategyInstances" @ref="Grid" AllowSelection="true"
+                Toolbar="@(new List<string>() { "Delete", "Cancel" })" Height="315" Width="1500">
+            <GridEditSettings AllowEditOnDblClick="false"  AllowDeleting="true" ShowConfirmDialog="true" Mode="EditMode.Dialog"></GridEditSettings>
+            <GridPageSettings PageSizes="true"></GridPageSettings>
+            <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Single"></GridSelectionSettings>
+            <GridEvents OnActionBegin="OnActionBegin" OnActionComplete="OnActionComplete" OnRecordDoubleClick="OnRecordDoubleClick" TValue="StrategyExchangeConfigDTO"></GridEvents>
+            <GridColumns>
+                <GridColumn Field=@nameof(StrategyExchangeConfigDTO.StrategySPSubscriptionConfigId) HeaderText="Id" ValidationRules="@(new ValidationRules { Required = false })" AllowAdding="false" AllowEditing="false" Width="150"></GridColumn>
+                <GridColumn Field=@nameof(StrategyExchangeConfigDTO.ConfigName) HeaderText="ConfigName" ValidationRules="@(new ValidationRules { Required = true })" Width="150"></GridColumn>
+                <GridColumn Field=SP.Name HeaderText="Account Name" ValidationRules="@(new ValidationRules { Required = true })" Width="150"></GridColumn>
+                <GridColumn HeaderText="Manage" Width="100" HeaderTextAlign="TextAlign.Right">
+                    <GridCommandColumns>
+                        <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-delete", CssClass = "e-flat" })"></GridCommandColumn>
+                    </GridCommandColumns>
+                </GridColumn>
+            </GridColumns>
+        </SfGrid>
+    </SfCard>
+}
+@code {
+    string _SPName;
+    SPDTO _portfolioHolder = new();
+    List<StrategyExchangeConfigDTO> _strategyInstances { get; set; } = new();
+    SfGrid<StrategyExchangeConfigDTO>? Grid { get; set; }
+    List<SPDTO> _sps = new();
+
+    private bool _displayStuff = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _sps = await PortfolioHttpClient.GetPortfolios();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Error throw in list-strategies-instances-by-portfolio - Error {e.Message}");
+        }
+    }
+
+    public async Task HandleValidSubmit()
+    {
+        Console.WriteLine($"In Handle submit with _SPName = {_SPName}");
+        _displayStuff = true;
+        _strategyInstances = await PortfolioHttpClient.GetStrategyConfigsForSP(_SPName);
+    }
+
+    public async Task OnActionBegin(ActionEventArgs<StrategyExchangeConfigDTO> args)
+    {
+        if (args == null)
+        {
+            Console.WriteLine("OnActionBegin args is null");
+            return;
+        }
+        if (args.Data == null)
+        {
+            Console.WriteLine("OnActionBegin args.Data is null");
+            return;
+        }
+
+        if (args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Delete))
+        {
+            await PortfolioHttpClient.DeleteStrategyExchangeConfig(args.Data.StrategySPSubscriptionConfigId);
+        }
+        await RefreshData();
+        await Grid?.Refresh();
+    }
+
+    public async Task OnActionComplete(ActionEventArgs<StrategyExchangeConfigDTO> args)
+    {
+        if (args == null)
+        {
+            Console.WriteLine("OnActionComplete args is null");
+            return;
+        }
+        if (args.Data == null)
+        {
+            Console.WriteLine("OnActionComplete args.Data is null");
+            return;
+        }
+
+        if (args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Delete))
+        {
+            Console.WriteLine("OnActionComplete args.Data is Delete");
+            await PortfolioHttpClient.DeleteLiquidationStrategyConfig(args.Data.StrategySPSubscriptionConfigId);
+        }
+
+        await RefreshData();
+        await Grid?.Refresh();
+    }
+
+    public void OnRecordDoubleClick(Syncfusion.Blazor.Grids.RecordDoubleClickEventArgs<StrategyExchangeConfigDTO> args)
+    {
+       NavigationManager.NavigateTo($"strategy-config-instance-detail/{args.RowData.StrategySPSubscriptionConfigId}");
+    }
+
+    private async Task RefreshData()
+    {
+        await HandleValidSubmit();
+    }
+}

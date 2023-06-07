@@ -1,0 +1,989 @@
+﻿@page "/strategyinstance/{StrategyConfigId:int}"
+@attribute [Authorize]
+@using BlazorLiquidity.Shared
+@using Common.Messages
+@using Common.Models
+@using Microsoft.AspNetCore.SignalR.Client
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.Extensions.Logging
+@using Common.Models.DTOs
+@using System.Text.Json
+@using System.Linq
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Navigations
+@using System.Collections.Concurrent
+@using System.ComponentModel.Design
+@inject ILogger<StrategyInstance> Logger
+@inject PortfolioHttpClient PortfolioHttpClient
+@inject HubConnection HubConnection
+@inject NavigationManager NavigationManager
+@implements IDisposable
+
+
+
+<div class="container-fluid">
+<div class="row">  
+    <div class="col-lg-12">
+        <div class="card text-white bg-dark mb-3">
+            <div class="card-header">
+                <div class="text-center">
+                    <h4>@_accountName        @_instanceName</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        
+            <div class="card">
+                <div class="card text-white bg-dark mb-3">
+                <div class="card-header"><div class="text-center"><h3 style='"width:100%", font-family:"Courier New", Courier, monospace; font-size:80%'>Original Balances & Subscriptions</h3></div></div></div>
+                <div class="card text-black bg-light mb-2">
+                <div class="card-body">
+                    <div class="text-center">
+                    <table  style='"width:100%", font-family:"Courier New", Courier, monospace; font-size:80%' >
+                        <thead ><tr><th style="width:25%">BTC</th><th style="width:25%">USDT</th><th style="width:25%">Subscription Price</th><th style="width:25%">Date</th></tr></thead>
+                        <tr><td>@_btcOpeningBalance</td><td>@_usdtOpeningBalance</td><td>21000</td>2022-08-01</tr>
+                    </table>
+                   
+                    </div>
+                </div>
+             
+                </div>
+        </div>
+         <div class="card">
+                <div class="card text-white bg-dark mb-3">
+                <div class="card-header"><div class="text-center"><h3 style='"width:100%", font-family:"Courier New", Courier, monospace; font-size:80%'>Current Opening Balances</h3></div></div></div>
+                <div class="card text-black bg-light mb-2">
+                <div class="card-body">
+                    <div class="text-center">
+                    <table  style='"width:100%", font-family:"Courier New", Courier, monospace; font-size:80%' >
+                        <thead ><tr><th style="width:25%">BTC</th><th style="width:25%">USDT</th><th style="width:25%">Subscription Price</th><th style="width:25%">Date</th></tr></thead>
+                        <tr><td>@_btcOpeningBalance</td><td>@_usdtOpeningBalance</td><td>21000</td>2022-08-01</tr>
+                    </table>
+                    
+                    </div>
+                </div>
+             
+                </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-2">
+        
+        <div class="card">
+            <div class="card text-white bg-dark mb-3">
+            <div class="card-header"><div class="text-center"><h3 style='"width:100%", font-family:"Courier New", Courier, monospace; font-size:80%'>Current Balances</h3></div></div></div>
+            <div class="card text-black bg-light mb-2">
+            <div class="card-body">
+                <div class="text-center">
+                <table style='"width:100%", font-family:"Courier New", Courier, monospace; font-size:80%'>
+                    <thead><tr><th style="width:50%">BTC</th><th style="width:50%">USDT</th></tr></thead>
+                    <tr><td>@_btcBalance</td><td>@_usdtBalance</td></tr>
+                </table>
+                </div>
+          </div>
+            </div>
+            
+        </div>
+        </div>
+        <div class="col-lg-2">
+          <div class="card">
+                <div class="card text-white bg-dark mb-3">
+                <div class="card-header"><div class="text-center"><h3 style='"width:100%", font-family:"Courier New", Courier, monospace; font-size:80%'>Strategy Status</h3></div></div></div>
+                <div class="card text-black bg-light mb-5">
+                <div class="card-body">
+                    <div class="text-center" > 
+                        <table class="table table-borderless table-responsive card-1 p-4">
+                            <tr><td><label>@_strategyName</label></td><td  width="50%"><SfSwitch  CssClass="e-large" @bind-Checked="strategyOnOffStatus" OffLabel="Off" OnLabel="On" ValueChange="StrategyOnOffEvent"  TChecked="bool?" ></SfSwitch></td><td><SfButton CssClass=@_strategyStatus></SfButton></td></tr>
+                                   
+                       </table>
+                      
+                    </div>
+                </div>               
+                </div>
+            </div>
+      </div>
+      <div class="col-lg-2">
+          <div class="card">
+                <div class="card text-white bg-dark mb-3">
+                <div class="card-header"><div class="text-center"><h3 style='"width:100%", font-family:"Courier New", Courier, monospace; font-size:80%'>Exchange Status</h3></div></div></div>
+                <div class="card text-black bg-light mb-5">
+                <div class="card-body">
+                    <div class="text-center" >                        
+                        <table class="table table-borderless table-responsive card-1 p-4">
+                            @if (_exchangeData != null && _exchangeData.ExchangeDetails != null)
+                            {
+                                @foreach (var exchange in _exchangeData?.ExchangeDetails)
+                                {
+                                    @if (@_exchangeStatus.ContainsKey(exchange.Venue.VenueName))
+                                    {
+                                        <tr><td>@exchange.Name</td><SfButton CssClass=@_exchangeStatus[exchange.Venue.VenueName]></SfButton></tr>
+                                    }
+                                    else
+                                    {
+                                        <tr><td>@exchange.Name</td><SfButton CssClass=@ConnectorDown></SfButton></tr>
+                                    }
+                                }
+                            }
+                              
+                        </table>
+                      
+                    </div>
+                </div>               
+                </div>
+            </div>
+      </div>
+      </div>
+     
+
+  
+   <div class="row">
+       <div class="col-lg-2">
+      
+            <div class="card">
+                 <div class="card text-white bg-dark mb-3">
+                <div class="card-header"><div class="text-center"><h3 style='"width:100%", font-family:"Courier New", Courier, monospace; font-size:80%'>Fair Value</h3></div></div></div>
+                <div class="card text-black bg-light mb-5">
+                <div class="card-body">
+                    <div class="text-center" >
+                        
+                        <table style='"width:100%", font-family:"Courier New", Courier, monospace; font-size:60%'>
+                            <thead><tr><th style="width:60%">Symbol</th><th style="width:40%">Price</th></tr></thead>
+                            <tr style='"width:100%", font-family:"Courier New", Courier, monospace; font-size:100%'><td>@_fairValueSymbol</td><td><p class=@_fairPriceDisplay>@_fairValuePrice</p></td></tr>
+                        </table>
+                   
+                    </div>
+                </div>
+                </div>
+                </div>
+        </div>
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card text-white bg-dark mb-3">
+                    <div class="card-header"><div class="text-center"><h3 style='"width:100%", font-family:"Courier New", Courier, monospace; font-size:80%'>Strategy Configuration</h3></div></div>
+                </div>
+                <div class="card text-black bg-light mb-5">
+                <div class="card-body">
+                    <div class="text-center" >
+                        
+                        <table style='"width:100%", font-family:"Courier New", Courier, monospace; font-size:60%'>
+                            
+                            <thead><tr><th>Symbol</th><th>Subscription Price</th><th>Number of Coins</th><th>Lot Size</th><th>% Upper from FV</th><th>% Lower from FV</th><th>Batch Size</th><th>Short Period(s)</th><th>Long Period(s)</th></tr></thead>
+                            <tr><td>@_strategyData.CoinPair.Name</td><td>@_strategyData.SubscriptionPrice</td><td>@_strategyData.CoinAmount</td><td>@_strategyData.OrderSize</td><td>@_strategyData.PercentageSpreadFromFV</td><td>@_strategyData.PercentageSpreadLowerThreshold</td><td>@_strategyData.BatchSize</td><td>@_strategyData.ShortTimeInterval</td><td>@_strategyData.LongTimeInterval</td><td><div class="button1"><button type="button"  @onclick="LoadEditConfigPage" >Edit</button></div></td></tr>
+                        </table>
+                   
+                    </div>
+                </div>
+                </div>
+        
+        </div>
+     </div>
+     <div class="row">
+      <div class="col-lg-4">
+          <SfTab Width="900" >
+              <TabItems>
+                  <TabItem>
+                      <HeaderTemplate> 
+                          Open Orders 
+                      </HeaderTemplate> 
+                      <ContentTemplate>
+                          <div class="card">
+                              <div class="card text-white bg-dark mb-3">
+                                  <div class="card-header">
+                                      <div class="text-center">
+                                          <h4>Open Orders</h4></div></div></div>
+                              
+                                  <div class="card-body">
+                                      <div class="text-center">
+
+                                          <table class="table table-borderless table-responsive card-1 p-4">
+                                              <thead><tr><th>Id</th><th>Symbol</th><th>Exchange</th><th>Price</th><th>Filled</th><th>Remaining</th><th>IsBuy</th><th>Status</th><th>Time</th></tr></thead>
+                                              @foreach (var order in _openOrderList)
+                                              {
+                                                  if (!order.IsBuy)
+                                                  {
+                                                      <tr class="text-danger"><td>@order.OrderId</td><td>@order.Symbol</td><td>@order.Venue</td><td>@order.Price</td><td>@order.FilledQuantity</td><td>@order.RemainingQuantity</td><td>@order.IsBuy</td><td>@order.Status</td><td>@order.OrderTime.ToShortTimeString()</td></tr>
+
+                                                  }
+                                                  else
+                                                  {
+                                                      <tr class="text-success"><td>@order.OrderId</td><td>@order.Symbol</td><td>@order.Venue</td><td>@order.Price</td><td>@order.FilledQuantity</td><td>@order.RemainingQuantity</td><td>@order.IsBuy</td><td>@order.Status</td><td>@order.OrderTime.ToShortTimeString()</td></tr>
+                                                  }
+                                              }
+
+                                          </table>
+
+
+                                      </div>
+                                  </div>
+
+                              
+                          </div>
+                      </ContentTemplate>
+
+
+                  </TabItem>
+                  <TabItem>
+                      <HeaderTemplate>
+                          Trades
+                      </HeaderTemplate>
+                      <ContentTemplate>
+                          <div class="card">
+                              <div class="card text-white bg-dark mb-3">
+                                  <div class="card-header">
+                                      <div class="text-center">
+                                          <h3>Trades</h3></div></div></div>
+                              
+                                  <div class="card-body">
+                                      <div class="text-center">
+
+                                          <table class="table table-borderless table-responsive card-1 p-4">
+                                              <thead><tr class="border-bottom"><th>TradeId</th><th>OrderId</th><th >Symbol</th><th >Exchange</th><th>Price</th><th >Quantity</th><th >Filled Quantity</th><th >Remaining Quantity</th><th>IsBuy</th><th>Time</th></tr></thead>
+                                              @foreach (var trade in _tradeList)
+                                              {
+                                                  if (!trade.IsBuy)
+                                                  {
+                                                      <tr class="text-danger"><td>@trade.TradeId</td><td>@trade.OrderId</td><td>@trade.Symbol</td><td>Binance</td><td>@trade.Price</td><td>@trade.Quantity</td><td>@trade.FilledQuantity</td><td>@trade.RemainingQuantity</td><td>@trade.IsBuy</td><td>@trade.Status</td><td>@trade.Timestamp.ToShortTimeString()</td></tr>
+
+                                                  }
+                                                  else
+                                                  {
+                                                      <tr class="text-success"><td>@trade.TradeId</td><td>@trade.OrderId</td><td>@trade.Symbol</td><td>Binance</td><td>@trade.Price</td><td>@trade.Quantity</td><td>@trade.FilledQuantity</td><td>@trade.RemainingQuantity</td><td>@trade.IsBuy</td><td>@trade.Status</td><td>@trade.Timestamp.ToShortTimeString()</td></tr>
+
+                                                  }
+                                              }
+
+                                          </table>
+                                      </div>
+                                  </div>
+                          </div>
+                      </ContentTemplate>
+
+                  </TabItem>
+                
+                  </TabItems>
+          </SfTab>
+           
+      </div>
+       
+     </div>
+      <div class="row">
+
+
+      <div class="col-lg-4">
+          <div class="card">
+              <div class="card text-white bg-dark mb-3">
+                  <div class="card-header"><div class="text-center"><h3 style='"width:100%", font-family:"Courier New", Courier, monospace; font-size:80%'>Place Orders</h3></div></div></div>
+              <div class="card text-black bg-light mb-5">
+                  <div class="card-body">
+                      <div class="text-center" >                        
+                          <table class="table ">
+                              <tr><td style='"width:100%", font-family:"Courier New", Courier, monospace; font-size:80%'><div class="button1"><button type="button"  @onclick="LoadPlaceOrderPage" >Place Market Order</button></div></td></tr>        
+                    
+                          </table>
+                      
+                      </div>
+                  </div>               
+              </div>
+          </div>
+
+      </div>
+
+      </div>
+       </div>
+       </div>
+
+
+<style> 
+    .CustomHeader, 
+    .e-card .e-card-header .e-card-header-caption:first-child { 
+        padding-left: 0%; 
+    } 
+    .card-1{
+
+        border: none;
+        border-radius: 10px;
+        width: 100%;
+        background-color: #fff;
+    }
+
+    .ml-1 {
+        margin-left: ($spacer * .25) !important;
+    }
+</style> 
+
+
+
+@code {
+    [Parameter]
+    public int StrategyConfigId { get; set; }
+    private SfGrid<OwnOrderChange>? Grid1 { get; set; }
+
+    public static string DisabledRedStrategyStatus = "p-3 mb-2 bg-danger text-white";
+    public static string PendingAmberStrategyStatus = "p-3 mb-2 bg-warning.bg-gradient text-white";
+    public static string ReadyGreenStrategyStatus = "p-3 mb-2 bg-success.bg-gradient text-white";
+
+
+    protected bool IsSelected { get; set; }
+  
+
+    private bool StrategyEnable = false;
+    private string _fairValueSymbol { get; set; } = "";
+    private decimal _fairValuePrice { get; set; }
+    private string _fairPriceDisplay = "text-success";
+    private string _strategyStatusBgColor = DisabledRedStrategyStatus;
+    private string _fairValueLiquidationButtonStatus = "badge badge-danger";
+
+    private decimal _previousPrice = 0;
+    private decimal _btcBalance { get; set; }
+    private decimal _usdtBalance { get; set; }
+    private decimal _btcOpeningBalance { get; set; }
+    private decimal _usdtOpeningBalance { get; set; }
+    public OpenOrdersRequest openOrdersRequest = new OpenOrdersRequest();
+    public GetBalanceRequest getBalanceRequest = new GetBalanceRequest();
+    private Dictionary<string, OwnOrderChange> _orderTable { get; set; } = new Dictionary<string, OwnOrderChange>();
+    private List<OwnOrderChange> _openOrderList { get; set; } = new List<OwnOrderChange>();
+    private List<TradeMsg> _tradeList { get; set; } = new List<TradeMsg>();
+    private Dictionary<string, TradeMsg> _tradeTable { get; set; } = new Dictionary<string, TradeMsg>();
+    
+
+    private LiquidationConfigurationDTO _strategyData { get; set; } = new LiquidationConfigurationDTO();
+    private StrategyExchangeConfigDTO _exchangeData = new StrategyExchangeConfigDTO();
+    private ConcurrentDictionary<string, string> _exchangeStatus = new ConcurrentDictionary<string, string>();
+    private Dictionary<int, CoinPairDTO> _coinPairs = new Dictionary<int, CoinPairDTO>();
+    private Dictionary<int, VenueDTO> _venues = new Dictionary<int, VenueDTO>();
+    private static string ConnectorUp = "e-success";
+    private static string ConnectorDown = "e-danger";
+    private static string StrategyUp = "e-success";
+    private static string StrategyDown = "e-danger";
+
+    private List<ConnectorStatusMsg> _connectorStatusMsgs { get; set; }
+    private string _strategyName { get; set; }
+    private bool? strategyOnOffStatus = null;
+    private SfSwitch<bool> SwitchObj;
+    private string _strategyStatus = StrategyDown;
+
+    private string _instanceName { get; set; } = "";
+    private string _accountName { get; set; } = "";
+
+
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+           _strategyData = await PortfolioHttpClient.GetLiquidationStrategyConfig(StrategyConfigId);
+           _exchangeData = _strategyData.StrategySPSubscriptionConfig;
+           _strategyName = _strategyData.StrategySPSubscriptionConfig.Strategy.StrategyName;
+            _instanceName = _strategyData.StrategySPSubscriptionConfig.ConfigName;
+            _accountName = _strategyData.StrategySPSubscriptionConfig.SP.Name;
+           _connectorStatusMsgs = await PortfolioHttpClient.GetAllConnectorStatuses();
+            foreach(var connector in _connectorStatusMsgs)
+            {
+                if (!_exchangeStatus.ContainsKey(connector.Public.Venue))
+                {
+                    if (connector.Public.IsConnected)
+                    {
+                        Console.WriteLine($"Adding Connector Statuses OnAfterRenderAsync {connector.Public.Venue} connector is up");
+                        _exchangeStatus.TryAdd(connector.Public.Venue, ConnectorUp);
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Adding Connector Statuses OnAfterRenderAsync {connector.Public.Venue} connector is down");
+                        _exchangeStatus.TryAdd(connector.Public.Venue, ConnectorDown);
+                    }
+                }
+            }
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Logger.LogInformation("******************* OnInitializedAsync Called *****************************");
+            Console.WriteLine("******************* OnInitializedAsync Called *****************************");
+            _strategyStatus = StrategyDown;
+            HubConnection.On<MessageQueueData>("RealTimeUpdate", (data) =>
+            {
+                HandleMessages(data);
+            });
+            _tradeTable  = new Dictionary<string, TradeMsg>();
+            _strategyData = await PortfolioHttpClient.GetLiquidationStrategyConfig(StrategyConfigId);
+            _instanceName = _strategyData.StrategySPSubscriptionConfig.ConfigName;
+            _accountName = _strategyData.StrategySPSubscriptionConfig.SP.Name;
+            _strategyName = _strategyData.StrategySPSubscriptionConfig.Strategy.StrategyName;
+            var pairs = await PortfolioHttpClient.GetCoinPairs();
+            _coinPairs = pairs.ToDictionary(p => p.CoinPairId, p => p);
+            var venues = await PortfolioHttpClient.GetVenues();
+            _venues = venues.ToDictionary(v => v.VenueId, v => v);
+            Console.WriteLine($"******************* OnInitializedAsync After Hub configName=*****************************");
+            _connectorStatusMsgs = await PortfolioHttpClient.GetAllConnectorStatuses();
+            foreach(var connector in _connectorStatusMsgs)
+            {
+                if (!_exchangeStatus.ContainsKey(connector.Public.Venue))
+                {
+                    if (connector.Public.IsConnected)
+                    {
+                        Console.WriteLine($"Adding Connector Statuses OnInitializedAsync {connector.Public.Venue} connector is up");
+                        _exchangeStatus.TryAdd(connector.Public.Venue, ConnectorUp);
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Adding Connector Statuses OnInitializedAsync {connector.Public.Venue} connector is down");
+                        _exchangeStatus.TryAdd(connector.Public.Venue, ConnectorDown);
+                    }
+                }
+            }
+
+            if (_strategyData != null)
+            {
+                Console.WriteLine($"************** Bladdy Bla Got the liquidation data back {_strategyData.StrategySPSubscriptionConfig.ConfigName}*****************");
+                _exchangeData = _strategyData.StrategySPSubscriptionConfig;
+               
+                if (_exchangeData != null)
+                {
+                    var realTimeUpdateDto = new RealTimeStartDTO()
+                    {
+                        SpName = _exchangeData.SP.Name,
+                        Instance = _exchangeData.ConfigName,
+                        ConfigId = StrategyConfigId
+                    };
+                    await PortfolioHttpClient.StartRealTimeUpdater(realTimeUpdateDto);
+                }
+                else
+                {
+                    Console.WriteLine($"************** What the hell is going wrong *****************");
+                }
+                Console.WriteLine($"**************************************** Getting latest  trades **********************");
+                var latestTrades = await PortfolioHttpClient.GetLatestTrades(_exchangeData?.ConfigName);
+               Console.WriteLine($"**************************************** Got {latestTrades.Count()} trades **********************");
+                HandleLatestTrades(latestTrades);
+                
+              //  Logger.LogInformation("The venue is {Venue} Batch Size is {BatchSize}, ", _strategyData.Venue, _strategyData.BatchSize);
+                
+    // PortfolioHttpClient.
+                foreach (var exchange in _exchangeData.ExchangeDetails)
+                {
+                    openOrdersRequest.Venue = exchange.Venue.VenueName;
+                    openOrdersRequest.InstanceName = _exchangeData?.ConfigName;
+                    openOrdersRequest.PortfolioName = _strategyData.StrategySPSubscriptionConfig.SP.Name;
+                    openOrdersRequest.CoinPairs = exchange.CoinPairs;
+                    Logger.LogInformation($"Sending request for Open Orders {openOrdersRequest.Venue}");
+                    await PortfolioHttpClient.GetOpenOrders(openOrdersRequest);
+                  //  getBalanceRequest.Venue = _strategyData.Venue;
+                    getBalanceRequest.InstanceName = _exchangeData?.ConfigName;
+                    getBalanceRequest.PortfolioName = _strategyData.StrategySPSubscriptionConfig.SP.Name;
+                    await PortfolioHttpClient.GetBalancesFromVenue(getBalanceRequest);
+                   
+                }
+            }
+            else
+            {
+                Logger.LogInformation("GetLiquidationStrategyConfig returned null *********************");
+            }
+            StateHasChanged();
+            await base.OnInitializedAsync();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"A fucking error ***************************** {e.Message}");
+            Logger.LogError(e, "Caught an exception in OnInitialised {Error}", e.Message);
+        }
+    }
+
+    public void Dispose()
+    {
+
+    }
+
+    private void HandleMessages(MessageQueueData msg)
+    {
+        //if (msg.MessageType != QueueMsgTypes.FAIRVALUEUPDATE)
+        // Console.WriteLine($"handling msg type {msg.MessageType.ToString()}");
+        switch(msg.MessageType)
+        {
+            case QueueMsgTypes.FAIRVALUEUPDATE:
+                var fairValueData = JsonSerializer.Deserialize<FairValueData>(msg.Data);
+                HandleFairValueUpdate(fairValueData);
+                break;
+            case QueueMsgTypes.BALANCEUPDATE:
+                var balanceUpdate = JsonSerializer.Deserialize<BalanceUpdate>(msg.Data);
+                HandleBalanceUpdate(balanceUpdate);
+                break;
+            case QueueMsgTypes.OPENINGBALANCE:
+                var openingBalance = JsonSerializer.Deserialize<BalanceUpdate>(msg.Data);
+                HandleOpeningBalance(openingBalance);            
+                break;
+            case QueueMsgTypes.NEWORDER:
+                var orderData = JsonSerializer.Deserialize<OwnOrderChange>(msg.Data);
+                HandleOwnOrderChanges(msg.Venue, orderData);
+                break;
+            case QueueMsgTypes.CANCELLEDORDER:
+                var cancelledData = JsonSerializer.Deserialize<OwnOrderChange>(msg.Data);
+                HandleCancelledOrder(msg.Venue, cancelledData);
+                break;
+            case QueueMsgTypes.PARTIALLYFILLEDORDER:
+                var partiallyFilledData = JsonSerializer.Deserialize<OwnOrderChange>(msg.Data);
+                HandlePartiallyFilledOrder(msg.Venue, partiallyFilledData);
+                break;
+            case QueueMsgTypes.FILLEDORDER:
+                var filledData = JsonSerializer.Deserialize<OwnOrderChange>(msg.Data);
+                HandleFilledOrder(msg.Venue, filledData);
+                break;
+            case QueueMsgTypes.TRADE:
+                var trade = JsonSerializer.Deserialize<TradeMsg>(msg.Data);
+                HandleTrade(msg.Venue, trade);
+                break;
+            case QueueMsgTypes.OPEN_ORDERS_RESPONSE:
+                var openOrders = JsonSerializer.Deserialize<List<OwnOrderChange>>(msg.Data);
+                HandleOpenOrders(msg.Venue, openOrders);
+                break;
+            case QueueMsgTypes.STRATEGY_ALIVE_PING:
+                var strategyAliveData = JsonSerializer.Deserialize<StrategyInstanceConnectionStatus>(msg.Data);
+                HandleStrategyAlive(strategyAliveData);
+                break;
+            case QueueMsgTypes.STRATEGY_CONTROL_MSG:
+                var strategyControlData = JsonSerializer.Deserialize<StrategyControlResponse>(msg.Data);
+                HandleStrategyControlMsg(strategyControlData);
+                break;
+            case QueueMsgTypes.CONNECTOR_STATUS:
+                var connectorStatus = JsonSerializer.Deserialize<ConnectorStatusMsg>(msg.Data);
+                HandleConnectorStatusMsg(msg.Venue, connectorStatus);
+                break;
+            default:
+                Logger.LogInformation("Unhandled Message - {MessageType}", msg.MessageType.ToString());
+                break;
+        }
+    }
+
+    private void FormatDecimals(List<OwnOrderChange> ownOrderChanges)
+    {
+        ownOrderChanges.ForEach(o =>
+        {
+            o.Price =  Math.Round(o.Price, 3, MidpointRounding.ToEven);
+            o.Quantity = Math.Round(o.Quantity, 3, MidpointRounding.ToEven);
+            o.FilledQuantity = Math.Round(o.FilledQuantity, 5, MidpointRounding.ToEven);
+            o.RemainingQuantity = Math.Round(o.RemainingQuantity, 5, MidpointRounding.ToEven);
+            switch(o.Status)
+            {
+                case "OPEN":
+                    o.Status = "Open";
+                    break;
+                case "ORDER_PARTIALLY_FILLED":
+                    o.Status = "Partially Filled";
+                    break;
+                case "PENDING":
+                    o.Status = "Pending";
+                    break;
+            }
+        });
+    }
+
+    private void FormatDecimals(List<TradeMsg> trades)
+    {
+        trades.ForEach(o =>
+        {
+            o.Price =  Math.Round(o.Price, 3, MidpointRounding.ToEven);
+            o.Quantity = Math.Round(o.Quantity, 3, MidpointRounding.ToEven);
+            o.FilledQuantity = Math.Round(o.FilledQuantity, 5, MidpointRounding.ToEven);
+            o.RemainingQuantity = Math.Round(o.RemainingQuantity, 5, MidpointRounding.ToEven);
+            switch(o.Status)
+            {
+                case "OPEN":
+                    o.Status = "Open";
+                    break;
+                case "ORDER_PARTIALLY_FILLED":
+                    o.Status = "Partially Filled";
+                    break;
+                case "PENDING":
+                    o.Status = "Pending";
+                    break;
+            }
+        });
+    }
+
+    private void HandleStrategyAlive(StrategyInstanceConnectionStatus status)
+    {
+        if (status.Status)
+        {
+            if (_strategyStatus == StrategyDown)
+            {
+                _strategyStatus = StrategyUp;
+                StateHasChanged();
+            }
+        }
+        else
+        {
+            if (_strategyStatus == StrategyUp)
+            {
+                _strategyStatus = StrategyDown;
+                StateHasChanged();
+            }
+        }
+    }
+
+    private void HandleStrategyControlMsg(StrategyControlResponse strategyControlData)
+    {
+        Console.WriteLine("**************** In HandleStrategyControlMsg ***************************");
+        if (strategyControlData.State == StrategyProcessStatus.STARTED)
+        {
+            if (_strategyStatus == StrategyDown)
+            {
+                _strategyStatus = StrategyUp;
+                StateHasChanged();
+            }
+        }
+        else if (strategyControlData.State == StrategyProcessStatus.STOPPED ||
+                 strategyControlData.State == StrategyProcessStatus.EXITED)
+        {
+            if (_strategyStatus == StrategyUp)
+            {
+                _strategyStatus = StrategyDown;
+                StateHasChanged();
+            }
+        }
+    }
+
+    private void HandleConnectorStatusMsg(string venue, ConnectorStatusMsg statusMsg)
+    {
+        Console.WriteLine($"In HandleConnectorStatusMsg with Status = {statusMsg.Public.IsConnected}");
+        if (!statusMsg.Public.IsConnected) 
+        {
+            if (_exchangeStatus.ContainsKey(venue))
+                _exchangeStatus[venue] = ConnectorDown;
+            else
+            {
+                _exchangeStatus.TryAdd(venue, ConnectorDown);
+            }
+        }
+        else
+        {
+            if (_exchangeStatus.ContainsKey(venue))
+                _exchangeStatus[venue] = ConnectorUp;
+            else
+            {
+                _exchangeStatus.TryAdd(venue, ConnectorUp);
+            }
+        }
+        StateHasChanged();
+    }
+
+    private void HandleOpenOrders(string venue, List<OwnOrderChange> openOrders)
+    {
+        Console.WriteLine($"In Handle Open Orders with {openOrders.Count()} orders");
+        foreach(var order in openOrders)
+        {
+            if (order.Account == _accountName && order.Instance == _instanceName)
+            {
+                _orderTable[order.ClientOid] = order;
+                order.Venue = venue;
+                if (order.RemainingQuantity == 0)
+                {
+                    _orderTable.Remove(order.ClientOid);
+                }
+            }
+        }
+        var l = _orderTable.Values.ToList();
+        _openOrderList.Clear();
+        _openOrderList = l.OrderByDescending(o => o.OrderTime).ToList();
+        FormatDecimals(_openOrderList);
+        StateHasChanged();
+    }
+
+    private void HandleTrade(string venue, TradeMsg? trade)
+    {
+        if (trade != null)
+        {
+            if (trade.Account == _accountName && trade.Instance == _instanceName)
+            {
+                trade.Venue = venue;
+                if (!_tradeTable.ContainsKey(trade.TradeId))
+                {
+                    _tradeTable.Add(trade.TradeId, trade);
+                    var l = _tradeTable.Values.ToList();
+                    _tradeList.Clear();
+                    _tradeList = l.OrderByDescending(o => o.OrderTime).Take(15).ToList();
+                    Logger.LogInformation("The size of the tradeList is {Count}", _tradeList.Count);
+                    FormatDecimals(_tradeList);
+                    StateHasChanged();
+                }
+                else
+                {
+                    Logger.LogInformation("Duplicate entry for {TradeId} ", trade.TradeId);
+                }
+            }
+        }
+    }
+
+    private void HandleLatestTrades(List<TradeDTO> latestTrades)
+    {
+        // TODO - 
+        foreach (var trade in latestTrades)
+        {
+            try
+            {
+               
+                if (trade == null)
+                    Console.WriteLine("Problem is that the trade is null");
+                var exchangeParts = trade.Venue.VenueName.Split("_");
+                var tradeMsg = new TradeMsg()
+                {
+                    TradeId = trade.ExchangeTradeId,
+                   OrderId = trade.OrderId,
+                   Venue =  exchangeParts[0],
+                    Symbol = trade.CoinPair.Name,
+                    Price = trade.Price,
+                    Quantity = trade.Quantity,
+                    FilledQuantity = trade.Quantity,
+                    RemainingQuantity = trade.LeaveQuantity,
+                    IsBuy = trade.IsBuy,
+                    Timestamp = trade.DateCreated,
+                    Instance =  trade.InstanceName,
+                    Account = _accountName
+                };
+
+                HandleTrade(tradeMsg.Venue, tradeMsg);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Caught exception in HandleLatestTrades {e.StackTrace}");
+            }
+        }
+    }
+
+    private void HandleFilledOrder(string venue, OwnOrderChange? order)
+    {
+        Console.WriteLine("In HandleFilledOrder");
+        if (order != null)
+        {
+            if (order.Account == _accountName && order.Instance == _instanceName)
+            {
+                if (_orderTable.ContainsKey(order.ClientOid))
+                {
+                    _orderTable.Remove(order.ClientOid);
+                    var l = _orderTable.Values.ToList();
+                    _openOrderList.Clear();
+                    _openOrderList = l.OrderByDescending(o => o.OrderTime).ToList();
+                    FormatDecimals(_openOrderList);
+    //Math.Round()
+                    StateHasChanged();
+                }
+                else
+                {
+                    ; // Shouldn't happen
+                }
+            }
+        }
+    }
+
+    private void HandlePartiallyFilledOrder(string venue, OwnOrderChange? order)
+    {
+        Console.WriteLine("In HandlePartiallyFilledOrder");
+        if (order != null)
+        {
+            if (order.Account == _accountName && order.Instance == _instanceName)
+            {
+                order.Venue = venue;
+                if (_orderTable.ContainsKey(order.ClientOid))
+                {
+                    _orderTable[order.ClientOid] = order;
+                    if (order.RemainingQuantity == 0)
+                        _orderTable.Remove(order.ClientOid);
+                    var l = _orderTable.Values.ToList();
+                    _openOrderList.Clear();
+                    _openOrderList = l.OrderByDescending(o => o.OrderTime).ToList();
+                    FormatDecimals(_openOrderList);
+                    StateHasChanged();
+                }
+                else
+                {
+                    ; // Shouldn't happen
+                }
+            }
+        }
+    }
+
+    private void HandleCancelledOrder(string venue, OwnOrderChange? order)
+    {
+        Console.WriteLine("In HandleCancelledOrder");
+        if (order != null)
+        {
+            if (order.Account == _accountName && order.Instance == _instanceName)
+            {
+                order.Venue = venue;
+                if (_orderTable.ContainsKey(order.ClientOid))
+                {
+                    _orderTable.Remove(order.ClientOid);
+                    var l = _orderTable.Values.ToList();
+                    _openOrderList.Clear();
+                    _openOrderList = l.OrderByDescending(o => o.OrderTime).ToList();
+                    FormatDecimals(_openOrderList);
+                    StateHasChanged();
+                }
+                else
+                {
+                    ; // Shouldn't happen
+                }
+            }
+        }
+    }
+
+    private void HandleOwnOrderChanges(string venue, OwnOrderChange? order)
+    {
+       
+        if (order != null)
+        {
+            if (order.Account == _accountName && order.Instance == _instanceName)
+            {
+                order.Venue = venue;
+                if (_orderTable.ContainsKey(order.ClientOid))
+                {
+    // That's weird - shouldn't happen
+                }
+                else
+                {
+                    _orderTable[order.ClientOid] = order;
+                    var l = _orderTable.Values.ToList();
+                    _openOrderList.Clear();
+                    _openOrderList = l.Where(o => o.RemainingQuantity > 0).OrderByDescending(o => o.OrderTime).ToList();
+                    FormatDecimals(_openOrderList);
+                    StateHasChanged();
+                }
+            }
+        }
+    }
+
+    private void HandleBalanceUpdate(BalanceUpdate? balanceUpdate)
+    {
+        if (balanceUpdate != null)
+        {
+            if (balanceUpdate.Balance.Account == _accountName && balanceUpdate.Balance.Instance == _instanceName)
+            {
+                // TODO - Massive
+                if (balanceUpdate.Currency.Equals("BTC"))
+                {
+                    _btcBalance = Math.Round(balanceUpdate.Balance.Available, 2, MidpointRounding.ToEven);
+                    ;
+                }
+                else if (balanceUpdate.Currency.Equals("USDT"))
+                {
+                    _usdtBalance = Math.Round(balanceUpdate.Balance.Available, 2, MidpointRounding.ToEven);
+                }
+                StateHasChanged();
+            }
+        }
+    }
+
+    private void HandleOpeningBalance(BalanceUpdate? balanceUpdate)
+    {
+        if (balanceUpdate != null)
+        {
+            if (balanceUpdate.Balance.Account == _accountName && balanceUpdate.Balance.Instance == _instanceName)
+            {
+                if (balanceUpdate.Currency.Equals("BTC"))
+                {
+                    _btcOpeningBalance = Math.Round(balanceUpdate.Balance.Available, 2, MidpointRounding.ToEven);
+                }
+                else if (balanceUpdate.Currency.Equals("USDT"))
+                {
+                    _usdtOpeningBalance = Math.Round(balanceUpdate.Balance.Available, 2, MidpointRounding.ToEven);
+                }
+                StateHasChanged();
+            }
+        }
+    }
+
+    private void HandleFairValueUpdate(FairValueData? fairValueData)
+    {
+        if (fairValueData != null)
+        {
+            _fairValueSymbol = fairValueData.Symbol;
+            _fairValuePrice = fairValueData.Price;
+            if (_fairValuePrice != _previousPrice)
+            {
+                _fairValuePrice = Math.Round(fairValueData.Price, 2, MidpointRounding.ToEven);
+                if (_fairValuePrice > _previousPrice)
+                    _fairPriceDisplay = "text-success";
+                else if (_fairValuePrice < _previousPrice)
+                    _fairPriceDisplay = "text-danger";
+                else
+                    _fairPriceDisplay = "text-dark";
+                _previousPrice = _fairValuePrice;
+                StateHasChanged();
+            }
+        }
+    }
+
+    private void LoadPlaceOrderPage()
+    {
+        NavigationManager.NavigateTo($"market-order/{StrategyConfigId}");
+    }
+
+    private void EnableStrategy()
+    {
+
+    }
+
+    private void LoadEditConfigPage()
+    {
+        NavigationManager.NavigateTo($"EditStrategyConfig/{StrategyConfigId}");
+    }
+
+    private void StrategyControlMethod()
+    {
+        Console.WriteLine("In StrategyControl");
+        Logger.LogInformation("In StrategyControl value of StrategyEnable = {StrategyEnable}", StrategyEnable);
+    }
+
+    protected async Task CheckBoxChanged(bool val, string e)
+    {
+        Console.WriteLine("In StrategyControl");
+        StrategyEnable = StrategyEnable ? false : true;
+
+        Logger.LogInformation("In StrategyControl value of StrategyEnable = {StrategyEnable}", StrategyEnable);
+
+        StrategyProcessDetails strategyProcessDetails =  new StrategyProcessDetails()
+        {
+            AccountName = _strategyData.StrategySPSubscriptionConfig.SP.Name,
+            ConfigName = _strategyData.StrategySPSubscriptionConfig.ConfigName,           
+            StrategyConfigId = StrategyConfigId
+        };
+
+        if (StrategyEnable)
+            strategyProcessDetails.Enable = true;
+        else
+            strategyProcessDetails.Enable = false;
+        Logger.LogInformation("Calling SendStrategyProcessCommand");
+        await PortfolioHttpClient.SendStrategyProcessCommand(strategyProcessDetails);
+        Logger.LogInformation("Called SendStrategyProcessCommand");
+
+    }
+
+    
+
+    private async Task StrategyOnOffEvent(Syncfusion.Blazor.Buttons.ChangeEventArgs<bool?> args)
+    {
+        
+        Console.WriteLine($"********************* The radio button is {args.Checked} ******************************");
+        if (_strategyData.StrategySPSubscriptionConfig == null)
+            Console.WriteLine("StrategySPSubscriptionConfig is null");
+        StrategyProcessDetails strategyProcessDetails =  new StrategyProcessDetails()
+        {
+            AccountName = _strategyData.StrategySPSubscriptionConfig.SP.Name,
+            ConfigName = _strategyData.StrategySPSubscriptionConfig.ConfigName,           
+            StrategyConfigId = StrategyConfigId
+        };
+
+        Console.WriteLine("We got here anyways");
+        if ((bool)args?.Checked)
+            strategyProcessDetails.Enable = true;
+        else
+            strategyProcessDetails.Enable = false;
+        Logger.LogInformation("Calling SendStrategyProcessCommand");
+        await PortfolioHttpClient.SendStrategyProcessCommand(strategyProcessDetails);
+        Logger.LogInformation("Called SendStrategyProcessCommand");
+    }
+
+}

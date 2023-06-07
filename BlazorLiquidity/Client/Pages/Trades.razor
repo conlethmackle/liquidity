@@ -1,0 +1,108 @@
+﻿@page "/trades"
+@attribute [Authorize]
+@using BlazorLiquidity.Shared
+@using Common.Models.DTOs
+@using Microsoft.AspNetCore.SignalR.Client
+@inject PortfolioHttpClient PortfolioHttpClient
+
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Cards
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Navigations
+@using System.Text.Json
+@using Common.Messages
+@using Common.Models
+@using Common.Models.Entities
+@using ProtoBuf
+
+<EditForm Model="@SPid" OnValidSubmit="@HandleValidSubmit" >
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <label for="Portfolio" >Portfolio</label>
+                               
+    <InputSelect id="Portfolio" @bind-Value="SPid" >
+        @foreach (var p  in _sps)
+        {
+            <option value="@p.SPId">@p.Name</option>
+        }
+    </InputSelect>
+    <br/>
+    <br/>
+
+    <SfButton Type="submit">OK</SfButton>
+</EditForm>
+@if (_displayTrades)
+{
+    <div id="ControlRegion2">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+
+
+                    <div class="CustomHeader">
+                        <h2>Trades</h2></div>
+                    <SfGrid ID="Grid" DataSource="@_trades" @ref="Grid" Height="100%" Width="2400" AllowSorting="true" AllowFiltering="true" AllowResizing="true" GridLines="GridLine.Both" AllowPaging="false">
+                      
+                        <GridColumns>
+                            <GridColumn Field=@nameof(TradeDTO.ExchangeTradeId) Visible="true" HeaderText="Trade Id" TextAlign="TextAlign.Left" Width="40"></GridColumn>
+                            <GridColumn Field=@nameof(TradeDTO.OrderId) Visible="true" HeaderText="Order Id" TextAlign="TextAlign.Left" Width="40"></GridColumn>
+                            <GridColumn Field=SP.Name Visible="true" HeaderText="Account" TextAlign="TextAlign.Left" Width="40"></GridColumn>
+                            <GridColumn Field=@nameof(TradeDTO.InstanceName) Visible="true" HeaderText="Instance Name" Width="20"></GridColumn>
+                            <GridColumn Field="Venue.VenueName" Visible="true" HeaderText="Exchange" TextAlign="TextAlign.Left" Width="25"></GridColumn>
+                            <GridColumn Field="CoinPair.Name" Visible="true" HeaderText="Coin Pair" TextAlign="TextAlign.Left" Width="25"></GridColumn>
+                            <GridColumn Field=@nameof(TradeDTO.IsBuy) Visible="true" HeaderText="IsBuy" Width="13"></GridColumn>
+                            <GridColumn Field=@nameof(TradeDTO.Price) Visible="true" HeaderText="Price" Width="20"></GridColumn>
+                            <GridColumn Field=@nameof(TradeDTO.Quantity) Visible="true" HeaderText="Quantity" Width="20"></GridColumn>
+                            <GridColumn Field=@nameof(TradeDTO.LeaveQuantity) Visible="true" HeaderText="Leave Quantity" Width="20"></GridColumn>
+                            <GridColumn Field=@nameof(TradeDTO.Fee) Visible="true" HeaderText="Fee" Width="20"></GridColumn>
+                            <GridColumn Field=@nameof(TradeDTO.DateCreated) Visible="true" HeaderText="Date" Width="20"></GridColumn>
+                        </GridColumns>
+                    </SfGrid>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+
+@code {
+
+    private List<SPDTO> _sps = new ();
+    private int SPid { get; set; }
+    private List<TradeDTO> _trades { get; set; } = new();
+    SfGrid<TradeDTO>? Grid { get; set; }
+    private bool _displayTrades = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        int ExchangeTradeId = 1;
+        int OrderId = 1;
+        try
+        {
+            _sps = await PortfolioHttpClient.GetPortfolios();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error retrieving Portfolios from d/b");
+        }
+    }
+
+    public async Task HandleValidSubmit()
+    {
+        try
+        {
+            _displayTrades = true;
+            _trades = await PortfolioHttpClient.GetAllTrades(SPid);
+             StateHasChanged();
+
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"What the hell is going on {e.Message} ");
+           
+        }
+    }
+
+}

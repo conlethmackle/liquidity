@@ -1,0 +1,18 @@
+﻿@page "/trafficlight"
+@inherits TrafficLightBase
+
+<div class="row">
+    <div class="lights">
+        <div class="red @(Lights.RedOn ? "on" : "off")">Red</div>
+        <div class="amber @(Lights.AmberOn ? "on" : "off")">Amber</div>
+        <div class="green @(Lights.GreenOn ? "on" : "off")">Green</div>
+    </div>
+</div>
+
+<div class="row pt-2">
+    <button @onclick="@Toggle" class="btn btn-primary">
+        Toggle
+    </button>
+</div>
+
+

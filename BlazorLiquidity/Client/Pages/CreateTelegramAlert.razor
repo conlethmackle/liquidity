@@ -1,0 +1,121 @@
+﻿@page "/create-telegram-alert"
+@attribute [Authorize]
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.Cards
+@using Microsoft.AspNetCore.Components
+@using Syncfusion.Blazor.Navigations
+@inject PortfolioHttpClient PortfolioHttpClient
+@inject NavigationManager NavigationManager
+
+<SfCard Orientation="CardOrientation.Vertical">
+    <CardHeader>
+        <div class="CustomHeader">Add New Telegram Alert</div></CardHeader>
+    
+    <EditForm Model="@_categories" OnValidSubmit="@HandleValidSubmit" >
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+ 
+        <SfTextBox id="AlertName" Placeholder='Alert Name' FloatLabelType='@FloatLabelType.Auto'  @bind-Value="_alert.AlertName"  />
+        <SfTextBox id="Message" Placeholder='Alert Message' FloatLabelType='@FloatLabelType.Auto'  @bind-Value="_alert.Message"  />
+         <SfNumericTextBox id="EnumId" TValue="int"  Format="n3" Placeholder="Enum Id" FloatLabelType='@FloatLabelType.Auto' @bind-Value="_alert.AlertEnumId"/>
+        <label class="label" for="category" >Alert Category : </label>
+                         
+        <InputSelect id="category" @bind-Value="_alert.AlertCategoryId" >
+            <option value="0">Select A Category</option>
+            @foreach (var c  in _categories)
+            {
+                <option value="@c.Id">@c.Category</option>
+            }
+        </InputSelect>
+        <br/>
+        <br/>
+        <SfButton Type="submit">OK</SfButton>
+                   
+    </EditForm>
+</SfCard>
+
+@code {
+
+    private List<TelegramAlertCategoryDTO> _categories = new();
+    private TelegramAlertDTO _alert = new TelegramAlertDTO();
+    protected override async Task OnInitializedAsync()
+    {
+        _categories = await PortfolioHttpClient.GetTelegramAlertCategories();
+    }
+
+    public async Task HandleValidSubmit()
+    {
+        await PortfolioHttpClient.CreateTelegramAlert(_alert);
+        NavigationManager.NavigateTo("list-telegram-alerts");
+    }
+
+}
+
+<style  type="text/css" class="cssStyles"> 
+    .label {
+        background-color: lightgrey;
+        color: black;
+    }
+    .e-grid .e-altrow {
+        background-color: #aaaaaa;
+    }
+    .CustomHeader, 
+    .e-card .e-card-header .e-card-header-caption:first-child { 
+        padding-left: 0%; 
+        
+    } 
+
+    
+ 
+    .lower {
+        background-color: red;
+    }
+
+    .higher {
+        background-color: green;
+    }
+
+    .same {
+        background-color: orange
+    }
+
+    .e-grid .e-headercell { 
+        background-color: #36486b; 
+    } 
+  
+    .e-headercell {         
+        color: white;
+        background-color: black;
+        
+        font-size: 40px;
+        font-weight: bold; 
+    }
+
+    .e-grid .e-rowcell {
+        font-size: 26px;
+        padding-bottom: 3px;
+        padding-top: 3px;
+    }
+
+    .e-headercelldiv {
+        font-size: 40px;
+        font-weight: bold;
+        padding-bottom: 6px;
+        padding-top: 6px;
+        background-color: black;
+    }
+    
+    .e-custom {
+        border-radius: 0;
+        height: 30px;
+        width: 80px;
+    }
+
+    .e-custom, .e-custom:hover, .e-custom:focus, .e-custom:active {
+        background-color: #ff6e40;
+        color: #fff;
+        font-size: 1.0rem; 
+        font-weight: bold;
+    }
+</style>

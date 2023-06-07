@@ -1,0 +1,124 @@
+﻿@page "/portfolio-start"
+@using SyncfusionLiquidity.Shared
+@using Common.Models.DTOs
+@inject PortfolioHttpClient PortfolioHttpClient
+@using Syncfusion.Blazor
+@using Syncfusion.Blazor.Grids
+@using Syncfusion
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Navigations
+@using SyncfusionLiquidity.Shared
+@inject NavigationManager NavigationManager
+
+<style>
+
+    table, th, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+    th, td, h2, h3 {
+        background-color: grey;
+        padding: 15px;
+        color: white
+    }
+</style>
+
+    <h2>Portfolios</h2>
+<br/>
+
+    <div id = "ControlRegion">
+        <SfGrid  ID="Grid" DataSource="@_portfolios"  @ref="Grid"  AllowSelection="true"
+                 Toolbar="@(new List<string>() { "Add", "Edit", "Delete", "Cancel", "Update","Search"})" Height="315" Width="900">        
+            <GridEditSettings AllowAdding="true" AllowEditing="true" AllowDeleting="true" Mode="EditMode.Dialog"></GridEditSettings>
+            <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.FilterBar"></GridFilterSettings>
+            <GridPageSettings PageSizes="true"></GridPageSettings>
+            <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Single"></GridSelectionSettings>
+            <GridEvents OnToolbarClick="ToolbarClick" TValue="SPDTO"></GridEvents>
+            <GridEvents OnActionComplete="OnActionComplete" TValue="SPDTO"></GridEvents>
+            <GridEvents OnRecordDoubleClick="OnRecordDoubleClick" TValue="SPDTO"></GridEvents>
+            <GridColumns>
+           
+                 <GridColumn HeaderText="XXXXXXXX" HeaderTextAlign="TextAlign.Right"></GridColumn>
+                <GridColumn Field=@nameof(SPDTO.SPId) IsPrimaryKey="true" ValidationRules="@(new ValidationRules { Required = true })" TextAlign="TextAlign.Right" Width="120"></GridColumn>
+                <GridColumn Field=@nameof(SPDTO.Name)  HeaderText="Name" ValidationRules="@(new ValidationRules { Required = true })" Width="120"></GridColumn>
+                <GridColumn Field=@nameof(SPDTO.Description) HeaderText="Description" Format="C2" TextAlign="TextAlign.Right" EditType="EditType.DefaultEdit" Width="120"></GridColumn>
+                <GridColumn HeaderText="Manage" Width="150">
+                    <GridCommandColumns>
+                        <GridCommandColumn Type="CommandButtonType.Edit" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-edit", CssClass = "e-flat" })"></GridCommandColumn>
+                        <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-delete", CssClass = "e-flat" })"></GridCommandColumn>
+                        <GridCommandColumn Type="CommandButtonType.Save" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-update", CssClass = "e-flat" })"></GridCommandColumn>
+                        <GridCommandColumn Type="CommandButtonType.Cancel" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-cancel-icon", CssClass = "e-flat" })"></GridCommandColumn>
+                    </GridCommandColumns>
+                </GridColumn>
+            </GridColumns>
+        </SfGrid>
+        
+
+    </div>
+
+
+@code {
+    private List<SPDTO> _portfolios { get; set; }
+    SfButton SPSelectButton;
+    SfGrid<SPDTO>? Grid { get; set; }
+    SfGrid<Order>? Grid1 { get; set; }
+    public List<Order>? Orders { get; set; }
+
+    public Orientation VerOrientation = Orientation.Vertical;
+    // Specify the value of Sidebar component state. It indicates whether the sidebar component is in an open/close state.
+    public bool SidebarToggle = false;
+    // Specifies the value of Sidebar HTMLAttribute property.
+    Dictionary<string, object> HtmlAttribute = new Dictionary<string, object>()
+    {
+        {"class", "sidebar-menu" }
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        _portfolios = await PortfolioHttpClient.GetPortfolios();
+        
+        Orders = Enumerable.Range(1, 75).Select(x => new Order()
+        {
+            OrderID = 1000 + x,
+            CustomerID = (new string[] { "ALFKI", "ANANTR", "ANTON", "BLONP", "BOLID" })[new Random().Next(5)],
+            Freight = 2.1 * x,
+            OrderDate = DateTime.Now.AddDays(-x),
+            ShipCountry = (new string[] { "USA", "UK", "CHINA", "RUSSIA", "INDIA" })[new Random().Next(5)]
+        }).ToList();
+    }
+
+    public void LoadPortfolio(string name)
+    {
+        NavigationManager.NavigateTo($"portfolio-instance-list/{name}");
+    }
+
+    public async Task CreatePortfolio()
+    {
+        NavigationManager.NavigateTo($"create-portfolio");
+    }
+
+    public void ToolbarClick(Syncfusion.Blazor.Navigations.ClickEventArgs args)
+    {
+        Console.WriteLine("In toolbarclick");
+    }
+
+    public void OnRecordDoubleClick(Syncfusion.Blazor.Grids.RecordDoubleClickEventArgs<SPDTO> args)
+    {
+        Console.WriteLine("In doubleclick");
+    }
+
+    public void OnActionComplete(ActionEventArgs<SPDTO> args)
+    {
+       Console.WriteLine($"Just had an {args.Action} action on Id = {args.Data.Name}");
+        
+    }
+    
+    public class Order
+    {
+        public int? OrderID { get; set; }
+        public string CustomerID { get; set; }
+        public DateTime? OrderDate { get; set; }
+        public double? Freight { get; set; }
+        public string ShipCountry { get; set; }
+    }
+}

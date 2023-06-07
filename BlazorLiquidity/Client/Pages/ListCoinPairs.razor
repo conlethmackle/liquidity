@@ -1,0 +1,178 @@
+﻿@page "/list-coinpairs"
+@attribute [Authorize]
+@using BlazorLiquidity.Shared
+@using Common.Models.DTOs
+@inject PortfolioHttpClient PortfolioHttpClient
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Cards
+@using Syncfusion.Blazor.Buttons
+@inject NavigationManager NavigationManager
+
+
+@if (_coinPairs == null)
+{
+    <p>Loading ...</p>
+}
+else {
+    <h2 style="color:white">Coin Pairs</h2>
+
+    <br/>
+    <div id="ControlRegion">
+    <SfCard Orientation="CardOrientation.Vertical">
+        <CardHeader><div class="CustomHeader">Coin Pairs</div></CardHeader>
+              
+        <SfButton @ref="AddNewButton" @onclick="OnAddNewInstance" CssClass="e-flat"  IsPrimary="true" Content="Add New CoinPair"></SfButton>
+        <SfGrid ID="Grid" DataSource="@_coinPairs" @ref="Grid" AllowSelection="true"
+                Toolbar="@(new List<string>() {  "Edit", "Delete", "Cancel", "Update" })" Height="315" Width="900">
+            <GridEditSettings AllowEditOnDblClick="true" AllowAdding="true" AllowEditing="true" AllowDeleting="true" Mode="EditMode.Dialog"></GridEditSettings>
+            <GridPageSettings PageSizes="true"></GridPageSettings>
+            <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Single"></GridSelectionSettings>
+          
+            <GridPageSettings PageSizes="true"></GridPageSettings>
+            <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Single"></GridSelectionSettings>
+            <GridEvents  OnActionBegin="OnActionBegin"  TValue="CoinPairDTO"></GridEvents>
+            <GridColumns>
+                <GridColumn Field=@nameof(CoinPairDTO.Name) HeaderText="Name" ValidationRules="@(new ValidationRules { Required = true })" Width="150"></GridColumn>
+                <GridColumn Field="PCoin.Name" HeaderText="PCoin" ValidationRules="@(new ValidationRules { Required = true })" TextAlign="TextAlign.Left" Width="150"></GridColumn>
+                <GridColumn Field="SCoin.Name" HeaderText="SCoin" ValidationRules="@(new ValidationRules { Required = true })" TextAlign="TextAlign.Left" Width="150"></GridColumn>
+                <GridColumn HeaderText="Manage" Width="100" HeaderTextAlign="TextAlign.Right">
+                    <GridCommandColumns>
+                        <GridCommandColumn Type="CommandButtonType.Save" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-save", CssClass = "e-flat" })"></GridCommandColumn>
+                        <GridCommandColumn Type="CommandButtonType.Cancel" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-cancel", CssClass = "e-flat" })"></GridCommandColumn>
+                        <GridCommandColumn Type="CommandButtonType.Edit" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-edit", CssClass = "e-flat" })"></GridCommandColumn>
+                        <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-delete", CssClass = "e-flat" })"></GridCommandColumn>
+                    </GridCommandColumns>
+                </GridColumn>
+            </GridColumns>
+        </SfGrid>
+                
+    </SfCard>
+    </div>
+}
+
+<style> 
+    .CustomHeader, 
+    .e-card .e-card-header .e-card-header-caption:first-child { 
+        padding-left: 0%; 
+        
+    } 
+
+ 
+    .lower {
+        background-color: red;
+    }
+
+    .higher {
+        background-color: green;
+    }
+
+    .same {
+        background-color: orange
+    }
+
+    .e-grid .e-headercell { 
+        background-color: #36486b; 
+    } 
+  
+    .e-headercell {         
+        color: white;
+        background-color: black;
+        
+        font-size: 40px;
+        font-weight: bold; 
+    }
+
+    .e-grid .e-rowcell {
+        font-size: 26px;
+        padding-bottom: 3px;
+        padding-top: 3px;
+    }
+
+    .e-headercelldiv {
+        font-size: 40px;
+        font-weight: bold;
+        padding-bottom: 6px;
+        padding-top: 6px;
+        background-color: black;
+    }
+    
+    .e-custom {
+        border-radius: 0;
+        height: 30px;
+        width: 80px;
+    }
+
+    .e-custom, .e-custom:hover, .e-custom:focus, .e-custom:active {
+        background-color: #ff6e40;
+        color: #fff;
+        font-size: 1.0rem; 
+        font-weight: bold;
+    }
+
+</style>
+
+@code {
+    List<CoinPairDTO> _coinPairs { get; set; }
+    SfGrid<CoinPairDTO>? Grid { get; set; }
+    SfButton AddNewButton;
+    protected override async Task OnInitializedAsync()
+    {
+        _coinPairs = await PortfolioHttpClient.GetCoinPairs();
+    }
+
+    public void OnAddNewInstance(MouseEventArgs args)
+    {
+        NavigationManager.NavigateTo($"create-coinpair");
+    }
+
+    
+
+    public async Task OnActionBegin(ActionEventArgs<CoinPairDTO> args)
+    {
+        if (args == null)
+        {
+            Console.WriteLine("OnActionBegin args is null");
+            return;
+        }
+        if (args.Data == null)
+        {
+            Console.WriteLine("OnActionBegin args.Data is null");
+            return;
+        }
+  
+        if (args.RequestType.Equals((Syncfusion.Blazor.Grids.Action.Save)))
+        {
+            if (args.Action == "Add")
+            {
+               await PortfolioHttpClient.CreateCoinPair(args.Data);
+            }
+            else if (args.Action == "Edit")
+            {
+                Console.WriteLine("Got an edit");
+                await PortfolioHttpClient.UpdateCoinPair(args.Data);
+            }
+         
+        }
+        else if (args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Delete))
+        {
+            Console.WriteLine("Deleting a record");
+            if (args.Action == "Delete")
+            {
+                Console.WriteLine("Shold be calling DeletePortfolio");
+               await PortfolioHttpClient.DeleteCoinPair(args.Data.CoinPairId);
+                Console.WriteLine("Should be finsihed calling DeletePortfolio");
+            }
+        }
+        else if (args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Add))
+        {
+            Console.WriteLine("OnActionBegin Add Request Type");
+            if (args.Action == "Add")
+            {
+    //             await PortfolioHttpClient.CreatePortfolio(args.Data);
+            }
+        }
+
+        _coinPairs = await PortfolioHttpClient.GetCoinPairs();
+        await Grid?.Refresh();
+    }
+}

@@ -1,0 +1,61 @@
+﻿.container-bg {
+    background: black;
+}
+.button1 {
+    background-color: green;
+    color: white;
+    border: 2px solid #4CAF50; /* Green */
+}
+
+.p {
+   
+    font-family: "Courier New", Courier, monospace;
+    font-size: 80%
+}
+
+.orderTable {
+    font-size : 6px
+}
+
+.custom-checkbox .custom-control-input:checked ~ .custom-control-label::before {
+    background-color: blue !important;
+}
+
+.custom-checkbox .custom-control-input:checked:focus ~ .custom-control-label::before {
+    box-shadow: 0 0 0 1px #fff, 0 0 0 0.2rem rgba(0, 255, 0, 0.25)
+}
+
+.custom-checkbox .custom-control-input:focus ~ .custom-control-label::before {
+    box-shadow: 0 0 0 1px #fff, 0 0 0 0.2rem rgba(0, 0, 0, 0.25)
+}
+
+.custom-checkbox .custom-control-input:active ~ .custom-control-label::before {
+    background-color: #C8FFC8;
+}
+
+.lights {
+    padding: 1em;
+    border: 1px solid grey;
+    width: 6em;
+    background-color: #343a40;
+}
+
+.lights div {
+    margin-bottom: 0.5em;
+    border: 2px solid grey;
+    width: 4em;
+    height: 4em;
+    border-radius: 50%;
+}
+
+div.red.on {
+    background-color: red;
+}
+
+div.amber.on {
+    background-color: orange;
+}
+
+div.green.on {
+    background-color: green;
+}

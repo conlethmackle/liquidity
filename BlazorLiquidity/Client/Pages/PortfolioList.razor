@@ -1,0 +1,237 @@
+﻿@using BlazorLiquidity.Shared
+@using Common.Models.DTOs
+@inject PortfolioHttpClient PortfolioHttpClient
+@using Syncfusion.Blazor
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Cards
+@using Syncfusion
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Navigations
+@inject NavigationManager NavigationManager
+
+
+<AuthorizeView>
+   
+    <Authorized>
+        @if (_portfolios == null)
+        {
+            <p>Loading ...</p>
+        }
+        else
+        {
+
+            <br/>
+            <br/>
+            <div id="ControlRegion">
+                <div class="Style-for-me">
+                    <h2>Available Portfolios</h2>
+                        <SfGrid ID="Grid" DataSource="@_portfolios" @ref="Grid" AllowSelection="true"
+                                Height="290" Width="1000">
+                            <GridEditSettings AllowEditOnDblClick="false" AllowAdding="true" AllowEditing="true" AllowDeleting="true" Mode="EditMode.Dialog"></GridEditSettings>
+
+                            <GridPageSettings PageSizes="true"></GridPageSettings>
+                            <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Single"></GridSelectionSettings>
+                            <GridEvents OnToolbarClick="ToolbarClick" OnActionBegin="OnActionBegin" OnRecordDoubleClick="OnRecordDoubleClick" TValue="SPDTO"></GridEvents>
+
+                            <GridColumns>
+
+                                <GridColumn Field=@nameof(SPDTO.Name) HeaderText="Name" ValidationRules="@(new ValidationRules { Required = true })" Width="300"></GridColumn>
+                                <GridColumn Field=@nameof(SPDTO.Description) HeaderText="Description" Format="C2" TextAlign="TextAlign.Left" Width="400"></GridColumn>
+                                <GridColumn HeaderText="Manage" Width="200" HeaderTextAlign="TextAlign.Center">
+                                    <GridCommandColumns>
+                                        <GridCommandColumn Type="CommandButtonType.Save" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-save", CssClass = "e-flat" })"></GridCommandColumn>
+                                        <GridCommandColumn Type="CommandButtonType.Cancel" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-cancel", CssClass = "e-flat" })"></GridCommandColumn>
+                                        <GridCommandColumn Type="CommandButtonType.Edit" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-edit", CssClass = "e-flat" })"></GridCommandColumn>
+                                        <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-delete", CssClass = "e-flat" })"></GridCommandColumn>
+                                    </GridCommandColumns>
+                                </GridColumn>
+                            </GridColumns>
+
+                        </SfGrid>
+                    
+                </div>
+            </div>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <div>Hard Luck Mate - you're not allowed to see this</div></NotAuthorized>
+</AuthorizeView>
+
+<style>
+    background_colour {
+        background-color: lightgray;
+    }
+    body  {
+        background-image: url("/images/background.jpg");
+        background-color: #cccccc;
+    }
+    .Style-for-me {
+        font-size: 26px;
+        color: white;
+    }
+    .CustomHeader, 
+    .e-card .e-card-header .e-card-header-caption:first-child { 
+        padding-left: 0%;
+        align-content: center;
+        background-color: lightgrey;
+    } 
+    .e-grid .e-table .e-rowcell{ 
+        font-size:26px;
+        padding-bottom: 3px;
+        padding-top: 3px;
+        background-color: lightgrey;
+    }
+    .e-headercelldiv {
+        font-size:40px;
+        font-weight: bold;
+        padding-bottom: 6px;
+        padding-top: 6px;
+        background-color: black;
+    }
+ 
+    .lower {
+        background-color: red;
+    }
+
+    .higher {
+        background-color: green;
+    }
+
+    .same {
+        background-color: orange
+    }
+
+    .e-grid .e-headercell { 
+        background-color: black; 
+    } 
+  
+    .e-headercell {         
+        color: white; 
+        font-size: 2.5rem; 
+        font-weight: bold; 
+    }
+
+    .e-edit-dialog .e-gridform .e-table{ 
+        border-spacing:0px !important; 
+    } 
+</style> 
+
+
+@code {
+    private List<SPDTO> _portfolios { get; set; }
+    SfButton SPSelectButton;
+    SfGrid<SPDTO>? Grid { get; set; }
+
+
+  //  public Orientation VerOrientation = Orientation.Vertical;
+    // Specify the value of Sidebar component state. It indicates whether the sidebar component is in an open/close state.
+    public bool SidebarToggle = false;
+    // Specifies the value of Sidebar HTMLAttribute property.
+    Dictionary<string, object> HtmlAttribute = new Dictionary<string, object>()
+    {
+        {"class", "sidebar-menu" }
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _portfolios = await PortfolioHttpClient.GetPortfolios();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Error getting Portfolios - {e.StackTrace}");
+        }
+
+    }
+
+    public void LoadPortfolio(string name)
+    {
+        NavigationManager.NavigateTo($"portfolio-instance-list/{name}");
+    }
+
+    public async Task CreatePortfolio()
+    {
+        NavigationManager.NavigateTo($"create-portfolio");
+    }
+
+    public void PortfolioCreated(object created)
+    {
+        var data = (SPDTO)created;
+
+        Console.WriteLine($"In PortfolioCreated with name {data.Name}");
+    }
+
+    public void ToolbarClick(Syncfusion.Blazor.Navigations.ClickEventArgs args)
+    {
+        Console.WriteLine("In toolbarclick");
+    }
+
+    public void OnRecordDoubleClick(Syncfusion.Blazor.Grids.RecordDoubleClickEventArgs<SPDTO> args)
+    {
+        NavigationManager.NavigateTo($"portfolio-instance-list/{args.RowData.Name}");
+    }
+
+    public async Task OnActionBegin(ActionEventArgs<SPDTO> args)
+    {
+        try
+        {
+
+        
+            if (args == null)
+            {
+           
+                return;
+            }
+            if (args.Data == null || args.Action == null || args.RequestType == null)
+            {
+            
+                return;
+            }
+           
+      
+            if (args.RequestType.Equals((Syncfusion.Blazor.Grids.Action.Save)))
+            {
+                if (args.Action == "Add")
+                {
+                    await PortfolioHttpClient.CreatePortfolio(args.Data);
+                }
+                else if (args.Action == "Edit")
+                {
+                    var res = await PortfolioHttpClient.UpdatePortfolio(args.Data);
+                
+                }
+            }
+            else if (args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Delete))
+            {
+       
+                if (args.Action == "Delete")
+                {
+                    await PortfolioHttpClient.DeletePortfolio(args.Data);
+                }
+            }
+            else if (args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Add))
+            {
+                if (args.Action == "Add")
+                {
+                    await PortfolioHttpClient.CreatePortfolio(args.Data);
+                }
+            }
+            _portfolios = await PortfolioHttpClient.GetPortfolios();
+            await Grid?.CloseEditAsync();
+            await Grid?.RefreshColumnsAsync();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+
+    public async Task OnActionComplete(ActionEventArgs<SPDTO> args)
+    {
+       Console.WriteLine($"OnActionComplete Just had an {args.Action} action on Id = {args.Data.Name}");
+        _portfolios = await PortfolioHttpClient.GetPortfolios();
+        await Grid?.Refresh();
+    }
+}

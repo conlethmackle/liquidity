@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.0" PrivateAssets="all" />
+	    <PackageReference Include="Syncfusion.Blazor.Grid" Version="20.2.0.46" />
+    <PackageReference Include="Syncfusion.Blazor.Charts" Version="20.2.0.46" />
+    <PackageReference Include="Syncfusion.Blazor.Cards" Version="20.2.0.46" />
+    <PackageReference Include="Syncfusion.Blazor.Navigations" Version="20.2.0.46" />
+    <PackageReference Include="Syncfusion.Blazor.SplitButtons" Version="20.2.0.46" />
+    <PackageReference Include="Syncfusion.Blazor.Buttons" Version="20.2.0.46" />
+    <PackageReference Include="Syncfusion.Blazor.Inputs" Version="20.2.0.46" />
+    <PackageReference Include="Syncfusion.Blazor.Layouts" Version="20.2.0.46" />
+    <PackageReference Include="Syncfusion.Blazor.Lists" Version="20.2.0.46" />
+    <PackageReference Include="Syncfusion.Blazor.DropDowns" Version="20.2.0.46" />
+    <PackageReference Include="Syncfusion.Blazor.Themes" Version="20.2.0.46" />
+    <PackageReference Include="Syncfusion.Blazor.PivotTable" Version="20.2.0.45" />
+
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.7" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="6.0.6" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
+    <PackageReference Include="Microsoft.JSInterop.WebAssembly" Version="6.0.7" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0" />
+    <PackageReference Include="Serilog.Sinks.BrowserConsole" Version="1.0.0" />
+    <PackageReference Include="System.Net.Http.Json" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Shared\SyncfusionLiquidity.Shared.csproj" />
+  </ItemGroup>
+  
+  
+
+</Project>

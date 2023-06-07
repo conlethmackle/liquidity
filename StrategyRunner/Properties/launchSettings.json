@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "StrategyRunner": {
+      "commandName": "Project",
+      "commandLineArgs": "Account=\"Hamilton VECHAIN Treasury Cell\" Strategy=LiquidationPriceStrategy ConfigName=BTCLiquidation4 FileLogging=Off ConsoleLogging=On"
+    }
+  }
+}

@@ -1,0 +1,175 @@
+﻿@page "/EditStrategyConfig/{StrategyConfigId:int}"
+@attribute [Authorize]
+@using BlazorLiquidity.Shared
+@using Common.Messages
+@using Common.Models
+@using Microsoft.AspNetCore.SignalR.Client
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.Extensions.Logging
+@using Common.Models.DTOs
+@using System.Text.Json
+@using System.Linq
+@inject ILogger<StrategyInstance> Logger
+@inject PortfolioHttpClient PortfolioHttpClient
+@inject HubConnection HubConnection
+@inject NavigationManager NavigationManager
+@implements IDisposable
+
+<EditForm Model="@_configDetails" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+  <div class="container-bg">
+        <div class="row">  
+            <div class="col-lg-4">
+        
+            <div class="card">
+                <div class="card text-white bg-dark mb-3">
+                <div class="card-header"><div class="text-center"><h3>Edit Liquidity Configuration</h3></div></div></div>
+                <div class="card text-black bg-light mb-2">
+                <div class="card-body">
+                    <div class="text-center">
+                        <table>
+                            <tr><td>
+                        <label for="symbol" >Symbol</label>
+                             </td><td>
+                        <InputText id="symbol"   @bind-Value="_configDetails.Symbol"  />
+                            </td></tr>
+                        <tr><td>
+                        <label for="SubscriptionPrice" >Subscription Price</label>
+                        </td>
+                        <td>
+                        <InputNumber id="SubscriptionPrice"   @bind-Value="_configDetails.SubscriptionPrice"  >
+                         
+                        </InputNumber>
+                        </td>  </tr>  
+                        <tr><td>
+                        <label for="NumCoins" >Initial No of Coins</label>
+                        </td><td>
+                        <InputNumber id="NumCoins" @bind-Value=_configDetails.InitialNumberOfCoins/>
+                            </td></tr>
+                        <tr><td>
+                            <label for="LotSize" >Lot Size</label>
+                            </td><td>
+                    <InputNumber id="LotSize"   @bind-Value="_configDetails.LotSize"  />
+                    
+                 
+                    </td>
+                    </tr>
+                      <tr><td>
+                            <label for="MaxSpread" >Max Spread from FV</label>
+                            </td><td>
+                            <InputNumber id="MaxSpread"   @bind-Value="_configDetails.MaxSpreadFromFV"  />
+                    
+                 
+                    </td>
+                    </tr>
+                      <tr><td>
+                            <label for="MinSpread">Min Spread from FV</label>
+                            </td><td>
+                    <InputNumber id="MinSpread"   @bind-Value="_configDetails.MinSpreadFromFV"  />
+                    
+                 
+                    </td>
+                    </tr>
+                      <tr><td>
+                            <label for="BatchSize" >Number of Orders</label>
+                            </td><td>
+                    <InputNumber id="BatchSize"   @bind-Value="_configDetails.BatchSize"  />
+                    
+                 
+                    </td>
+                    </tr>
+                      <tr><td>
+                            <label for="ShortPeriodInterval" >Short Period Interval (secs) </label>
+                            </td><td>
+                    <InputNumber id="ShortPeriodInterval"   @bind-Value="_configDetails.ShortPeriodInterval"  />
+                    
+                 
+                    </td>
+                   </tr>
+                   <tr><td>
+                            <label for="LongPeriodInterval" >Long Period Interval (secs) </label>
+                            </td><td>
+                    <InputNumber id="LongPeriodInterval"   @bind-Value="_configDetails.LongPeriodInterval"  />
+                    
+                 
+                    </td>
+                   </tr>
+                    <tr>
+                    <button type="submit">OK</button>
+                    </tr>
+                    
+                    </table>
+                 </div>
+               </div>
+            </div>
+          </div>
+          </div>
+          </div>
+     </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int StrategyConfigId { get; set; }
+    private string _configName { get; set; } = "";
+    private int _Id { get; set; }
+
+    private EditLiquidityStrategyConfigDetails _configDetails = new EditLiquidityStrategyConfigDetails();
+    private LiquidationConfigurationDTO _strategyData { get; set; } = new ();
+    protected override async Task OnInitializedAsync()
+    {
+        _strategyData =  await PortfolioHttpClient.GetLiquidationStrategyConfig(StrategyConfigId);
+        if (_strategyData != null)
+        {
+            _configName = _strategyData.StrategySPSubscriptionConfig.ConfigName;
+            _Id = _strategyData.Id;
+            _configDetails.BatchSize = _strategyData.BatchSize;
+            _configDetails.InitialNumberOfCoins = _strategyData.CoinAmount;
+            _configDetails.LotSize = _strategyData.OrderSize;
+            _configDetails.MaxSpreadFromFV = _strategyData.PercentageSpreadFromFV;
+            _configDetails.MinSpreadFromFV = _strategyData.PercentageSpreadLowerThreshold;
+            _configDetails.Symbol = _strategyData.CoinPair.Name;
+            _configDetails.SubscriptionPrice = _strategyData.SubscriptionPrice;
+            _configDetails.ShortPeriodInterval = _strategyData.ShortTimeInterval;
+            _configDetails.LongPeriodInterval = _strategyData.LongTimeInterval;
+        }
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        var strategyData = new LiquidationStrategyConfigDTO();
+        strategyData.BatchSize = _configDetails.BatchSize;
+        strategyData.NumberOfCoins = _configDetails.InitialNumberOfCoins;
+        strategyData.OrderSize = _configDetails.LotSize;
+        strategyData.PercentageSpreadFromFV = _configDetails.MaxSpreadFromFV;
+        strategyData.PercentageSpreadLowerThreshold = _configDetails.MinSpreadFromFV;
+        strategyData.Symbol = _configDetails.Symbol;
+        strategyData.SubscriptionPrice = _configDetails.SubscriptionPrice;
+        strategyData.ShortTimeInterval = _configDetails.ShortPeriodInterval;
+        strategyData.LongTimeInterval = _configDetails.LongPeriodInterval;
+        strategyData.StrategySPSubscriptionConfigId = StrategyConfigId;
+        strategyData.CoinPairId = _strategyData.CoinPairId;
+        strategyData.ConfigName = _configName;
+        strategyData.Id = _Id;
+       // strategyData.Venue = _strategyData.Venue;
+        strategyData.DateCreated = DateTime.UtcNow;
+        strategyData.PriceDecimals = _strategyData.PriceDecimals;
+        strategyData.AmountDecimals = _strategyData.AmountDecimals;
+
+
+        await PortfolioHttpClient.UpdateLiquidationStrategyConfig(strategyData);
+        NavigationManager.NavigateTo($"strategyinstance/{StrategyConfigId}");
+    }
+
+    private void HandleInvalidSubmit()
+    {
+        
+    }
+}

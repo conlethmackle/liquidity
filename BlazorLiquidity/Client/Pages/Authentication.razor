@@ -1,0 +1,21 @@
+﻿@page "/authentication/{action}"
+
+@using Microsoft.Extensions.Configuration
+@using Microsoft.EntityFrameworkCore.Metadata.Internal
+
+@inject NavigationManager NavigationManager
+@inject IConfiguration Configuration
+
+<RemoteAuthenticatorView Action="@Action">
+    <LogOut>
+        @{
+            var authority = (string)Configuration["Liquidity:Auth:Auth0:Authority"];
+            var clientId = (string)Configuration["Liquidity:Auth:Auth0:ClientId"];
+            NavigationManager.NavigateTo($"{authority}/v2/logout?client_id={clientId}");
+        }
+    </LogOut>
+</RemoteAuthenticatorView>
+
+@code{
+    [Parameter] public string? Action { get; set; }
+}

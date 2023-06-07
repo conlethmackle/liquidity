@@ -1,0 +1,19 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Common.Models.Entities
+{
+   public class TelegramCommandToUser
+   {
+      public int TelegramCommandToUserId { get; set; }
+      public int TelegramCommandId { get; set; }
+      public TelegramCommand TelegramCommand { get; set; }
+      public int TelegramUserId { get; set; }
+      public TelegramUser TelegramUser { get; set; }
+      public bool IsAuthorised { get; set; }
+      public DateTime DateCreated { get; set; }
+   }
+}

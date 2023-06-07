@@ -1,0 +1,242 @@
+[
+  {
+    "name": "Fortress",
+    "Description": "This is a description of this SP Fortress",
+    "Balances": [
+      {
+        "Available": 99999.0,
+        "Currency": "VET",
+        "Held": 1.0,
+        "Total": 1000000
+      },
+      {
+        "Currency": "USDT",
+        "Total": 20000000,
+        "Available": 20000000.0,
+        "Held": 0
+      }
+    ],
+    "SubAccounts": [
+      {
+        "name": "kucoin",
+        "Currency": "VET",
+        "Total": 500000,
+        "Available": 99999.0,
+        "Held": 1.0
+      },
+      {
+        "name": "kucoin",
+        "Currency": "USDT",
+        "Total": 1000000,
+        "Available": 99999.0,
+        "Held": 1.0
+      },
+      {
+        "name": "binance",
+        "Currency": "VET",
+        "Total": 1000000,
+        "Available": 1000000.0,
+        "Held": 0
+      },
+      {
+        "name": "binance",
+        "Currency": "USDT",
+        "Total": 1000000,
+        "Available": 1000000.0,
+        "Held": 1.0
+      }
+    ]
+  },
+  {
+    "name": "SP2",
+    "Description": "This is a description of this SP 2",
+    "Balances": [
+      {
+        "Available": 99999.0,
+        "Currency": "VET",
+        "Held": 1.0,
+        "Total": 1000000
+      },
+      {
+        "Currency": "USDT",
+        "Total": 20000000,
+        "Available": 20000000.0,
+        "Held": 0
+      }
+    ],
+    "SubAccounts": [
+      {
+        "name": "kucoin",
+        "Currency": "VET",
+        "Total": 500000,
+        "Available": 99999.0,
+        "Held": 1.0
+      },
+      {
+        "name": "kucoin",
+        "Currency": "USDT",
+        "Total": 1000000,
+        "Available": 99999.0,
+        "Held": 1.0
+      },
+      {
+        "name": "binance",
+        "Currency": "VET",
+        "Total": 1000000,
+        "Available": 1000000.0,
+        "Held": 0
+      },
+      {
+        "name": "binance",
+        "Currency": "USDT",
+        "Total": 1000000,
+        "Available": 1000000.0,
+        "Held": 1.0
+      }
+    ]
+  },
+  {
+    "name": "Segregated Portfolio 3",
+    "Description": "This is a description of this SP 3",
+    "Balances": [
+      {
+        "Available": 99999.0,
+        "Currency": "VET",
+        "Held": 1.0,
+        "Total": 1000000
+      },
+      {
+        "Currency": "USDT",
+        "Total": 20000000,
+        "Available": 20000000.0,
+        "Held": 0
+      }
+    ],
+    "SubAccounts": [
+      {
+        "name": "kucoin",
+        "Currency": "VET",
+        "Total": 500000,
+        "Available": 99999.0,
+        "Held": 1.0
+      },
+      {
+        "name": "kucoin",
+        "Currency": "USDT",
+        "Total": 1000000,
+        "Available": 99999.0,
+        "Held": 1.0
+      },
+      {
+        "name": "binance",
+        "Currency": "VET",
+        "Total": 1000000,
+        "Available": 1000000.0,
+        "Held": 0
+      },
+      {
+        "name": "binance",
+        "Currency": "USDT",
+        "Total": 1000000,
+        "Available": 1000000.0,
+        "Held": 1.0
+      }
+    ]
+  },
+  {
+    "name": "Segregated Portfolio 4",
+    "Description": "This is a description of this SP 4",
+    "Balances": [
+      {
+        "Available": 99999.0,
+        "Currency": "VET",
+        "Held": 1.0,
+        "Total": 1000000
+      },
+      {
+        "Currency": "USDT",
+        "Total": 20000000,
+        "Available": 20000000.0,
+        "Held": 0
+      }
+    ],
+    "SubAccounts": [
+      {
+        "name": "kucoin",
+        "Currency": "VET",
+        "Total": 500000,
+        "Available": 99999.0,
+        "Held": 1.0
+      },
+      {
+        "name": "kucoin",
+        "Currency": "USDT",
+        "Total": 1000000,
+        "Available": 99999.0,
+        "Held": 1.0
+      },
+      {
+        "name": "binance",
+        "Currency": "VET",
+        "Total": 1000000,
+        "Available": 1000000.0,
+        "Held": 0
+      },
+      {
+        "name": "binance",
+        "Currency": "USDT",
+        "Total": 1000000,
+        "Available": 1000000.0,
+        "Held": 1.0
+      }
+    ]
+  },
+  {
+    "name": "Segregated Portfolio 5",
+    "Description": "This is a description of this SP 5",
+    "Balances": [
+      {
+        "Available": 99999.0,
+        "Currency": "VET",
+        "Held": 1.0,
+        "Total": 1000000
+      },
+      {
+        "Currency": "USDT",
+        "Total": 20000000,
+        "Available": 20000000.0,
+        "Held": 0
+      }
+    ],
+    "SubAccounts": [
+      {
+        "name": "kucoin",
+        "Currency": "VET",
+        "Total": 500000,
+        "Available": 99999.0,
+        "Held": 1.0
+      },
+      {
+        "name": "kucoin",
+        "Currency": "USDT",
+        "Total": 1000000,
+        "Available": 99999.0,
+        "Held": 1.0
+      },
+      {
+        "name": "binance",
+        "Currency": "VET",
+        "Total": 1000000,
+        "Available": 1000000.0,
+        "Held": 0
+      },
+      {
+        "name": "binance",
+        "Currency": "USDT",
+        "Total": 1000000,
+        "Available": 1000000.0,
+        "Held": 1.0
+      }
+    ]
+  }
+]

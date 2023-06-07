@@ -1,0 +1,37 @@
+﻿@page "/create-portfolio"
+@attribute [Authorize]
+@inject ILogger<StrategyInstance> Logger
+@inject PortfolioHttpClient PortfolioHttpClient
+@inject HubConnection HubConnection
+@inject NavigationManager NavigationManager
+
+@using Syncfusion.Blazor.Navigations
+@using BlazorLiquidity.Shared
+@using Common.Models.DTOs
+@using Microsoft.AspNetCore.SignalR.Client
+@using Syncfusion.Blazor.Inputs
+
+
+<EditForm Model="@_spdto" OnValidSubmit="HandleValidSubmit"><DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <InputText FloatLabelType="FloatLabelType.Auto" @bind-Value="_spdto.Name"></InputText>
+        </div>
+    </div>
+    
+ 
+    <p>
+        <SfButton>Submit</SfButton>
+    </p>
+</EditForm>
+
+
+@code {
+
+    SPDTO _spdto = new SPDTO();
+    private async Task HandleValidSubmit()
+    {
+
+    }
+}

@@ -1,0 +1,61 @@
+﻿@page "/create-telegram-command"
+@attribute [Authorize]
+@using Syncfusion.Blazor.Navigations
+@using Syncfusion.Blazor.Inputs
+@using Common.Models.DTOs
+@using Syncfusion.Blazor.Buttons
+@using System.Text.Json
+@using BlazorLiquidity.Shared
+@inject PortfolioHttpClient PortfolioHttpClient
+@inject NavigationManager NavigationManager
+@using Microsoft.AspNetCore.Components.Forms
+@using Syncfusion.Blazor.Inputs
+
+<EditForm Model="@_command" OnValidSubmit="@HandleValidSubmit" >
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+ 
+    <SfTextBox id="Command Text" Placeholder='Command Text' FloatLabelType='@FloatLabelType.Auto'  @bind-Value="_command.TelegramCommandText"  />
+    <br/>
+    <br/>                     
+    <label for="CommandType" >Command Type</label>
+                               
+    <InputSelect id="CommandType" @bind-Value="_command.TelegramCommandTypeId">
+        <option value="" >Please choose a category</option>
+        @foreach (var c  in _commandTypes)
+        {
+            <option value="@c.TelegramCommandTypeId">@c.Category</option>
+        }
+    </InputSelect>
+    <br/>
+    <br/>
+                    
+    
+    <br/>
+    <br/>
+    <SfButton Type="submit">OK</SfButton>
+                   
+</EditForm>
+
+@code {
+   
+    private TelegramCommandDTO _command = new ();
+
+    string coinPairs = null;
+    SfButton ToggleBtn;
+    
+    private bool _displayStuff = false;
+    private List<TelegramCommandTypeDTO> _commandTypes = new ();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _commandTypes = await PortfolioHttpClient.GetTelegramCommandTypes();
+    }
+
+
+    public async Task HandleValidSubmit()
+    {
+        await PortfolioHttpClient.CreateTelegramCommand(_command);
+        NavigationManager.NavigateTo("list-telegram-commands");
+    }
+}

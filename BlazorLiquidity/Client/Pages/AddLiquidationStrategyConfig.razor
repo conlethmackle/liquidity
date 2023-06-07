@@ -1,0 +1,192 @@
+﻿@page "/add-liquidation-strategy-config"
+@attribute [Authorize]
+@using BlazorLiquidity.Shared
+@using Common.Messages
+@using Common.Models
+@using Microsoft.AspNetCore.SignalR.Client
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.Extensions.Logging
+@using Common.Models.DTOs
+@using System.Text.Json
+@using System.Linq
+@inject ILogger<StrategyInstance> Logger
+@inject PortfolioHttpClient PortfolioHttpClient
+@inject HubConnection HubConnection
+@inject NavigationManager NavigationManager
+@implements IDisposable
+
+    <EditForm Model="@_configDetails" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+        <DataAnnotationsValidator/>
+        <ValidationSummary/>
+        <div class="container-bg">
+            <div class="row">
+                <div class="col-lg-12">
+
+                    <div class="card">
+                        <div class="card text-white bg-dark mb-3">
+                            <div class="card-header">
+                                <div class="text-center">Add Liquidity Configuration</div></div></div>
+                        <div class="card text-black bg-light mb-2">
+                            <div class="card-body">
+                                <div class="text-center">
+                                    <table>
+                                        <tr>
+                                            <td>
+                                                <label for="StrategyConfigId">Strategy Config</label></td>
+                                            <td>
+                                                <InputSelect id="StrategyConfigId" @bind-Value="_configDetails.StrategySPSubscriptionConfigId">
+                                                    @foreach (var c  in _strategyConfigs)
+                                                    {
+                                                        <option value="@c.StrategySPSubscriptionConfigId">@c.ConfigName</option>
+                                                    }
+                                                </InputSelect></td></tr>
+                                        <tr>
+                                            <td>
+                                                <label for="symbol">Symbol</label>
+                                            </td>
+                                            <td>
+                                                <td>
+                                                    <InputSelect id="symbol" @bind-Value="_configDetails.Symbol">
+                                                        @foreach (var c  in _coinPairs)
+                                                        {
+                                                            <option value="@c.Name">@c.Name</option>
+                                                        }
+                                                    </InputSelect></td>
+                                            </td></tr>
+                                        <tr>
+                                            <td>
+                                                <label for="SubscriptionPrice">Subscription Price</label>
+                                            </td>
+                                            <td>
+                                                <InputNumber id="SubscriptionPrice" @bind-Value="_configDetails.SubscriptionPrice">
+
+                                                </InputNumber>
+                                            </td> </tr>
+                                        <tr>
+                                            <td>
+                                                <label for="NumCoins">Initial No of Coins</label>
+                                            </td>
+                                            <td>
+                                                <InputNumber id="NumCoins" @bind-Value=_configDetails.InitialNumberOfCoins/>
+                                            </td></tr>
+                                        <tr>
+                                            <td>
+                                                <label for="LotSize">Lot Size</label>
+                                            </td>
+                                            <td>
+                                                <InputNumber id="LotSize" @bind-Value="_configDetails.LotSize"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <label for="MaxSpread">Max Spread from FV</label>
+                                            </td>
+                                            <td>
+                                                <InputNumber id="MaxSpread" @bind-Value="_configDetails.MaxSpreadFromFV"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <label for="MinSpread">Min Spread from FV</label>
+                                            </td>
+                                            <td>
+                                                <InputNumber id="MinSpread" @bind-Value="_configDetails.MinSpreadFromFV"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <label for="BatchSize">Number of Orders</label>
+                                            </td>
+                                            <td>
+                                                <InputNumber id="BatchSize" @bind-Value="_configDetails.BatchSize"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <label for="ShortPeriodInterval">Short Period Interval (secs) </label>
+                                            </td>
+                                            <td>
+                                                <InputNumber id="ShortPeriodInterval" @bind-Value="_configDetails.ShortPeriodInterval"/>
+
+
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>
+                                                <label for="LongPeriodInterval">Long Period Interval (secs) </label>
+                                            </td>
+                                            <td>
+                                                <InputNumber id="LongPeriodInterval" @bind-Value="_configDetails.LongPeriodInterval"/>
+
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <button type="submit">OK</button>
+                                        </tr>
+
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </EditForm>
+   
+
+@code {
+
+    private AddLiquidityStrategyConfig _configDetails = new AddLiquidityStrategyConfig();
+    private LiquidationStrategyConfigDTO _strategyData { get; set; } = new LiquidationStrategyConfigDTO();
+    private List<StrategyExchangeConfigDTO> _strategyConfigs = new List<StrategyExchangeConfigDTO>();
+    private List<CoinPairDTO> _coinPairs = new List<CoinPairDTO>();
+    protected override async Task OnInitializedAsync()
+    {
+        _strategyConfigs = await PortfolioHttpClient.GetAllStrategyConfigs();
+        _coinPairs = await PortfolioHttpClient.GetCoinPairs();
+        
+    }
+
+    public void Dispose()
+    {
+
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        var strategyData = new LiquidationStrategyConfigDTO();
+        strategyData.BatchSize = _configDetails.BatchSize;
+        strategyData.NumberOfCoins = _configDetails.InitialNumberOfCoins;
+        strategyData.OrderSize = _configDetails.LotSize;
+        strategyData.PercentageSpreadFromFV = _configDetails.MaxSpreadFromFV;
+        strategyData.PercentageSpreadLowerThreshold = _configDetails.MinSpreadFromFV;
+        strategyData.Symbol = _configDetails.Symbol;
+        strategyData.SubscriptionPrice = _configDetails.SubscriptionPrice;
+        strategyData.ShortTimeInterval = _configDetails.ShortPeriodInterval;
+        strategyData.LongTimeInterval = _configDetails.LongPeriodInterval;
+        strategyData.StrategySPSubscriptionConfigId = _configDetails.StrategySPSubscriptionConfigId;
+        strategyData.CoinPairId = (int)_coinPairs.Where(c => c.Name == _configDetails.Symbol).FirstOrDefault().CoinPairId;
+
+        var config = (string)_strategyConfigs.Where(s => s.StrategySPSubscriptionConfigId == _configDetails.StrategySPSubscriptionConfigId).FirstOrDefault().ConfigName;
+
+        if (config != null)
+            strategyData.ConfigName = config;
+        
+        strategyData.Venue = _strategyData.Venue;
+        strategyData.DateCreated = DateTime.UtcNow;
+        strategyData.PriceDecimals = 5;
+        strategyData.AmountDecimals = 5; 
+
+
+        await PortfolioHttpClient.CreateLiquidationStrategyConfig(strategyData);
+        NavigationManager.NavigateTo("list-liquidstrategies-config");
+    }
+
+    private void HandleInvalidSubmit()
+    {
+        
+    }
+}

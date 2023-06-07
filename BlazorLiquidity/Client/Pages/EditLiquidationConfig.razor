@@ -1,0 +1,170 @@
+﻿@page "/EditLiquidationConfig/{InstanceId:int}"
+@attribute [Authorize]
+@using BlazorLiquidity.Shared
+@using Common.Messages
+@using Common.Models
+@using Microsoft.AspNetCore.SignalR.Client
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.Extensions.Logging
+@using Common.Models.DTOs
+@using System.Text.Json
+@using System.Linq
+@using Microsoft.AspNetCore.Components
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Calendars
+@inject ILogger<StrategyInstance> Logger
+@inject PortfolioHttpClient PortfolioHttpClient
+@inject HubConnection HubConnection
+@inject NavigationManager NavigationManager
+@inject PageHistoryState PageHistory 
+@implements IDisposable
+
+
+<SfCard Orientation="CardOrientation.Vertical">
+    
+<CardHeader>
+    <div class="CustomHeader">Modify Liquidation Config</div>
+</CardHeader>
+    <br/>
+  
+<EditForm Model="@_strategyData" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+  
+        <SfNumericTextBox Placeholder="Subscription Price" TValue="decimal" FloatLabelType='@FloatLabelType.Auto'  @bind-Value="_strategyData.SubscriptionPrice"  />
+                                    <br/>   
+       
+        @if (_strategyData != null && _strategyData.StrategySPSubscriptionConfig != null && _strategyData.StrategySPSubscriptionConfig.ExchangeDetails != null)
+        {
+            @foreach (var exchange in _strategyData.StrategySPSubscriptionConfig.ExchangeDetails)
+            {
+                _placeHolder = $"Coins to Liquidate on {exchange.Venue.VenueName.Split("_")[0]}";
+
+                <SfNumericTextBox Placeholder="@_placeHolder" TValue="decimal" FloatLabelType='@FloatLabelType.Auto' @bind-Value="exchange.OpeningExchangeBalance.AmountToBeLiquidated"/>
+            }
+        }
+        <br/>  
+        <SfNumericTextBox Placeholder="Maximum Order Size" TValue="decimal" FloatLabelType='@FloatLabelType.Auto'  @bind-Value="_strategyData.OrderSize"  />
+        <br/>  
+        <SfNumericTextBox Placeholder="Max Spread from FV" TValue="decimal" FloatLabelType='@FloatLabelType.Auto'  @bind-Value="_strategyData.PercentageSpreadFromFV"  />
+        <br/>  
+        <SfNumericTextBox Placeholder="Min Spread from FV" TValue="decimal" FloatLabelType='@FloatLabelType.Auto'  @bind-Value="_strategyData.PercentageSpreadLowerThreshold"  />
+        <br/>   
+        <SfNumericTextBox Placeholder="Number of Orders" TValue="int" FloatLabelType='@FloatLabelType.Auto'  @bind-Value="_strategyData.BatchSize"  />
+        <br/>  
+        <SfNumericTextBox Placeholder="Short Period Interval (secs)" TValue="int" FloatLabelType='@FloatLabelType.Auto'  @bind-Value="_strategyData.ShortTimeInterval"  />
+        <SfNumericTextBox id="PriceDecimals" TValue="int"  Placeholder="Price Decimals" FloatLabelType='@FloatLabelType.Auto' @bind-Value="_strategyData.PriceDecimals"/>
+        <br/> 
+        <SfNumericTextBox id="AmountDecimals" TValue="int"  Placeholder="Amount Decimals" FloatLabelType='@FloatLabelType.Auto' @bind-Value="_strategyData.AmountDecimals"/>
+        <br/> 
+        <SfNumericTextBox id="TakerModeTimeInterval" TValue="int"  Placeholder="Taker Mode TimeInterval (secs)" FloatLabelType='@FloatLabelType.Auto' @bind-Value="_strategyData.TakerModeTimeInterval"/>
+        <br/> 
+        <SfNumericTextBox id="CancelTimerInterval" TValue="int"  Placeholder="Cancel Timer Interval" FloatLabelType='@FloatLabelType.Auto' @bind-Value="_strategyData.CancelTimerInterval"/>
+        <br/>
+        <label for="MakerTakerMode">Maker/Taker Mode</label>
+           
+                    <InputSelect id="MakerTakerMode" DisplayName = "MakerTakerMode" @bind-Value="_strategyData.MakerMode">
+                        <option value="@_strategyData.MakerMode">@_strategyData.MakerMode.ToString()</option>
+                        <option value="0">Maker</option>
+                        <option value="1">Taker</option>
+                    </InputSelect>
+        <br/>  
+         <label for="OrderLoading">Order Loading Method</label>
+                    <InputSelect id="OrderLoading" @bind-Value="_strategyData.LiquidationOrderLoadingConfigurationId">
+                        <option value="0">Select Order Loading Method</option>
+                        @foreach (var c  in _orderLoadingConfig)
+                        {
+                            <option value="@c.Id">@c.Name</option>
+                        }
+                    </InputSelect>
+        <br/>  
+    <label for="StrategyState">Strategy State On/Off</label>
+    <InputSelect id="StrategyState" @bind-Value="_strategyData.StrategyState">
+        <option value="false">Select State of the Strategy Instance</option>
+        <option value="true">Strategy On</option>
+        <option value="false">Strategy Off</option>
+    </InputSelect>
+    <br/>  
+       <SfDatePicker TValue="DateTime" Placeholder="Choose an End Date" @bind-Value="_strategyData.EndDate" />
+    <br/>  
+   
+    <button type="submit">OK</button>
+                                    
+                    
+                                
+                           
+         
+</EditForm>
+</SfCard>
+
+@code {
+    [Parameter]
+    public int InstanceId { get; set; }
+    private string _configName { get; set; } = "";
+    private int _Id { get; set; }
+    private ExchangeDetailsDTO _tempExchange { get; set; } = new();
+    private string _placeHolder { get; set; }
+    private EditLiquidityStrategyConfigDetails _configDetails = new EditLiquidityStrategyConfigDetails();
+    private LiquidationConfigurationDTO _strategyData { get; set; } = new ();
+    private List<LiquidationOrderLoadingConfigurationDTO> _orderLoadingConfig { get; set; } = new();
+    private List<OpeningExchangeBalanceDTO> _openingBalances = new();
+    DateTime endDate { get; set; }
+    private string _previousPage { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        _previousPage = PageHistory.GetGoBackPage();
+        _strategyData =  await PortfolioHttpClient.GetLiquidationStrategyConfig(InstanceId);
+        _orderLoadingConfig = await PortfolioHttpClient.GetLiquidationOrderLoadingConfiguration();
+        _openingBalances = await PortfolioHttpClient.GetOpeningExchangeBalancesForInstance(InstanceId);
+      
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        Console.WriteLine($"What the f is wrong here");
+        Console.WriteLine($"{_strategyData.MaxOrderSize}, {_strategyData.BatchSize} {_strategyData.CoinAmount} {_strategyData.EndDate} {_strategyData.MakerMode.ToString()} {_strategyData.PercentageSpreadFromFV} {_strategyData.PercentageSpreadLowerThreshold} {_strategyData.ShortTimeInterval} {_strategyData.StrategySPSubscriptionConfigId} {_strategyData.AmountDecimals} {_strategyData.PriceDecimals} {_strategyData.OrderSize}");
+        var copy = new LiquidationConfigurationDTO()
+        {
+            Id = _strategyData.Id,
+            BatchSize = _strategyData.BatchSize,
+            CoinAmount = _strategyData.CoinAmount,
+            EndDate = _strategyData.EndDate,
+            MakerMode = _strategyData.MakerMode,
+            PercentageSpreadFromFV = _strategyData.PercentageSpreadFromFV,
+            PercentageSpreadLowerThreshold = _strategyData.PercentageSpreadLowerThreshold,
+            ShortTimeInterval = _strategyData.ShortTimeInterval,
+            OrderSize = _strategyData.OrderSize,
+            AmountDecimals = _strategyData.AmountDecimals,
+            PriceDecimals = _strategyData.PriceDecimals,
+            StrategySPSubscriptionConfigId = _strategyData.StrategySPSubscriptionConfigId,
+            SPId = _strategyData.SPId,
+            StrategyId = _strategyData.StrategyId,
+            SubscriptionPrice = _strategyData.SubscriptionPrice,
+            CoinPairId = _strategyData.CoinPairId,
+            TakerModeTimeInterval = _strategyData.TakerModeTimeInterval,
+            CancelTimerInterval = _strategyData.CancelTimerInterval,
+            LiquidationOrderLoadingConfigurationId = _strategyData.LiquidationOrderLoadingConfigurationId,
+            StrategyState = _strategyData.StrategyState
+        };
+        await PortfolioHttpClient.UpdateOpeningLiquidationSubscription(copy);
+        foreach (var exchange in _strategyData.StrategySPSubscriptionConfig.ExchangeDetails)
+        {
+            await PortfolioHttpClient.UpdateOpeningExchangeBalance(exchange.OpeningExchangeBalance);
+            
+        }
+        NavigationManager.NavigateTo($"{_previousPage}");
+    }
+
+    private void HandleInvalidSubmit()
+    {
+        Console.WriteLine($"What the f is wrong here");
+        Console.WriteLine($"{_strategyData.MaxOrderSize}, {_strategyData.BatchSize} {_strategyData.CoinAmount} {_strategyData.EndDate} {_strategyData.MakerMode.ToString()} {_strategyData.PercentageSpreadFromFV} {_strategyData.PercentageSpreadLowerThreshold} {_strategyData.ShortTimeInterval} {_strategyData.StrategySPSubscriptionConfigId} {_strategyData.AmountDecimals} {_strategyData.PriceDecimals} {_strategyData.OrderSize}");
+    }
+}
+

@@ -1,0 +1,292 @@
+﻿@page "/portfolio-instance-list2/{SPName}"
+@using BlazorLiquidity.Shared
+@using Common.Models.DTOs
+@using Microsoft.AspNetCore.SignalR.Client
+@inject PortfolioHttpClient PortfolioHttpClient
+@using Syncfusion.Blazor
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Cards
+@using Syncfusion
+@using Syncfusion.Blazor.Buttons
+@using System.Text.Json
+@inject NavigationManager NavigationManager
+@inject HubConnection HubConnection
+
+
+@if (_configs == null)
+{
+    <p>Loading ...</p>
+}
+else {
+    <h2 style="color:white">Strategy Instances for @_spName</h2>
+
+    <br/>
+    <div id="ControlRegion2">
+        <SfCard Orientation="CardOrientation.Vertical">
+            <CardHeader><div class="CustomHeader">Instances</div></CardHeader>
+              
+            <SfButton @ref="AddNewButton" @onclick="OnAddNewInstance" CssClass="e-flat"  IsPrimary="true" Content="Add New Instance"></SfButton>
+            <SfGrid ID="Grid" DataSource="@_configs" @ref="Grid" AllowSelection="true"
+                    Toolbar="@(new List<string>() { "Edit", "Delete", "Cancel", "Update" })" Height="100" Width="900">
+                <GridEditSettings AllowEditOnDblClick="true" AllowAdding="true" AllowEditing="true" AllowDeleting="true" Mode="EditMode.Dialog"></GridEditSettings>
+                <GridPageSettings PageSizes="true"></GridPageSettings>
+                <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Single"></GridSelectionSettings>
+                <GridEvents OnToolbarClick="ToolbarClick" OnActionBegin="OnActionBegin" OnRecordDoubleClick="OnRecordDoubleClick" TValue="StrategyExchangeConfigDTO"></GridEvents>
+                <GridColumns>
+                    <GridColumn Field=@nameof(StrategyExchangeConfigDTO.ConfigName) HeaderText="StrategyInstance" ValidationRules="@(new ValidationRules { Required = true })" Width="150"></GridColumn>
+                    <GridColumn Field="Strategy.StrategyName" HeaderText="Strategy" ValidationRules="@(new ValidationRules { Required = true })" TextAlign="TextAlign.Left" Width="150"></GridColumn>
+                    <GridColumn HeaderText="DashBoard" Width="100">
+                        <Template> 
+                            @{
+                                var spInstance = (context as StrategyExchangeConfigDTO);
+                                <SfButton @ref="DashBoardButton" @onclick="@((args) => GoToDashBoard(args,spInstance))" IsToggle="true" IsPrimary="true">DashBoard</SfButton> 
+                            } 
+                        </Template> 
+                    </GridColumn>
+                   
+                    <GridColumn HeaderText="Manage" Width="100" HeaderTextAlign="TextAlign.Right">
+                        <GridCommandColumns>
+                            <GridCommandColumn Type="CommandButtonType.Save" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-save", CssClass = "e-flat" })"></GridCommandColumn>
+                            <GridCommandColumn Type="CommandButtonType.Cancel" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-cancel", CssClass = "e-flat" })"></GridCommandColumn>
+                            <GridCommandColumn Type="CommandButtonType.Edit" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-edit", CssClass = "e-flat" })"></GridCommandColumn>
+                            <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-delete", CssClass = "e-flat" })"></GridCommandColumn>
+                        </GridCommandColumns>
+                    </GridColumn>
+                </GridColumns>
+            </SfGrid>
+        
+        </SfCard>
+        
+        <SfCard Orientation="CardOrientation.Vertical">
+            <CardHeader><div class="CustomHeader">Fair Value</div></CardHeader>
+            <SfGrid  ID="Grid2" DataSource="@_fairValueDisplay" @ref="Grid2"  EnableVirtualization="true" EnableColumnVirtualization="true"
+                     Height="100" Width="900">
+                <GridEvents QueryCellInfo="CustomizeCell" TValue="FairValueDisplay"></GridEvents>
+                <GridColumns>
+                    <GridColumn Field=@nameof(FairValueDisplay.Symbol) IsPrimaryKey="true" AllowEditing="false" HeaderText="Symbol" TextAlign="TextAlign.Left" ></GridColumn> 
+                    <GridColumn Field=@nameof(FairValueDisplay.Price) HeaderText="Price" TextAlign="TextAlign.Left" ></GridColumn>
+                </GridColumns>
+            </SfGrid>
+        </SfCard>
+    </div>
+}
+
+<style> 
+    .CustomHeader, 
+    .e-card .e-card-header .e-card-header-caption:first-child { 
+        padding-left: 0%; 
+    } 
+
+ 
+    .lower {
+         background-color: red;
+     }
+
+    .higher {
+        background-color: green;
+    }
+
+    .same {
+        background-color: orange
+    }
+
+</style> 
+
+@code
+{
+    [Parameter]
+    public string? SPName { get; set; }
+
+    SfGrid<StrategyExchangeConfigDTO>? Grid { get; set; }
+    SfGrid<FairValueDisplay>? Grid2 { get; set; }
+    SfButton AddNewButton;
+    SfButton DashBoardButton;
+
+    private List<StrategyExchangeConfigDTO> _configs = new ();
+    //private List<ExchangeDetailsDTO> _exchangeDetails = new();
+    private string _spName { get; set; }
+    private string _fairValueSymbol { get; set; } = "";
+    private decimal _fairValuePrice { get; set; }
+    private string _fairPriceDisplay = "text-success";
+    private List<FairValueDisplay> _fairValueDisplay = new List<FairValueDisplay>();
+
+    private string _fairValueLiquidationButtonStatus = "badge badge-danger";
+    private decimal _previousPrice = 0;
+
+    public PortfolioInstanceList()
+    {
+        var fairValueThing = new FairValueDisplay()
+        {
+           
+            Price = 19000,
+            Symbol = "BTC/USDT",
+            Display = ""
+        };
+
+        _fairValueDisplay.Add(fairValueThing);
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        _spName = (string)SPName;
+        _configs = await PortfolioHttpClient.GetStrategyConfigsForSP(_spName);
+
+        
+       
+        //_exchangeDetails = _configs[0].ExchangeDetails;
+
+        HubConnection.On<MessageQueueData>("RealTimeUpdate", async(data) =>
+        {
+         
+           await HandleMessages(data);
+        });
+       
+        foreach (var s in _configs)
+        {
+            Console.WriteLine($"The Strategy Name is {s.Strategy.StrategyName}");
+        }
+       
+        StateHasChanged();
+    }
+
+    public void LoadStrategyInstance(int StrategyConfigId)
+    {
+        NavigationManager.NavigateTo($"strategyinstance/{StrategyConfigId}");
+    }
+
+     public void ToolbarClick(Syncfusion.Blazor.Navigations.ClickEventArgs args)
+    {
+        Console.WriteLine("In toolbarclick");
+    }
+
+    public void OnRecordDoubleClick(Syncfusion.Blazor.Grids.RecordDoubleClickEventArgs<StrategyExchangeConfigDTO> args)
+    {
+       // NavigationManager.NavigateTo($"portfolio-instance-list/{args.RowData.}");
+        var rowData = args.RowData;
+        NavigationManager.NavigateTo($"strategy-instance-configure/{args.RowData.ConfigName}");
+        Console.WriteLine("In doubleclick");
+    }
+
+    public async Task OnActionBegin(ActionEventArgs<StrategyExchangeConfigDTO> args)
+    {
+        if (args == null)
+        {
+            Console.WriteLine("OnActionBegin args is null");
+            return;
+        }
+        if (args.Data == null)
+        {
+            Console.WriteLine("OnActionBegin args.Data is null");
+            return;
+        }
+     //   Console.WriteLine($"OnActionBegin Just had an {args.Action} action on Id = {args.Data.Name}");
+        if (args.RequestType.Equals((Syncfusion.Blazor.Grids.Action.Save)))
+        {
+            if (args.Action == "Add")
+            {
+     //           await PortfolioHttpClient.CreatePortfolio(args.Data);
+            }
+            else if (args.Action == "Edit")
+            {
+                Console.WriteLine("Got an edit");
+    //            await PortfolioHttpClient.UpdatePortfolio(args.Data);
+            }
+         
+        }
+        else if (args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Delete))
+        {
+            Console.WriteLine("Deleting a record");
+            if (args.Action == "Delete")
+            {
+                Console.WriteLine("Shold be calling DeletePortfolio");
+      //          await PortfolioHttpClient.DeletePortfolio(args.Data);
+                Console.WriteLine("Should be finsihed calling DeletePortfolio");
+            }
+        }
+        else if (args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Add))
+        {
+            Console.WriteLine("OnActionBegin Add Request Type");
+            if (args.Action == "Add")
+            {
+   //             await PortfolioHttpClient.CreatePortfolio(args.Data);
+            }
+        }
+
+      //  _portfolios = await PortfolioHttpClient.GetPortfolios();
+      //  await Grid?.Refresh();
+    }
+
+    public async Task OnActionComplete(ActionEventArgs<StrategyExchangeConfigDTO> args)
+    {
+  //     Console.WriteLine($"OnActionComplete Just had an {args.Action} action on Id = {args.Data.Name}");
+//        _portfolios = await PortfolioHttpClient.GetPortfolios();
+        await Grid?.Refresh();
+    }
+
+    public void OnAddNewInstance(MouseEventArgs args)
+    {
+        NavigationManager.NavigateTo($"create-strategy-instance");
+    }
+
+    public void GoToDashBoard(MouseEventArgs args, StrategyExchangeConfigDTO? instance)
+    {
+        if (instance == null)
+        {
+            Console.WriteLine("GoToDashBoard - instance is null");
+            return;
+        }
+        NavigationManager.NavigateTo($"strategyinstance/{instance.StrategySPSubscriptionConfigId}");
+    }
+
+    private async Task HandleMessages(MessageQueueData msg)
+    {
+    //if (msg.MessageType != QueueMsgTypes.FAIRVALUEUPDATE)
+    // Console.WriteLine($"handling msg type {msg.MessageType.ToString()}");
+        switch (msg.MessageType)
+        {
+            case QueueMsgTypes.FAIRVALUEUPDATE:
+                var fairValueData = JsonSerializer.Deserialize<FairValueData>(msg.Data);
+                await HandleFairValueUpdate(fairValueData);
+                break;
+        }
+    }
+
+    private async Task HandleFairValueUpdate(FairValueData? fairValueData)
+    {
+        if (fairValueData != null)
+        {
+            Console.WriteLine($"In handle Fair value with price = {fairValueData.Price} ");
+            _fairValueDisplay.Clear();
+            FairValueDisplay display = new FairValueDisplay();
+            display.Id = 1;
+            display.Price = Math.Round(fairValueData.Price, 2, MidpointRounding.ToEven);;
+            display.Symbol = fairValueData.Symbol;
+            display.Display = "text-success";
+            _fairValueDisplay.Add(display);
+            await Grid2.SetRowDataAsync(display.Symbol, _fairValueDisplay[0]);
+            StateHasChanged();
+            _previousPrice = display.Price;
+        }
+
+       
+    }
+
+    public void CustomizeCell(QueryCellInfoEventArgs<FairValueDisplay> args)
+    {
+        if (args.Column.Field == "Price")
+        {
+            if (args.Data.Price < _previousPrice)
+            {
+                args.Cell.AddClass(new string[] { "lower" });
+            }
+            else if (args.Data.Price >  _previousPrice)
+            {
+                args.Cell.AddClass(new string[] { "higher" });
+            }
+            else
+            {
+                args.Cell.AddClass(new string[] { "same" });
+            }
+        }
+    }
+
+}

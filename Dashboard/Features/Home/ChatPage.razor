@@ -1,0 +1,122 @@
+﻿@page "/chat"
+@using Microsoft.AspNetCore.SignalR.Client
+@inject NavigationManager NavigationManager
+@implements IAsyncDisposable
+@using System.Text.Json;
+@using Common.Models;
+
+<div class="form-group">
+    <label>
+        User:
+        <input @bind="userInput" />
+    </label>
+</div>
+<div class="form-group">
+    <label>
+        Message:
+        <input @bind="messageInput" size="50" />
+    </label>
+</div>
+<button @onclick="Send" disabled="@(!IsConnected)">Send</button>
+<hr>
+
+
+    <div>
+                  
+        <table class="table table-striped">
+            <thead class="thead-light">
+                <tr>
+                  <th>Price(USDT)</th>
+                  <th>Quantity(BTC)</th>
+                  <th>Total (USDT)</th>
+               
+                </tr>
+            </thead>
+            @if (_snapshot != null)
+            {
+                @foreach (var ask in _snapshot.OrderBook.Ask)
+                {
+                    <tr>
+                        <td class="text-danger">@ask.Price.</td>
+                        <td>@ask.Quantity</td>
+                        <td>@ask.Price*@ask.Quantity</td>                   
+                    </tr>
+                }
+                <p>@_snapshot.OrderBook.Ask[0].Price</p>
+                @foreach (var bid in _snapshot.OrderBook.Bid)
+                {
+                    <tr>
+                        <td class="text-success">@bid.Price.</td>
+                        <td>@bid.Quantity</td>
+                        <td>@bid.Price*@bid.Quantity</td>                   
+                    </tr>
+            }
+        }
+        </table>
+                    
+                </div>
+<ul id="messagesList">
+    @foreach (var message in messages)
+    {
+        <li>@message</li>
+    }
+</ul>
+
+
+
+@code {
+    private HubConnection hubConnection;
+    private List<string> messages = new List<string>();
+    private List<string> orderbookData = new List<string>();
+    private string userInput;
+    private string messageInput;
+    private string _symbol;
+    private OrderBookSnapshot _snapshot;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var ip = "localhost";
+        var port = 5011;
+        var url = new Uri($"https://{ip}:{port}/chat");
+
+
+        hubConnection = new HubConnectionBuilder().WithUrl(url).Build();
+
+        hubConnection.On<string, string>("ReceiveMessage", (user, message) =>
+        {
+            var encodedMsg = $"{user}: {message}";
+            messages.Add(encodedMsg);
+            StateHasChanged();
+        });
+
+        hubConnection.On<string, string>("ReceiveOrderBook", (user, message) =>
+       {
+           _snapshot = JsonSerializer.Deserialize<OrderBookSnapshot>(message);
+           _symbol = _snapshot.Symbol;        
+          
+            StateHasChanged();
+        });
+        
+
+        await hubConnection.StartAsync();
+    }
+
+    private async Task Send()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.SendAsync("SendMessage", userInput, messageInput);
+        }
+    }
+
+    public bool IsConnected =>
+        hubConnection?.State == HubConnectionState.Connected;
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
+    }
+}

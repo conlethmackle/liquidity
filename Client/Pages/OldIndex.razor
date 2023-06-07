@@ -1,0 +1,81 @@
+﻿@page "/old-index"
+@using Microsoft.AspNetCore.SignalR.Client
+@using SyncfusionLiquidity.Shared
+@using Common.Models
+@using SyncfusionLiquidity.Shared
+@inject PortfolioHttpClient PortfolioHttpClient
+@inject HubConnection HubConnection
+@inject NavigationManager NavigationManager
+@implements IDisposable
+
+<PageTitle>Index</PageTitle>
+
+<h1></h1>
+
+
+@if (balance == null)
+{
+    <p><em>Loading...</em></p>
+} else {
+  <div class="row row-cols-1 row-cols-md-2">    
+      <p>Coin: @balance.Currency  Available: @balance.Available</p>
+  </div>
+}
+
+<div class="row row-cols-1 row-cols-md-2">
+    @foreach (var p in portfolios)
+    {
+      <div class="col mb-4">
+        <div class="card">
+          <div class="card-body">    
+               <h5 class="card-title">@p.Name</h5>
+               <h5 class="card-text">Id = @p.SPId</h5>
+               @foreach(var e in p.Exchanges)
+                    {
+                        <h5 class="card-subtitle">@e.Coinpairs</h5>
+                    }
+                    <button class="btn btn-primary mb-4" @onclick="(() => LoadPortfolio(p.Name))"> @p.Name</button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+
+
+
+@code {
+
+    private ExchangeBalance balance = 
+
+        new ExchangeBalance()
+        {
+            Available = 10,
+            Total = 10,
+            Hold = 0,
+            Currency = "USDT"
+        };
+    private List<Common.Models.DTOs.SPDTO> portfolios = new List<Common.Models.DTOs.SPDTO>();
+   
+    protected override async Task OnInitializedAsync()
+    {
+        portfolios = await PortfolioHttpClient.GetPortfolios();
+       
+        HubConnection.On<ExchangeBalance>("BalanceUpdated", newBalance =>
+        {
+            balance = newBalance;                
+          
+            StateHasChanged();
+        });
+    }
+
+    public void LoadPortfolio(string name)
+    {
+        NavigationManager.NavigateTo($"load-portfolio/{name}");
+    }
+
+    public void Dispose()
+    {
+        //HubConnection.Remove("BalanceUpdated");
+    }
+}

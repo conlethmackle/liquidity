@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AccountBalanceManager\AccountBalanceManager.csproj" />
+    <ProjectReference Include="..\Common\Common.csproj" />
+    <ProjectReference Include="..\DynamicConfigHandling\DynamicConfigHandling.csproj" />
+    <ProjectReference Include="..\LastTradedPriceProcessing\LastTradedPriceProcessing.csproj" />
+    <ProjectReference Include="..\OrderAndTradeProcessing\OrderAndTradeProcessing.csproj" />
+    <ProjectReference Include="..\OrderBookProcessing\OrderBookProcessing.csproj" />
+  </ItemGroup>
+
+</Project>

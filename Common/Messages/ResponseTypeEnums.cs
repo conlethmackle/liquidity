@@ -1,0 +1,48 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Common.Messages
+{
+   public enum ResponseTypeEnums
+   {
+      PLACE_ORDER_RESPONSE = 1,
+      GET_BALANCE_RESPONSE = 2,
+      OWN_ORDER_UPDATE = 3,
+      BALANCE_UPDATE = 4,
+      ORDERBOOK_UPDATE = 5,
+      ORDERBOOK_SNAPSHOT = 6,
+      GET_OPEN_ORDERS_RESPONSE = 7,
+      CANCEL_ORDERS_RESPONSE = 8,
+      REFERENCE_DATA_RESPONSE = 9,
+      TRADE_UPDATE = 10,
+      NEW_ORDER = 11,
+      FILLED_ORDER = 12,
+      PARTIALLY_FILLED_ORDER = 13,
+      CANCELLED_ORDER = 14,
+      CANCEL_ALL_ORDERS_RESPONSE = 15,
+      GET_ORDERBOOK_RESPONSE = 16,
+      CONNECTOR_PING = 17,
+      PRIVATE_CLIENT_LOGIN_STATUS = 18,
+      LAST_TRADED_PRICE = 19,
+      PLACE_ORDER_ERROR = 20,
+      CANCEL_ORDER_ERROR = 21,
+      STRATEGY_CONTROL_RESPONSE = 22,
+      STRATEGY_ALIVE_STATUS = 23,
+      CONFIG_UPDATE_STATUS = 24,
+      GET_BALANCE_RESPONSE_ERROR = 25,
+      CONNECTOR_STATUS_UPDATE = 26,
+      GET_LATEST_TRADE_RESPONSE=27,
+      START_OF_DAY = 28,
+      OPEN_ORDERS_ERROR = 29,
+
+      // Telegram Messages
+      CONNECTION_ALERT = 30,
+      TELEGRAM_CONFIG_CHANGE = 31,
+      LIQUIDITY_PROGRESS_ALERT = 32,
+      PRIVATE_CLIENT_ERROR = 33
+     
+   }
+}

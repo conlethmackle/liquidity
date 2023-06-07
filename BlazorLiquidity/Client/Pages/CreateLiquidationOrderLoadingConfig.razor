@@ -1,0 +1,124 @@
+﻿@page "/create-liquidation-order-loading-config"
+@attribute [Authorize]
+@using Syncfusion.Blazor.Inputs
+@using Microsoft.AspNetCore.Components
+@using Syncfusion.Blazor.DropDowns
+@inject PortfolioHttpClient PortfolioHttpClient
+@inject NavigationManager NavigationManager
+
+<SfCard Orientation="CardOrientation.Vertical">
+    
+    <CardHeader>
+        <div class="CustomHeader">Create an Auto Order Loading Item</div>
+    </CardHeader>
+    <br/>
+    <EditForm Model="@_config" OnValidSubmit="@HandleValidSubmit" >
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+      
+        
+        <label class="label" for="IsAuto" >IsAuto : </label>
+                                   
+        <InputSelect id="IsAuto" @bind-Value="_config.IsAuto" >
+            <option value="true">true</option>
+            <option value="false">false</option>
+        </InputSelect>
+        <br/>     
+        <br/>
+        <SfTextBox ID="Name" Placeholder='Name :' FloatLabelType='@FloatLabelType.Auto' @bind-Value="_config.Name"></SfTextBox>
+        <SfNumericTextBox ID="StartPercentage" Placeholder='Start Percentage : ' FloatLabelType='@FloatLabelType.Auto' @bind-Value="_config.StartPercentage"></SfNumericTextBox>
+        <br/>    <br/>    
+       
+        <SfNumericTextBox ID="ScalingFactor" Placeholder='Scaling Factor : ' FloatLabelType='@FloatLabelType.Auto' @bind-Value="_config.ScalingFactor"></SfNumericTextBox>
+        
+        <br/>    <br/>   
+        <label class="label" for="IsHighest" >Is Highest First : </label>
+        <InputSelect id="IsHighest" @bind-Value="_config.IsHighestFirst" >
+            <option value="true">true</option>
+            <option value="false">false</option>
+        </InputSelect>
+        <br /> <br />
+        <SfButton Type="submit">OK</SfButton>
+                       
+    </EditForm>
+</SfCard>
+
+<style  type="text/css" class="cssStyles"> 
+   
+    .e-grid .e-altrow {
+        background-color: #aaaaaa;
+    }
+    .CustomHeader, 
+    .e-card .e-card-header .e-card-header-caption:first-child { 
+        padding-left: 0%; 
+        
+    } 
+
+    .label {
+        background-color: white;
+        color: black;
+    }
+ 
+    .lower {
+        background-color: red;
+    }
+
+    .higher {
+        background-color: green;
+    }
+
+    .same {
+        background-color: orange
+    }
+
+    .e-grid .e-headercell { 
+        background-color: #36486b; 
+    } 
+  
+    .e-headercell {         
+        color: white;
+        background-color: black;
+        
+        font-size: 40px;
+        font-weight: bold; 
+    }
+
+    .e-grid .e-rowcell {
+        font-size: 26px;
+        padding-bottom: 3px;
+        padding-top: 3px;
+    }
+
+    .e-headercelldiv {
+        font-size: 40px;
+        font-weight: bold;
+        padding-bottom: 6px;
+        padding-top: 6px;
+        background-color: black;
+    }
+    
+    .e-custom {
+        border-radius: 0;
+        height: 30px;
+        width: 80px;
+    }
+
+    .e-custom, .e-custom:hover, .e-custom:focus, .e-custom:active {
+        background-color: #ff6e40;
+        color: #fff;
+        font-size: 1.0rem; 
+        font-weight: bold;
+    }
+
+</style>
+
+@code {
+    private LiquidationOrderLoadingConfigurationDTO _config = new ();
+
+    public async Task HandleValidSubmit()
+    {
+        await PortfolioHttpClient.CreateLiquidationOrderLoadingConfiguration(_config);
+        NavigationManager.NavigateTo("list-auto-order-loading-config");
+    }
+
+}

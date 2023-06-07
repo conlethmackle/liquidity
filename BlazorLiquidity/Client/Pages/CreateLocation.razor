@@ -1,0 +1,114 @@
+﻿@page "/create-location"
+@attribute [Authorize]
+@using Syncfusion.Blazor.Inputs
+@inject PortfolioHttpClient PortfolioHttpClient
+@inject NavigationManager NavigationManager
+
+
+<SfCard Orientation="CardOrientation.Vertical">
+    
+<CardHeader>
+    <div class="CustomHeader">Create Fund</div></CardHeader>
+<EditForm Model="@_location" OnValidSubmit="@HandleValidSubmit" >
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+ 
+    <SfTextBox id="LocationName" Placeholder='Location Name' FloatLabelType='@FloatLabelType.Auto'  @bind-Value="_location.LocationName"  />
+
+    <br/>
+    <br/>
+                    
+   
+    <br/>
+    <br/>
+    <SfButton Type="submit">OK</SfButton>
+                   
+</EditForm>
+</SfCard>
+
+<style  type="text/css" class="cssStyles"> 
+    .label {
+        background-color: lightgrey;
+        color: black;
+    }
+    .e-grid .e-altrow {
+        background-color: #aaaaaa;
+    }
+    .CustomHeader, 
+    .e-card .e-card-header .e-card-header-caption:first-child { 
+        padding-left: 0%; 
+        
+    } 
+
+    
+ 
+    .lower {
+        background-color: red;
+    }
+
+    .higher {
+        background-color: green;
+    }
+
+    .same {
+        background-color: orange
+    }
+
+    .e-grid .e-headercell { 
+        background-color: #36486b; 
+    } 
+  
+    .e-headercell {         
+        color: white;
+        background-color: black;
+        
+        font-size: 40px;
+        font-weight: bold; 
+    }
+
+    .e-grid .e-rowcell {
+        font-size: 26px;
+        padding-bottom: 3px;
+        padding-top: 3px;
+    }
+
+    .e-headercelldiv {
+        font-size: 40px;
+        font-weight: bold;
+        padding-bottom: 6px;
+        padding-top: 6px;
+        background-color: black;
+    }
+    
+    .e-custom {
+        border-radius: 0;
+        height: 30px;
+        width: 80px;
+    }
+
+    .e-custom, .e-custom:hover, .e-custom:focus, .e-custom:active {
+        background-color: #ff6e40;
+        color: #fff;
+        font-size: 1.0rem; 
+        font-weight: bold;
+    }
+</style>
+
+@code {
+   
+    private LocationDTO _location = new LocationDTO();
+
+    SfButton ToggleBtn;
+
+    private List<LocationDTO> _locations = new List<LocationDTO>();
+
+    protected override async Task OnInitializedAsync()
+    {
+    }
+
+    public async Task HandleValidSubmit()
+    {
+        await PortfolioHttpClient.CreateLocation(_location);
+        NavigationManager.NavigateTo("list-locations");
+    }
+}

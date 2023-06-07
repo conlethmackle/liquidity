@@ -1,0 +1,81 @@
+﻿@page "/create-exchangecoinpair"
+@attribute [Authorize]
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Buttons
+@using BlazorLiquidity.Shared
+@using Common.Models.DTOs
+@using Common.Models.Entities
+@using Microsoft.AspNetCore.Components
+@inject PortfolioHttpClient PortfolioHttpClient
+@inject NavigationManager NavigationManager
+
+<SfCard Orientation="CardOrientation.Vertical">
+    
+<CardHeader>
+    <div class="CustomHeader">Add New Exchange Coin Pair</div></CardHeader>
+
+<EditForm Model="@_exchangeCoinPair" OnValidSubmit="@HandleValidSubmit" >
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+ 
+    
+                           
+    <label class="label" for="CoinPair" >Generic Coin Pair</label>
+                               
+    <InputSelect id="CoinPair" @bind-Value="_exchangeCoinPair.CoinPairId">
+        <option value="0">Choose a CoinPair</option>
+        @foreach (var c  in _coinPairs)
+        {
+            <option value="@c.CoinPairId">@c.Name</option>
+        }
+    </InputSelect>
+    <br/>   <br/>                  
+                    
+    <label class="label" for="Venue" >Exchange Name</label>
+                               
+    <InputSelect id="Venue" @bind-Value="_exchangeCoinPair.VenueId" >
+        @foreach (var c  in _venues)
+        {
+            <option value="@c.VenueId">@c.VenueName</option>
+        }
+    </InputSelect>
+    <br/>   <br/>  
+    <SfTextBox id="Exchange" Placeholder='Exchange CoinPair Name' FloatLabelType='@FloatLabelType.Auto'  @bind-Value="_exchangeCoinPair.ExchangeCoinpairName"  />
+    <br/>   <br/>
+    <SfButton Type="submit">OK</SfButton>
+                   
+</EditForm>
+</SfCard>
+
+<style  type="text/css" class="cssStyles"> 
+    .label {
+        background-color: lightgrey;
+        color: black;
+    }
+</style>
+
+@code {
+    private ExchangeCoinpairMappingDTO _exchangeCoinPair = new ExchangeCoinpairMappingDTO();
+    private VenueDTO _venue = new VenueDTO();
+    private List<VenueDTO> _venues = new List<VenueDTO>();
+    private List<CoinPairDTO> _coinPairs = new List<CoinPairDTO>();
+    string coinPairs = null;
+    SfButton ToggleBtn;
+    
+    private bool _displayStuff = false;
+    //private List<CoinDTO> _coins = new List<CoinDTO>();
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        _coinPairs = await PortfolioHttpClient.GetCoinPairs();
+        _venues = await PortfolioHttpClient.GetVenues();
+    }
+
+
+    public async Task HandleValidSubmit()
+    {
+        await PortfolioHttpClient.CreateExchangeCoinPair(_exchangeCoinPair);
+        NavigationManager.NavigateTo("list-exchangecoinpairs");
+    }
+}

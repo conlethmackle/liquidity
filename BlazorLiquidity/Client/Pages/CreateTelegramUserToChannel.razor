@@ -1,0 +1,66 @@
+﻿@page "/create-user-to-channel"
+@attribute [Authorize]
+@using Syncfusion.Blazor.Navigations
+@using Syncfusion.Blazor.Inputs
+@using Common.Models.DTOs
+@using Syncfusion.Blazor.Buttons
+@using System.Text.Json
+@using BlazorLiquidity.Shared
+@inject PortfolioHttpClient PortfolioHttpClient
+@inject NavigationManager NavigationManager
+@using Microsoft.AspNetCore.Components.Forms
+@using Syncfusion.Blazor.Inputs
+
+<EditForm Model="@_userToChannel" OnValidSubmit="@HandleValidSubmit" >
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <label for="User" >User Name</label>
+                               
+    <InputSelect id="User" @bind-Value="_userToChannel.TelegramUserId">
+        <option value="">Select a User</option>
+        @foreach (var c  in _users)
+        {
+            <option value="@c.Id">@c.UserName</option>
+        }
+    </InputSelect>
+   
+                    
+    <label for="Channel" >Channel Name</label>
+                               
+    <InputSelect id="Channel" @bind-Value="_userToChannel.TelegramChannelId">
+        <option value="">Select a Channel</option>
+        @foreach (var c  in _channels)
+        {
+            <option value="@c.TelegramChannelId">@c.ChannelName</option>
+        }
+    </InputSelect>
+    <InputSelect id="AuthorizedState" @bind-Value="_userToChannel.IsAuthorised">
+        <option value="">Set the Authorized State</option>
+        <option value=true>Enable</option>
+        <option value=false>Disable</option>
+
+    </InputSelect>
+    <SfButton Type="submit">OK</SfButton>
+                   
+</EditForm>
+
+@code {
+   
+    private TelegramSubscriberToChannelDTO _userToChannel = new ();
+    private List<TelegramUserDTO> _users = new () ;
+    private List<TelegramChannelDTO> _channels = new List<TelegramChannelDTO>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _users = await PortfolioHttpClient.GetTelegramUsers();
+        _channels = await PortfolioHttpClient.GetTelegramChannels();
+    }
+
+
+    public async Task HandleValidSubmit()
+    {
+        await PortfolioHttpClient.CreateTelegramSubscriberToChannel(_userToChannel);
+        NavigationManager.NavigateTo("list-telegram-users-to-channels");
+    }
+}

@@ -1,0 +1,687 @@
+﻿@page "/strategyinstance/{StrategyConfigId:int}"
+@using SyncfusionLiquidity.Shared
+@using Common.Messages
+@using Common.Models
+@using Microsoft.AspNetCore.SignalR.Client
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.Extensions.Logging
+@using Common.Models.DTOs
+@using System.Text.Json
+@using System.Linq
+@using ProtoBuf
+@using SyncfusionLiquidity.Shared
+@inject ILogger<StrategyInstance> Logger
+@inject PortfolioHttpClient PortfolioHttpClient
+@inject HubConnection HubConnection
+@inject NavigationManager NavigationManager
+@inherits SyncfusionLiquidity.Client.Pages.TrafficLightBase
+@implements IDisposable
+
+
+<div class="container-bg">
+<div class="container-fluid">
+  <div class="row">  
+      <div class="col-lg-4">
+        
+            <div class="card">
+                <div class="card text-white bg-dark mb-3">
+                <div class="card-header"><div class="text-center"><h3 style='"width:100%", font-family:"Courier New", Courier, monospace; font-size:80%'>Original Balances & Subscriptions</h3></div></div></div>
+                <div class="card text-black bg-light mb-2">
+                <div class="card-body">
+                    <div class="text-center">
+                    <table  style='"width:100%", font-family:"Courier New", Courier, monospace; font-size:80%' >
+                        <thead ><tr><th style="width:25%">BTC</th><th style="width:25%">USDT</th><th style="width:25%">Subscription Price</th><th style="width:25%">Date</th></tr></thead>
+                        <tr><td>@_btcOpeningBalance</td><td>@_usdtOpeningBalance</td><td>21000</td>2022-08-01</tr>
+                    </table>
+                   
+                    </div>
+                </div>
+             
+                </div>
+        </div>
+         <div class="card">
+                <div class="card text-white bg-dark mb-3">
+                <div class="card-header"><div class="text-center"><h3 style='"width:100%", font-family:"Courier New", Courier, monospace; font-size:80%'>Current Opening Balances</h3></div></div></div>
+                <div class="card text-black bg-light mb-2">
+                <div class="card-body">
+                    <div class="text-center">
+                    <table  style='"width:100%", font-family:"Courier New", Courier, monospace; font-size:80%' >
+                        <thead ><tr><th style="width:25%">BTC</th><th style="width:25%">USDT</th><th style="width:25%">Subscription Price</th><th style="width:25%">Date</th></tr></thead>
+                        <tr><td>@_btcOpeningBalance</td><td>@_usdtOpeningBalance</td><td>21000</td>2022-08-01</tr>
+                    </table>
+                    
+                    </div>
+                </div>
+             
+                </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-2">
+        
+        <div class="card">
+            <div class="card text-white bg-dark mb-3">
+            <div class="card-header"><div class="text-center"><h3 style='"width:100%", font-family:"Courier New", Courier, monospace; font-size:80%'>Current Balances</h3></div></div></div>
+            <div class="card text-black bg-light mb-2">
+            <div class="card-body">
+                <div class="text-center">
+                <table style='"width:100%", font-family:"Courier New", Courier, monospace; font-size:80%'>
+                    <thead><tr><th style="width:50%">BTC</th><th style="width:50%">USDT</th></tr></thead>
+                    <tr><td>@_btcBalance</td><td>@_usdtBalance</td></tr>
+                </table>
+                </div>
+          </div>
+            </div>
+            
+        </div>
+        </div>
+        <div class="col-lg-2">
+          <div class="card">
+                <div class="card text-white bg-dark mb-3">
+                <div class="card-header"><div class="text-center"><h3 style='"width:100%", font-family:"Courier New", Courier, monospace; font-size:80%'>Strategy Status</h3></div></div></div>
+                <div class="card text-black bg-light mb-5">
+                <div class="card-body">
+                    <div class="text-center" > 
+                          <table style='"width:100%", font-family:"Courier New", Courier, monospace; font-size:80%'>
+                        <tr><td  class=@_strategyStatusBgColor><button type="button" @onclick="() => EnableDisableStrategy(StrategyEnable)">
+                            FairValueLiquidation</button></td></tr>        
+                       </table>
+                      
+                    </div>
+                </div>               
+                </div>
+            </div>
+      </div>
+      <div class="col-lg-2">
+          <div class="card">
+                <div class="card text-white bg-dark mb-3">
+                <div class="card-header"><div class="text-center"><h3 style='"width:100%", font-family:"Courier New", Courier, monospace; font-size:80%'>Exchange Status</h3></div></div></div>
+                <div class="card text-black bg-light mb-5">
+                <div class="card-body">
+                    <div class="text-center" >                        
+                        <table style='"width:100%", font-family:"Courier New", Courier, monospace; font-size:80%'>
+                        <tr><td><h5 style='"width:100%", font-family:"Courier New", Courier, monospace; font-size:80%'>Binance</h5></td><td><button type="button" class="btn btn-success">
+                             <span class="badge badge-success"></span></button></td></tr>        
+                       </table>
+                      
+                    </div>
+                </div>               
+                </div>
+            </div>
+      </div>
+      </div>
+     
+
+  
+   <div class="row">
+       <div class="col-lg-2">
+      
+            <div class="card">
+                 <div class="card text-white bg-dark mb-3">
+                <div class="card-header"><div class="text-center"><h3 style='"width:100%", font-family:"Courier New", Courier, monospace; font-size:80%'>Fair Value</h3></div></div></div>
+                <div class="card text-black bg-light mb-5">
+                <div class="card-body">
+                    <div class="text-center" >
+                        
+                        <table style='"width:100%", font-family:"Courier New", Courier, monospace; font-size:60%'>
+                            <thead><tr><th style="width:60%">Symbol</th><th style="width:40%">Price</th></tr></thead>
+                            <tr style='"width:100%", font-family:"Courier New", Courier, monospace; font-size:100%'><td>@_fairValueSymbol</td><td><p class=@_fairPriceDisplay>@_fairValuePrice</p></td></tr>
+                        </table>
+                   
+                    </div>
+                </div>
+                </div>
+                </div>
+        </div>
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card text-white bg-dark mb-3">
+                    <div class="card-header"><div class="text-center"><h3 style='"width:100%", font-family:"Courier New", Courier, monospace; font-size:80%'>Strategy Configuration</h3></div></div>
+                </div>
+                <div class="card text-black bg-light mb-5">
+                <div class="card-body">
+                    <div class="text-center" >
+                        
+                        <table style='"width:100%", font-family:"Courier New", Courier, monospace; font-size:60%'>
+                            
+                            <thead><tr><th>Symbol</th><th>Subscription Price</th><th>Number of Coins</th><th>Lot Size</th><th>% Upper from FV</th><th>% Lower from FV</th><th>Batch Size</th><th>Short Period(s)</th><th>Long Period(s)</th></tr></thead>
+                            <tr><td>@_strategyData.Symbol</td><td>@_strategyData.SubscriptionPrice</td><td>@_strategyData.NumberOfCoins</td><td>@_strategyData.OrderSize</td><td>@_strategyData.PercentageSpreadFromFV</td><td>@_strategyData.PercentageSpreadLowerThreshold</td><td>@_strategyData.BatchSize</td><td>@_strategyData.ShortTimeInterval</td><td>@_strategyData.LongTimeInterval</td><td><div class="button1"><button type="button"  @onclick="LoadEditConfigPage" >Edit</button></div></td></tr>
+                        </table>
+                   
+                    </div>
+                </div>
+                </div>
+        
+        </div>
+     </div>
+     <div class="row">
+      <div class="col-lg-4">
+       
+            <div class="card">
+                 <div class="card text-white bg-dark mb-3">
+                <div class="card-header"><div class="text-center"><h3 style='"width:100%", font-family:"Courier New", Courier, monospace; font-size:80%'>Open Orders</h3></div></div></div>
+                <div class="card text-black bg-light mb-5">
+                <div class="card-body">
+                    <div class="text-center" >
+                        
+                        <table style='"width:100%", font-family:"Courier New", Courier, monospace; font-size:60%'>
+                            <thead><tr><th style="width:13%">Id</th><th style="width:13%">Symbol</th><th style="width:11%">Exchange</th><th style="width=11%">Price</th><th style="width=11%">Filled</th><th style="width=11%">Remaining</th><th style="width=11%">IsBuy</th><th style="width=11%">Status</th><th style="width=11%">Time</th></tr></thead>
+                            @foreach(var order in _openOrderList)
+                            {                              
+                                <tr class="text-danger"><td>@order.OrderId</td><td>@order.Symbol</td><td>@order.Venue</td><td>@order.Price</td><td>@order.FilledQuantity</td><td>@order.RemainingQuantity</td><td>@order.IsBuy</td><td>@order.Status</td><td>@order.OrderTime.ToShortTimeString()</td></tr>                
+                            }
+                                      
+                        </table>
+                       
+                   
+                    </div>
+                </div>
+               
+                </div>
+            </div>
+      </div>
+       <div class="col-lg-4">      
+            <div class="card">
+                <div class="card text-white bg-dark mb-3">
+                <div class="card-header"><div class="text-center"><h3 style='"width:100%", font-family:"Courier New", Courier, monospace; font-size:80%'>Trades</h3></div></div></div>
+                <div class="card text-black bg-light mb-5">
+                <div class="card-body">
+                    <div class="text-center" >
+                        
+                         <table style='"width:100%", font-family:"Courier New", Courier, monospace; font-size:60%'>
+                            <thead><tr><th style="width:16%">Id</th><th style="width:16%">Symbol</th><th style="width:16%">Exchange</th><th style="width=16%">Price</th><th style="width=16%">Quantity</th><th style="width=16%">IsBuy</th><th style="width=16%">Time</th></tr></thead>
+                            @foreach(var trade in _tradeList)
+                            {                              
+                                <tr><td>@trade.OrderId</td><td>@trade.Symbol</td><td>@trade.Venue</td><td>@trade.Price</td><td>@trade.FilledQuantity</td><td>@trade.IsBuy</td><td>@trade.Status</td><td>@trade.Timestamp.ToShortTimeString()</td></tr>                
+                            }
+                           
+                        </table>
+                   
+                    </div>
+                </div>
+               
+                </div>
+        </div>
+      </div>
+     </div>
+      <div class="row">
+
+
+      <div class="col-lg-4">
+          <div class="card">
+              <div class="card text-white bg-dark mb-3">
+                  <div class="card-header"><div class="text-center"><h3 style='"width:100%", font-family:"Courier New", Courier, monospace; font-size:80%'>Place Orders</h3></div></div></div>
+              <div class="card text-black bg-light mb-5">
+                  <div class="card-body">
+                      <div class="text-center" >                        
+                          <table class="table ">
+                              <tr><td style='"width:100%", font-family:"Courier New", Courier, monospace; font-size:80%'><div class="button1"><button type="button"  @onclick="LoadPlaceOrderPage" >Place Market Order</button></div></td></tr>        
+                    
+                          </table>
+                      
+                      </div>
+                  </div>               
+              </div>
+          </div>
+
+      </div>
+
+      </div>
+       </div>
+       </div>
+       
+</div>
+
+
+
+
+@code {
+    [Parameter]
+    public int StrategyConfigId { get; set; }
+
+    public static string DisabledRedStrategyStatus = "p-3 mb-2 bg-danger text-white";
+    public static string PendingAmberStrategyStatus = "p-3 mb-2 bg-warning.bg-gradient text-white";
+    public static string ReadyGreenStrategyStatus = "p-3 mb-2 bg-success.bg-gradient text-white";
+
+
+    protected bool IsSelected { get; set; }
+    private string thisIsAString = "hello";
+
+    private bool StrategyEnable = false;
+    private string _fairValueSymbol { get; set; } = "";
+    private decimal _fairValuePrice { get; set; }
+    private string _fairPriceDisplay = "text-success";
+    private string _strategyStatusBgColor = DisabledRedStrategyStatus;
+    private string _fairValueLiquidationButtonStatus = "badge badge-danger";
+
+    private decimal _previousPrice = 0;
+    private decimal _btcBalance { get; set; }
+    private decimal _usdtBalance { get; set; }
+    private decimal _btcOpeningBalance { get; set; }
+    private decimal _usdtOpeningBalance { get; set; }
+    public OpenOrdersRequest openOrdersRequest = new OpenOrdersRequest();
+    public GetBalanceRequest getBalanceRequest = new GetBalanceRequest();
+    private Dictionary<string, OwnOrderChange> _orderTable { get; set; } = new Dictionary<string, OwnOrderChange>();
+    private List<OwnOrderChange> _openOrderList { get; set; } = new List<OwnOrderChange>();
+
+    private Dictionary<string, TradeMsg> _tradeTable { get; set; } = new Dictionary<string, TradeMsg>();
+    private List<TradeMsg> _tradeList { get; set; } = new List<TradeMsg>();
+
+    private LiquidationStrategyConfigDTO _strategyData { get; set; } = new LiquidationStrategyConfigDTO();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+            _strategyData =  await PortfolioHttpClient.GetLiquidationStrategyConfig(StrategyConfigId);
+       
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Logger.LogInformation("******************* OnInitializedAsync Called *****************************");
+        HubConnection.On<MessageQueueData>("RealTimeUpdate", (data) =>
+            {
+
+                HandleMessages(data);
+            });
+        _strategyData =  await PortfolioHttpClient.GetLiquidationStrategyConfig(StrategyConfigId);
+        if (_strategyData != null)
+        {
+            Logger.LogInformation("The venue is {Venue} Batch Size is {BatchSize}, ", _strategyData.Venue, _strategyData.BatchSize);
+            Console.WriteLine($"The venue is {_strategyData.Venue} Batch Size is {_strategyData.BatchSize},");
+           // PortfolioHttpClient.
+            openOrdersRequest.Venue = _strategyData.Venue;
+            openOrdersRequest.InstanceName = _strategyData.ConfigName;
+            openOrdersRequest.PortfolioName = _strategyData.StrategySPSubscriptionConfig.SP.Name;
+            Logger.LogInformation($"Sending request for Open Orders {openOrdersRequest.Venue}");
+            await PortfolioHttpClient.GetOpenOrders(openOrdersRequest);
+            getBalanceRequest.Venue = _strategyData.Venue;
+            getBalanceRequest.InstanceName = _strategyData.ConfigName;
+            getBalanceRequest.PortfolioName = _strategyData.StrategySPSubscriptionConfig.SP.Name;
+            await PortfolioHttpClient.GetBalancesFromVenue(getBalanceRequest);
+            Logger.LogInformation($"Got values {_strategyData.NumberOfCoins} and {_strategyData.SubscriptionPrice}");
+        }
+        else
+        {
+            Logger.LogInformation("GetLiquidationStrategyConfig returned null *********************");
+        }
+        StateHasChanged();
+        await base.OnInitializedAsync();
+    }
+
+    public void Dispose()
+    {
+
+    }
+
+    private void HandleMessages(MessageQueueData msg)
+    {
+        //if (msg.MessageType != QueueMsgTypes.FAIRVALUEUPDATE)
+        // Console.WriteLine($"handling msg type {msg.MessageType.ToString()}");
+        switch(msg.MessageType)
+        {
+            case QueueMsgTypes.FAIRVALUEUPDATE:
+                var fairValueData = JsonSerializer.Deserialize<FairValueData>(msg.Data);
+                HandleFairValueUpdate(fairValueData);
+                break;
+            case QueueMsgTypes.BALANCEUPDATE:
+                var balanceUpdate = JsonSerializer.Deserialize<BalanceUpdate>(msg.Data);
+                HandleBalanceUpdate(balanceUpdate);
+                break;
+            case QueueMsgTypes.OPENINGBALANCE:
+                var openingBalance = JsonSerializer.Deserialize<BalanceUpdate>(msg.Data);
+                HandleOpeningBalance(openingBalance);            
+                break;
+            case QueueMsgTypes.NEWORDER:
+                var orderData = JsonSerializer.Deserialize<OwnOrderChange>(msg.Data);
+                HandleOwnOrderChanges(msg.Venue, orderData);
+                break;
+            case QueueMsgTypes.CANCELLEDORDER:
+                var cancelledData = JsonSerializer.Deserialize<OwnOrderChange>(msg.Data);
+                HandleCancelledOrder(msg.Venue, cancelledData);
+                break;
+            case QueueMsgTypes.PARTIALLYFILLEDORDER:
+                var partiallyFilledData = JsonSerializer.Deserialize<OwnOrderChange>(msg.Data);
+                HandlePartiallyFilledOrder(msg.Venue, partiallyFilledData);
+                break;
+            case QueueMsgTypes.FILLEDORDER:
+                var filledData = JsonSerializer.Deserialize<OwnOrderChange>(msg.Data);
+                HandleFilledOrder(msg.Venue, filledData);
+                break;
+            case QueueMsgTypes.TRADE:
+                var trade = JsonSerializer.Deserialize<TradeMsg>(msg.Data);
+                HandleTrade(msg.Venue, trade);
+                break;
+            case QueueMsgTypes.OPEN_ORDERS_RESPONSE:
+                var openOrders = JsonSerializer.Deserialize<List<OwnOrderChange>>(msg.Data);
+                HandleOpenOrders(msg.Venue, openOrders);
+                break;
+            case QueueMsgTypes.STRATEGY_ALIVE_PING:
+                var strategyAliveData = JsonSerializer.Deserialize<StrategyInstanceConnectionStatus>(msg.Data);
+                HandleStrategyAlive(strategyAliveData);
+                break;
+            default:
+                Logger.LogInformation("Unhandled Message - {MessageType}", msg.MessageType.ToString());
+                break;
+        }
+    }
+
+    private void FormatDecimals(List<OwnOrderChange> ownOrderChanges)
+    {
+        ownOrderChanges.ForEach(o =>
+        {
+            o.Price =  Math.Round(o.Price, 3, MidpointRounding.ToEven);
+            o.Quantity = Math.Round(o.Quantity, 3, MidpointRounding.ToEven);
+            o.FilledQuantity = Math.Round(o.FilledQuantity, 5, MidpointRounding.ToEven);
+            o.RemainingQuantity = Math.Round(o.RemainingQuantity, 5, MidpointRounding.ToEven);
+            switch(o.Status)
+            {
+                case "OPEN":
+                    o.Status = "Open";
+                    break;
+                case "ORDER_PARTIALLY_FILLED":
+                    o.Status = "Partially Filled";
+                    break;
+                case "PENDING":
+                    o.Status = "Pending";
+                    break;
+            }
+        });
+    }
+
+    private void FormatDecimals(List<TradeMsg> trades)
+    {
+        trades.ForEach(o =>
+        {
+            o.Price =  Math.Round(o.Price, 3, MidpointRounding.ToEven);
+            o.Quantity = Math.Round(o.Quantity, 3, MidpointRounding.ToEven);
+            o.FilledQuantity = Math.Round(o.FilledQuantity, 5, MidpointRounding.ToEven);
+            o.RemainingQuantity = Math.Round(o.RemainingQuantity, 5, MidpointRounding.ToEven);
+            switch(o.Status)
+            {
+                case "OPEN":
+                    o.Status = "Open";
+                    break;
+                case "ORDER_PARTIALLY_FILLED":
+                    o.Status = "Partially Filled";
+                    break;
+                case "PENDING":
+                    o.Status = "Pending";
+                    break;
+            }
+        });
+    }
+
+    private void HandleStrategyAlive(StrategyInstanceConnectionStatus status)
+    {
+        _strategyStatusBgColor = ReadyGreenStrategyStatus;
+    }
+
+    private void HandleOpenOrders(string venue, List<OwnOrderChange> openOrders)
+    {
+        foreach(var order in openOrders)
+        {
+            _orderTable[order.ClientOid] = order;
+            var l = _orderTable.Values.ToList();
+            _openOrderList.Clear();
+            _openOrderList = l.OrderByDescending(o => o.OrderTime).ToList();
+            FormatDecimals(_openOrderList);
+            StateHasChanged();
+        }
+    }
+
+
+    private void HandleTrade(string venue, TradeMsg? trade)
+    {
+
+        Console.WriteLine("In HandleTrade");
+        if (trade != null)
+        {
+            trade.Venue = venue;
+
+            if (!_tradeTable.ContainsKey(trade.TradeId))
+            {
+                _tradeTable.Add(trade.TradeId, trade);
+                var l = _tradeTable.Values.ToList();
+                _tradeList.Clear();
+                _tradeList = l.OrderByDescending(o => o.OrderTime).Take(5).ToList();
+                Logger.LogInformation("The size of the tradeList is {Count}", _tradeList.Count);
+
+                FormatDecimals(_tradeList);
+                StateHasChanged();
+            }
+            else
+            {
+                Logger.LogInformation("Duplicate entry for {TradeId} ", trade.TradeId);
+            }
+        }
+
+    }
+
+    private void HandleFilledOrder(string venue, OwnOrderChange? order)
+    {
+        Console.WriteLine("In HandleFilledOrder");
+        if (order != null)
+        {
+            if (_orderTable.ContainsKey(order.ClientOid))
+            {              
+                _orderTable.Remove(order.ClientOid);
+                var l = _orderTable.Values.ToList();
+                _openOrderList.Clear();
+                _openOrderList = l.OrderByDescending(o => o.OrderTime).ToList();
+                FormatDecimals(_openOrderList);
+                //Math.Round()
+                StateHasChanged();
+            }
+            else
+            {
+                ;// Shouldn't happen
+            }
+        }
+    }
+
+    private void HandlePartiallyFilledOrder(string venue, OwnOrderChange? order)
+    {
+        Console.WriteLine("In HandlePartiallyFilledOrder");
+        if (order != null)
+        {
+            order.Venue = venue;
+            if (_orderTable.ContainsKey(order.ClientOid))
+            {
+                _orderTable[order.ClientOid] = order;
+                if (order.RemainingQuantity == 0)
+                    _orderTable.Remove(order.ClientOid);
+                var l = _orderTable.Values.ToList();
+                _openOrderList.Clear();
+                _openOrderList = l.OrderByDescending(o => o.OrderTime).ToList();
+                FormatDecimals(_openOrderList);
+                StateHasChanged();
+            }
+            else
+            {
+                ;// Shouldn't happen
+            }
+        }
+    }
+
+    private void HandleCancelledOrder(string venue, OwnOrderChange? order)
+    {
+        Console.WriteLine("In HandleCancelledOrder");
+        if (order != null)
+        {
+            order.Venue = venue;
+            if (_orderTable.ContainsKey(order.ClientOid))
+            {              
+                _orderTable.Remove(order.ClientOid);
+                var l = _orderTable.Values.ToList();
+                _openOrderList.Clear();
+                _openOrderList = l.OrderByDescending(o => o.OrderTime).ToList();
+                FormatDecimals(_openOrderList);
+                StateHasChanged();
+            }
+            else
+            {
+                ;// Shouldn't happen
+            }
+        }
+    }
+
+    private void HandleOwnOrderChanges(string venue, OwnOrderChange? order)
+    {
+       
+        if (order != null)
+        {
+            order.Venue = venue;
+            if (_orderTable.ContainsKey(order.ClientOid))
+            {
+                // That's weird - shouldn't happen
+            }
+            else
+            {
+                _orderTable[order.ClientOid] = order;
+                var l = _orderTable.Values.ToList();
+                _openOrderList.Clear();
+                _openOrderList = l.Where(o => o.RemainingQuantity > 0).OrderByDescending(o => o.OrderTime).ToList();
+                FormatDecimals(_openOrderList);
+                StateHasChanged();
+            }
+        }
+    }
+
+    private void HandleBalanceUpdate(BalanceUpdate? balanceUpdate)
+    {
+        if (balanceUpdate != null)
+        {
+            if (balanceUpdate.Currency.Equals("BTC"))
+            {
+                _btcBalance = Math.Round(balanceUpdate.Balance.Available, 2, MidpointRounding.ToEven); ;
+            }
+            else if (balanceUpdate.Currency.Equals("USDT"))
+            {
+                _usdtBalance = Math.Round(balanceUpdate.Balance.Available, 2, MidpointRounding.ToEven);
+            }
+            StateHasChanged();
+        }
+    }
+
+    private void HandleOpeningBalance(BalanceUpdate? balanceUpdate)
+    {
+        if (balanceUpdate != null)
+        {
+            if (balanceUpdate.Currency.Equals("BTC"))
+            {
+                _btcOpeningBalance = Math.Round(balanceUpdate.Balance.Available, 2, MidpointRounding.ToEven);
+            }
+            else if (balanceUpdate.Currency.Equals("USDT"))
+            {
+                _usdtOpeningBalance = Math.Round(balanceUpdate.Balance.Available, 2, MidpointRounding.ToEven);
+            }
+            StateHasChanged();
+        }
+    }
+
+    private void HandleFairValueUpdate(FairValueData? fairValueData)
+    {
+        if (fairValueData != null)
+        {
+            _fairValueSymbol = fairValueData.Symbol;
+            _fairValuePrice = fairValueData.Price;
+            if (_fairValuePrice != _previousPrice)
+            {
+                _fairValuePrice = Math.Round(fairValueData.Price, 2, MidpointRounding.ToEven);
+                if (_fairValuePrice > _previousPrice)
+                    _fairPriceDisplay = "text-success";
+                else if (_fairValuePrice < _previousPrice)
+                    _fairPriceDisplay = "text-danger";
+                else
+                    _fairPriceDisplay = "text-dark";
+                _previousPrice = _fairValuePrice;
+                StateHasChanged();
+            }
+        }
+    }
+
+    private void LoadPlaceOrderPage()
+    {
+        NavigationManager.NavigateTo($"market-order/{StrategyConfigId}");
+    }
+
+    private void EnableStrategy()
+    {
+
+    }
+
+    private void LoadEditConfigPage()
+    {
+        NavigationManager.NavigateTo($"EditStrategyConfig/{StrategyConfigId}");
+    }
+
+    private void StrategyControlMethod()
+    {
+        Console.WriteLine("In StrategyControl");
+        Logger.LogInformation("In StrategyControl value of StrategyEnable = {StrategyEnable}", StrategyEnable);
+    }
+
+    protected async Task CheckBoxChanged(bool val, string e)
+    {
+        Console.WriteLine("In StrategyControl");
+        StrategyEnable = StrategyEnable ? false : true;
+
+        Logger.LogInformation("In StrategyControl value of StrategyEnable = {StrategyEnable}", StrategyEnable);
+
+        StrategyProcessDetails strategyProcessDetails =  new StrategyProcessDetails()
+        {
+            AccountName = _strategyData.StrategySPSubscriptionConfig.SP.Name,
+            ConfigName = _strategyData.StrategySPSubscriptionConfig.ConfigName,           
+            StrategyConfigId = StrategyConfigId
+        };
+
+        if (StrategyEnable)
+            strategyProcessDetails.Enable = true;
+        else
+            strategyProcessDetails.Enable = false;
+        Logger.LogInformation("Calling SendStrategyProcessCommand");
+        await PortfolioHttpClient.SendStrategyProcessCommand(strategyProcessDetails);
+        Logger.LogInformation("Called SendStrategyProcessCommand");
+
+    }
+
+    protected async Task EnableDisableStrategy(bool val)
+    {
+      
+        _strategyStatusBgColor = "p-3 mb-2 bg-success.bg-gradient text-white";
+      
+        if (_fairValueLiquidationButtonStatus.Equals( "badge badge-danger"))
+        {
+            Console.WriteLine("In EnableDisableStrategy xxxx with red ");
+            Logger.LogInformation("In EnableDisableStrategy with red ");
+            _fairValueLiquidationButtonStatus = "badge badge-success";
+        }
+        else if (_fairValueLiquidationButtonStatus.Equals( "badge badge-success"))
+        {
+             Console.WriteLine("In EnableDisableStrategy xxxxx with green ");
+            _fairValueLiquidationButtonStatus = "badge badge-danger";
+            Logger.LogInformation("In EnableDisableStrategy with green ");
+        }
+        StrategyEnable = val ? false : true;
+
+        Logger.LogInformation("In StrategyControl value of StrategyEnable = {StrategyEnable}", StrategyEnable);
+
+        StrategyProcessDetails strategyProcessDetails =  new StrategyProcessDetails()
+        {
+            AccountName = _strategyData.StrategySPSubscriptionConfig.SP.Name,
+            ConfigName = _strategyData.StrategySPSubscriptionConfig.ConfigName,           
+            StrategyConfigId = StrategyConfigId
+        };
+
+        if (StrategyEnable)
+            strategyProcessDetails.Enable = true;
+        else
+            strategyProcessDetails.Enable = false;
+        Logger.LogInformation("Calling SendStrategyProcessCommand");
+        await PortfolioHttpClient.SendStrategyProcessCommand(strategyProcessDetails);
+        Logger.LogInformation("Called SendStrategyProcessCommand");
+        StateHasChanged();
+    }
+
+}

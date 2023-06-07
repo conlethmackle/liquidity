@@ -1,0 +1,68 @@
+﻿@page "/list-liquidation-order-config-options"
+@using Microsoft.AspNetCore.Components
+@inject PortfolioHttpClient PortfolioHttpClient
+@inject NavigationManager NavigationManager
+
+<SfCard Orientation="CardOrientation.Vertical">
+    
+    <CardHeader>
+        <div class="CustomHeader"><b>Configure an auto/manual order quantity setting</b></div></CardHeader>
+    <SfGrid ID="Grid" DataSource="@_configItems" @ref="Grid" AllowSelection="true" AllowResizing="true"
+             Height="200" Width="500">
+        <GridEditSettings AllowEditOnDblClick="false"  AllowDeleting="false" ShowConfirmDialog="false" Mode="EditMode.Dialog"></GridEditSettings>
+        <GridPageSettings PageSizes="true"></GridPageSettings>
+        <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Single"></GridSelectionSettings>
+        <GridEvents  OnRecordDoubleClick="OnRecordDoubleClick" TValue="ColumnsForDisplay"></GridEvents>
+        <GridColumns>
+            <GridColumn Field=@nameof(ColumnsForDisplay.Display) HeaderText="Order Sizing Type" ValidationRules="@(new ValidationRules { Required = false })" AllowAdding="false" AllowEditing="false" Width="150"></GridColumn>
+        </GridColumns>
+    </SfGrid>
+    
+
+</SfCard>
+
+@code {
+
+    public class ColumnsForDisplay
+    {
+        public int Id { get; set; }
+        public string Display { get; set; }
+    }
+  
+    SfGrid<ColumnsForDisplay>? Grid { get; set; }
+    List<ColumnsForDisplay> _configItems = new();
+
+    private bool _displayStuff = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var item1 = new ColumnsForDisplay()
+            {
+                Id = 1,
+                Display = "Liquidation Auto Order Sizing Strategy"
+            };
+            var item2 = new ColumnsForDisplay()
+            {
+                Id = 2,
+                Display = "Liquidation Manual Order Sizing"
+            };
+            _configItems.Add(item1);
+            _configItems.Add(item2);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Error throw in list-strategies-instances-by-portfolio - Error {e.Message}");
+        }
+    }
+
+    public void OnRecordDoubleClick(Syncfusion.Blazor.Grids.RecordDoubleClickEventArgs<ColumnsForDisplay> args)
+    {
+        if (args.RowData.Id == 1)
+            NavigationManager.NavigateTo("list-auto-order-loading-config");
+        else if (args.RowData.Id == 2)
+            NavigationManager.NavigateTo("list-manual-order-loading-config");
+    }
+
+}

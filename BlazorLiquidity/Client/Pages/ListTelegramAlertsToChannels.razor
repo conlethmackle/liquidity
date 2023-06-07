@@ -1,0 +1,106 @@
+﻿@page "/list-telegram-alerts-to-channels"
+@attribute [Authorize]
+@using BlazorLiquidity.Shared
+@using Common.Models.DTOs
+@inject PortfolioHttpClient PortfolioHttpClient
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Cards
+@using Syncfusion.Blazor.Buttons
+@inject NavigationManager NavigationManager
+
+
+@if (_alertsToChannels == null)
+{
+    <p>Loading ...</p>
+}
+else {
+    <h2 style="color:white">Telegram Alerts To Channels</h2>
+
+    <br/>
+    <div id="ControlRegion">
+    <SfCard Orientation="CardOrientation.Vertical">
+        <CardHeader><div class="CustomHeader">Telegram Alerts To Channels</div></CardHeader>
+              
+        <SfButton @ref="AddNewButton" @onclick="OnAddNewInstance" CssClass="e-flat"  IsPrimary="true" Content="New Alert to Channel"></SfButton>
+        <SfGrid ID="Grid" DataSource="@_alertsToChannels" @ref="Grid" AllowSelection="true"
+                Toolbar="@(new List<string>() { "Edit", "Delete", "Cancel", "Update"})" Height="315" Width="900">
+            <GridEditSettings AllowEditOnDblClick="true" AllowAdding="true" AllowEditing="true" AllowDeleting="true" Mode="EditMode.Dialog"></GridEditSettings>
+            <GridPageSettings PageSizes="true"></GridPageSettings>
+            <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Single"></GridSelectionSettings>
+          
+            <GridPageSettings PageSizes="true"></GridPageSettings>
+            <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Single"></GridSelectionSettings>
+            <GridEvents  OnActionBegin="OnActionBegin"  TValue="TelegramAlertToChannelDTO"></GridEvents>
+            <GridColumns>
+                <GridColumn Field=@nameof(TelegramAlertToChannelDTO.TelegramAlertToChannelId) AllowEditing="false" HeaderText="Id" ValidationRules="@(new ValidationRules { Required = true })" Width="150"></GridColumn>
+                <GridColumn Field=TelegramAlert.AlertName HeaderText="Alert Name" ValidationRules="@(new ValidationRules { Required = true })" Width="150"></GridColumn>
+                <GridColumn Field=TelegramChannel.ChannelName HeaderText="Channel Name" ValidationRules="@(new ValidationRules { Required = true })" Width="150"></GridColumn>
+                <GridColumn HeaderText="Manage" Width="100" HeaderTextAlign="TextAlign.Right">
+                    <GridCommandColumns>
+                        <GridCommandColumn Type="CommandButtonType.Save" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-save", CssClass = "e-flat" })"></GridCommandColumn>
+                        <GridCommandColumn Type="CommandButtonType.Cancel" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-cancel", CssClass = "e-flat" })"></GridCommandColumn>
+                        <GridCommandColumn Type="CommandButtonType.Edit" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-edit", CssClass = "e-flat" })"></GridCommandColumn>
+                        <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-delete", CssClass = "e-flat" })"></GridCommandColumn>
+                    </GridCommandColumns>
+                </GridColumn>
+            </GridColumns>
+        </SfGrid>
+                
+    </SfCard>
+    </div>
+}
+
+
+
+@code {
+    List<TelegramAlertToChannelDTO> _alertsToChannels { get; set; }
+    SfGrid<TelegramAlertToChannelDTO>? Grid { get; set; }
+    SfButton AddNewButton;
+    protected override async Task OnInitializedAsync()
+    {
+        _alertsToChannels = await PortfolioHttpClient.GetTelegramAlertsToChannels();
+    }
+
+    public void OnAddNewInstance(MouseEventArgs args)
+    {
+        NavigationManager.NavigateTo($"create-alert-to-channel");
+    }
+
+    public async Task OnActionBegin(ActionEventArgs<TelegramAlertToChannelDTO> args)
+    {
+        if (args == null)
+        {
+            Console.WriteLine("OnActionBegin args is null");
+            return;
+        }
+        if (args.Data == null)
+        {
+            Console.WriteLine("OnActionBegin args.Data is null");
+            return;
+        }
+  
+        if (args.RequestType.Equals((Syncfusion.Blazor.Grids.Action.Save)))
+        {
+            if (args.Action == "Add")
+            {
+               await PortfolioHttpClient.CreateTelegramAlertToChannel(args.Data);
+            }
+            else if (args.Action == "Edit")
+            {
+                Console.WriteLine("Got an edit");
+                await PortfolioHttpClient.UpdateTelegramAlertToChannel(args.Data);
+            }
+         
+        }
+        else if (args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Delete))
+        {
+            if (args.Action == "Delete")
+            {
+                await PortfolioHttpClient.DeleteTelegramAlert(args.Data.TelegramAlertId);
+            }
+        }
+
+        _alertsToChannels = await PortfolioHttpClient.GetTelegramAlertsToChannels();
+        await Grid?.Refresh();
+    }
+}

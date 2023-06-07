@@ -1,0 +1,891 @@
+2022-07-29 21:40:08.817 +00:00 [INF] In StrategyManager ...
+2022-07-29 21:40:09.672 +00:00 [INF] Entity Framework Core 6.0.5 initialized 'LiquidityDbContext' using provider 'Npgsql.EntityFrameworkCore.PostgreSQL:6.0.5+9d79af6e2586d5d28da253ac075706a5575a1743' with options: None
+2022-07-29 21:40:10.166 +00:00 [INF] Executed DbCommand (65ms) [Parameters=[@__Name_0='?'], CommandType='"Text"', CommandTimeout='3600']
+SELECT c."ConfigSettingId", c."Description", c."Name", c."Value"
+FROM "ConfigSettings" AS c
+WHERE c."Name" = @__Name_0
+2022-07-29 21:40:10.280 +00:00 [INF] In StrategyManager.InitialiseWithStrategy ...
+2022-07-29 21:40:10.288 +00:00 [INF] Entity Framework Core 6.0.5 initialized 'LiquidityDbContext' using provider 'Npgsql.EntityFrameworkCore.PostgreSQL:6.0.5+9d79af6e2586d5d28da253ac075706a5575a1743' with options: None
+2022-07-29 21:40:10.399 +00:00 [INF] Executed DbCommand (11ms) [Parameters=[@__configName_0='?'], CommandType='"Text"', CommandTimeout='3600']
+SELECT s."StrategySPSubscriptionConfigId", s."ConfigName", s."SPId", s."StrategyId", s0."SPId", s1."StrategyId", t."ExchangeDetailsId", t."ApiKeyId", t."CoinPairs", t."DateCreated", t."IsEnabled", t."Name", t."SPId", t."StrategySPSubscriptionConfigId", t."VenueId", t."ApiKeyId0", t."DateCreated0", t."Key", t."PassPhrase", t."Secret", t."VenueId0", t."VenueName", s0."DateCreated", s0."IsEnabled", s0."Name", s1."StrategyName"
+FROM "StrategySPSubscriptionConfigs" AS s
+INNER JOIN "SPs" AS s0 ON s."SPId" = s0."SPId"
+INNER JOIN "Strategies" AS s1 ON s."StrategyId" = s1."StrategyId"
+LEFT JOIN (
+    SELECT e."ExchangeDetailsId", e."ApiKeyId", e."CoinPairs", e."DateCreated", e."IsEnabled", e."Name", e."SPId", e."StrategySPSubscriptionConfigId", e."VenueId", a."ApiKeyId" AS "ApiKeyId0", a."DateCreated" AS "DateCreated0", a."Key", a."PassPhrase", a."Secret", v."VenueId" AS "VenueId0", v."VenueName"
+    FROM "ExchangeDetails" AS e
+    INNER JOIN "ApiKeys" AS a ON e."ApiKeyId" = a."ApiKeyId"
+    INNER JOIN "Venues" AS v ON e."VenueId" = v."VenueId"
+) AS t ON s."StrategySPSubscriptionConfigId" = t."StrategySPSubscriptionConfigId"
+WHERE s."ConfigName" = @__configName_0
+ORDER BY s."StrategySPSubscriptionConfigId", s0."SPId", s1."StrategyId", t."ExchangeDetailsId", t."ApiKeyId0"
+2022-07-29 21:40:10.404 +00:00 [INF] Creating Exchange for VetFairValueConfig.orderbooks
+2022-07-29 21:40:10.414 +00:00 [INF] Creating Exchange for VetLiquidationTest.VetFairValueConfig.balances
+2022-07-29 21:40:10.417 +00:00 [INF] Creating Exchange for VetLiquidationTest.VetFairValueConfig.status
+2022-07-29 21:40:10.419 +00:00 [INF] Creating Exchange for VetLiquidationTest.VetFairValueConfig.orders
+2022-07-29 21:40:10.423 +00:00 [INF] Creating Exchange for VetLiquidationTest.VetFairValueConfig.trades
+2022-07-29 21:40:10.473 +00:00 [INF] Entity Framework Core 6.0.5 initialized 'LiquidityDbContext' using provider 'Npgsql.EntityFrameworkCore.PostgreSQL:6.0.5+9d79af6e2586d5d28da253ac075706a5575a1743' with options: None
+2022-07-29 21:40:10.530 +00:00 [INF] Executed DbCommand (9ms) [Parameters=[@__configName_0='?'], CommandType='"Text"', CommandTimeout='3600']
+SELECT s."StrategySPSubscriptionConfigId", s."ConfigName", s."SPId", s."StrategyId", s0."SPId", s1."StrategyId", t."ExchangeDetailsId", t."ApiKeyId", t."CoinPairs", t."DateCreated", t."IsEnabled", t."Name", t."SPId", t."StrategySPSubscriptionConfigId", t."VenueId", t."ApiKeyId0", t."DateCreated0", t."Key", t."PassPhrase", t."Secret", t."VenueId0", t."VenueName", s0."DateCreated", s0."IsEnabled", s0."Name", s1."StrategyName"
+FROM "StrategySPSubscriptionConfigs" AS s
+INNER JOIN "SPs" AS s0 ON s."SPId" = s0."SPId"
+INNER JOIN "Strategies" AS s1 ON s."StrategyId" = s1."StrategyId"
+LEFT JOIN (
+    SELECT e."ExchangeDetailsId", e."ApiKeyId", e."CoinPairs", e."DateCreated", e."IsEnabled", e."Name", e."SPId", e."StrategySPSubscriptionConfigId", e."VenueId", a."ApiKeyId" AS "ApiKeyId0", a."DateCreated" AS "DateCreated0", a."Key", a."PassPhrase", a."Secret", v."VenueId" AS "VenueId0", v."VenueName"
+    FROM "ExchangeDetails" AS e
+    INNER JOIN "ApiKeys" AS a ON e."ApiKeyId" = a."ApiKeyId"
+    INNER JOIN "Venues" AS v ON e."VenueId" = v."VenueId"
+) AS t ON s."StrategySPSubscriptionConfigId" = t."StrategySPSubscriptionConfigId"
+WHERE s."ConfigName" = @__configName_0
+ORDER BY s."StrategySPSubscriptionConfigId", s0."SPId", s1."StrategyId", t."ExchangeDetailsId", t."ApiKeyId0"
+2022-07-29 21:40:10.532 +00:00 [INF] Creating Exchange for BTC/USDT.Binance_Exchange.orderbooks
+2022-07-29 21:40:10.536 +00:00 [INF] Creating Exchange for BTC/USDT.Binance_Exchange.last_traded
+2022-07-29 21:40:10.539 +00:00 [INF] Creating Exchange for connectorAlive.Binance_Exchange
+2022-07-29 21:40:10.585 +00:00 [INF] Entity Framework Core 6.0.5 initialized 'LiquidityDbContext' using provider 'Npgsql.EntityFrameworkCore.PostgreSQL:6.0.5+9d79af6e2586d5d28da253ac075706a5575a1743' with options: None
+2022-07-29 21:40:10.587 +00:00 [INF] Executed DbCommand (2ms) [Parameters=[@__configName_0='?'], CommandType='"Text"', CommandTimeout='3600']
+SELECT s."StrategySPSubscriptionConfigId", s."ConfigName", s."SPId", s."StrategyId", s0."SPId", s1."StrategyId", t."ExchangeDetailsId", t."ApiKeyId", t."CoinPairs", t."DateCreated", t."IsEnabled", t."Name", t."SPId", t."StrategySPSubscriptionConfigId", t."VenueId", t."ApiKeyId0", t."DateCreated0", t."Key", t."PassPhrase", t."Secret", t."VenueId0", t."VenueName", s0."DateCreated", s0."IsEnabled", s0."Name", s1."StrategyName"
+FROM "StrategySPSubscriptionConfigs" AS s
+INNER JOIN "SPs" AS s0 ON s."SPId" = s0."SPId"
+INNER JOIN "Strategies" AS s1 ON s."StrategyId" = s1."StrategyId"
+LEFT JOIN (
+    SELECT e."ExchangeDetailsId", e."ApiKeyId", e."CoinPairs", e."DateCreated", e."IsEnabled", e."Name", e."SPId", e."StrategySPSubscriptionConfigId", e."VenueId", a."ApiKeyId" AS "ApiKeyId0", a."DateCreated" AS "DateCreated0", a."Key", a."PassPhrase", a."Secret", v."VenueId" AS "VenueId0", v."VenueName"
+    FROM "ExchangeDetails" AS e
+    INNER JOIN "ApiKeys" AS a ON e."ApiKeyId" = a."ApiKeyId"
+    INNER JOIN "Venues" AS v ON e."VenueId" = v."VenueId"
+) AS t ON s."StrategySPSubscriptionConfigId" = t."StrategySPSubscriptionConfigId"
+WHERE s."ConfigName" = @__configName_0
+ORDER BY s."StrategySPSubscriptionConfigId", s0."SPId", s1."StrategyId", t."ExchangeDetailsId", t."ApiKeyId0"
+2022-07-29 21:40:10.592 +00:00 [INF] Entity Framework Core 6.0.5 initialized 'LiquidityDbContext' using provider 'Npgsql.EntityFrameworkCore.PostgreSQL:6.0.5+9d79af6e2586d5d28da253ac075706a5575a1743' with options: None
+2022-07-29 21:40:10.616 +00:00 [INF] Executed DbCommand (6ms) [Parameters=[@__StrategyExchangeId_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='3600']
+SELECT l."Id", l."AmountDecimals", l."BatchSize", l."CancellationPolicyOnStart", l."CoinPairId", l."DateCreated", l."LongTimeInterval", l."NumberOfCoins", l."OrderSize", l."PercentageSpreadFromFV", l."PercentageSpreadLowerThreshold", l."PriceDecimals", l."ShortTimeInterval", l."StrategySPSubscriptionConfigId", l."SubscriptionPrice", l."Symbol", l."Venue", c."CoinPairId", c."Name", c."PCoinId", c."SCoinId", c0."CoinId", c0."Name", c1."CoinId", c1."Name", s."StrategySPSubscriptionConfigId", s."ConfigName", s."SPId", s."StrategyId", s0."SPId", s0."DateCreated", s0."IsEnabled", s0."Name"
+FROM "LiquidationStrategyConfigs" AS l
+INNER JOIN "CoinPairs" AS c ON l."CoinPairId" = c."CoinPairId"
+INNER JOIN "Coins" AS c0 ON c."PCoinId" = c0."CoinId"
+INNER JOIN "Coins" AS c1 ON c."SCoinId" = c1."CoinId"
+INNER JOIN "StrategySPSubscriptionConfigs" AS s ON l."StrategySPSubscriptionConfigId" = s."StrategySPSubscriptionConfigId"
+INNER JOIN "SPs" AS s0 ON s."SPId" = s0."SPId"
+WHERE l."StrategySPSubscriptionConfigId" = @__StrategyExchangeId_0
+2022-07-29 21:40:25.697 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 21:40:40.696 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 21:40:55.696 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 21:41:10.698 +00:00 [INF] **********************In HandleLongCycle *******************************
+2022-07-29 21:41:25.695 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 21:41:40.696 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 21:41:55.698 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 21:42:10.695 +00:00 [INF] **********************In HandleLongCycle *******************************
+2022-07-29 21:42:25.695 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 21:42:40.696 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 21:42:55.698 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 21:43:10.695 +00:00 [INF] **********************In HandleLongCycle *******************************
+2022-07-29 21:43:25.696 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 21:43:40.698 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 21:43:55.696 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 21:44:10.695 +00:00 [INF] **********************In HandleLongCycle *******************************
+2022-07-29 21:44:25.698 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 21:46:46.298 +00:00 [INF] In StrategyManager ...
+2022-07-29 21:46:47.198 +00:00 [INF] Entity Framework Core 6.0.5 initialized 'LiquidityDbContext' using provider 'Npgsql.EntityFrameworkCore.PostgreSQL:6.0.5+9d79af6e2586d5d28da253ac075706a5575a1743' with options: None
+2022-07-29 21:46:47.695 +00:00 [INF] Executed DbCommand (65ms) [Parameters=[@__Name_0='?'], CommandType='"Text"', CommandTimeout='3600']
+SELECT c."ConfigSettingId", c."Description", c."Name", c."Value"
+FROM "ConfigSettings" AS c
+WHERE c."Name" = @__Name_0
+2022-07-29 21:46:47.812 +00:00 [INF] In StrategyManager.InitialiseWithStrategy ...
+2022-07-29 21:46:47.820 +00:00 [INF] Entity Framework Core 6.0.5 initialized 'LiquidityDbContext' using provider 'Npgsql.EntityFrameworkCore.PostgreSQL:6.0.5+9d79af6e2586d5d28da253ac075706a5575a1743' with options: None
+2022-07-29 21:46:47.935 +00:00 [INF] Executed DbCommand (12ms) [Parameters=[@__configName_0='?'], CommandType='"Text"', CommandTimeout='3600']
+SELECT s."StrategySPSubscriptionConfigId", s."ConfigName", s."SPId", s."StrategyId", s0."SPId", s1."StrategyId", t."ExchangeDetailsId", t."ApiKeyId", t."CoinPairs", t."DateCreated", t."IsEnabled", t."Name", t."SPId", t."StrategySPSubscriptionConfigId", t."VenueId", t."ApiKeyId0", t."DateCreated0", t."Key", t."PassPhrase", t."Secret", t."VenueId0", t."VenueName", s0."DateCreated", s0."IsEnabled", s0."Name", s1."StrategyName"
+FROM "StrategySPSubscriptionConfigs" AS s
+INNER JOIN "SPs" AS s0 ON s."SPId" = s0."SPId"
+INNER JOIN "Strategies" AS s1 ON s."StrategyId" = s1."StrategyId"
+LEFT JOIN (
+    SELECT e."ExchangeDetailsId", e."ApiKeyId", e."CoinPairs", e."DateCreated", e."IsEnabled", e."Name", e."SPId", e."StrategySPSubscriptionConfigId", e."VenueId", a."ApiKeyId" AS "ApiKeyId0", a."DateCreated" AS "DateCreated0", a."Key", a."PassPhrase", a."Secret", v."VenueId" AS "VenueId0", v."VenueName"
+    FROM "ExchangeDetails" AS e
+    INNER JOIN "ApiKeys" AS a ON e."ApiKeyId" = a."ApiKeyId"
+    INNER JOIN "Venues" AS v ON e."VenueId" = v."VenueId"
+) AS t ON s."StrategySPSubscriptionConfigId" = t."StrategySPSubscriptionConfigId"
+WHERE s."ConfigName" = @__configName_0
+ORDER BY s."StrategySPSubscriptionConfigId", s0."SPId", s1."StrategyId", t."ExchangeDetailsId", t."ApiKeyId0"
+2022-07-29 21:46:47.966 +00:00 [INF] Creating Exchange for VetFairValueConfig.orderbooks
+2022-07-29 21:46:47.977 +00:00 [INF] Creating Exchange for VetLiquidationTest.VetFairValueConfig.balances
+2022-07-29 21:46:47.980 +00:00 [INF] Creating Exchange for VetLiquidationTest.VetFairValueConfig.status
+2022-07-29 21:46:47.982 +00:00 [INF] Creating Exchange for VetLiquidationTest.VetFairValueConfig.orders
+2022-07-29 21:46:47.986 +00:00 [INF] Creating Exchange for VetLiquidationTest.VetFairValueConfig.trades
+2022-07-29 21:46:48.037 +00:00 [INF] Entity Framework Core 6.0.5 initialized 'LiquidityDbContext' using provider 'Npgsql.EntityFrameworkCore.PostgreSQL:6.0.5+9d79af6e2586d5d28da253ac075706a5575a1743' with options: None
+2022-07-29 21:46:48.041 +00:00 [INF] Executed DbCommand (2ms) [Parameters=[@__configName_0='?'], CommandType='"Text"', CommandTimeout='3600']
+SELECT s."StrategySPSubscriptionConfigId", s."ConfigName", s."SPId", s."StrategyId", s0."SPId", s1."StrategyId", t."ExchangeDetailsId", t."ApiKeyId", t."CoinPairs", t."DateCreated", t."IsEnabled", t."Name", t."SPId", t."StrategySPSubscriptionConfigId", t."VenueId", t."ApiKeyId0", t."DateCreated0", t."Key", t."PassPhrase", t."Secret", t."VenueId0", t."VenueName", s0."DateCreated", s0."IsEnabled", s0."Name", s1."StrategyName"
+FROM "StrategySPSubscriptionConfigs" AS s
+INNER JOIN "SPs" AS s0 ON s."SPId" = s0."SPId"
+INNER JOIN "Strategies" AS s1 ON s."StrategyId" = s1."StrategyId"
+LEFT JOIN (
+    SELECT e."ExchangeDetailsId", e."ApiKeyId", e."CoinPairs", e."DateCreated", e."IsEnabled", e."Name", e."SPId", e."StrategySPSubscriptionConfigId", e."VenueId", a."ApiKeyId" AS "ApiKeyId0", a."DateCreated" AS "DateCreated0", a."Key", a."PassPhrase", a."Secret", v."VenueId" AS "VenueId0", v."VenueName"
+    FROM "ExchangeDetails" AS e
+    INNER JOIN "ApiKeys" AS a ON e."ApiKeyId" = a."ApiKeyId"
+    INNER JOIN "Venues" AS v ON e."VenueId" = v."VenueId"
+) AS t ON s."StrategySPSubscriptionConfigId" = t."StrategySPSubscriptionConfigId"
+WHERE s."ConfigName" = @__configName_0
+ORDER BY s."StrategySPSubscriptionConfigId", s0."SPId", s1."StrategyId", t."ExchangeDetailsId", t."ApiKeyId0"
+2022-07-29 21:46:48.042 +00:00 [INF] Creating Exchange for BTC/USDT.Binance_Exchange.orderbooks
+2022-07-29 21:46:48.046 +00:00 [INF] Creating Exchange for BTC/USDT.Binance_Exchange.last_traded
+2022-07-29 21:46:48.048 +00:00 [INF] Creating Exchange for connectorAlive.Binance_Exchange
+2022-07-29 21:46:48.121 +00:00 [INF] Entity Framework Core 6.0.5 initialized 'LiquidityDbContext' using provider 'Npgsql.EntityFrameworkCore.PostgreSQL:6.0.5+9d79af6e2586d5d28da253ac075706a5575a1743' with options: None
+2022-07-29 21:46:48.123 +00:00 [INF] Executed DbCommand (2ms) [Parameters=[@__configName_0='?'], CommandType='"Text"', CommandTimeout='3600']
+SELECT s."StrategySPSubscriptionConfigId", s."ConfigName", s."SPId", s."StrategyId", s0."SPId", s1."StrategyId", t."ExchangeDetailsId", t."ApiKeyId", t."CoinPairs", t."DateCreated", t."IsEnabled", t."Name", t."SPId", t."StrategySPSubscriptionConfigId", t."VenueId", t."ApiKeyId0", t."DateCreated0", t."Key", t."PassPhrase", t."Secret", t."VenueId0", t."VenueName", s0."DateCreated", s0."IsEnabled", s0."Name", s1."StrategyName"
+FROM "StrategySPSubscriptionConfigs" AS s
+INNER JOIN "SPs" AS s0 ON s."SPId" = s0."SPId"
+INNER JOIN "Strategies" AS s1 ON s."StrategyId" = s1."StrategyId"
+LEFT JOIN (
+    SELECT e."ExchangeDetailsId", e."ApiKeyId", e."CoinPairs", e."DateCreated", e."IsEnabled", e."Name", e."SPId", e."StrategySPSubscriptionConfigId", e."VenueId", a."ApiKeyId" AS "ApiKeyId0", a."DateCreated" AS "DateCreated0", a."Key", a."PassPhrase", a."Secret", v."VenueId" AS "VenueId0", v."VenueName"
+    FROM "ExchangeDetails" AS e
+    INNER JOIN "ApiKeys" AS a ON e."ApiKeyId" = a."ApiKeyId"
+    INNER JOIN "Venues" AS v ON e."VenueId" = v."VenueId"
+) AS t ON s."StrategySPSubscriptionConfigId" = t."StrategySPSubscriptionConfigId"
+WHERE s."ConfigName" = @__configName_0
+ORDER BY s."StrategySPSubscriptionConfigId", s0."SPId", s1."StrategyId", t."ExchangeDetailsId", t."ApiKeyId0"
+2022-07-29 21:46:48.130 +00:00 [INF] Entity Framework Core 6.0.5 initialized 'LiquidityDbContext' using provider 'Npgsql.EntityFrameworkCore.PostgreSQL:6.0.5+9d79af6e2586d5d28da253ac075706a5575a1743' with options: None
+2022-07-29 21:46:48.135 +00:00 [INF] Received Successful Login to Binance_Exchange
+2022-07-29 21:46:48.156 +00:00 [INF] Executed DbCommand (6ms) [Parameters=[@__StrategyExchangeId_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='3600']
+SELECT l."Id", l."AmountDecimals", l."BatchSize", l."CancellationPolicyOnStart", l."CoinPairId", l."DateCreated", l."LongTimeInterval", l."NumberOfCoins", l."OrderSize", l."PercentageSpreadFromFV", l."PercentageSpreadLowerThreshold", l."PriceDecimals", l."ShortTimeInterval", l."StrategySPSubscriptionConfigId", l."SubscriptionPrice", l."Symbol", l."Venue", c."CoinPairId", c."Name", c."PCoinId", c."SCoinId", c0."CoinId", c0."Name", c1."CoinId", c1."Name", s."StrategySPSubscriptionConfigId", s."ConfigName", s."SPId", s."StrategyId", s0."SPId", s0."DateCreated", s0."IsEnabled", s0."Name"
+FROM "LiquidationStrategyConfigs" AS l
+INNER JOIN "CoinPairs" AS c ON l."CoinPairId" = c."CoinPairId"
+INNER JOIN "Coins" AS c0 ON c."PCoinId" = c0."CoinId"
+INNER JOIN "Coins" AS c1 ON c."SCoinId" = c1."CoinId"
+INNER JOIN "StrategySPSubscriptionConfigs" AS s ON l."StrategySPSubscriptionConfigId" = s."StrategySPSubscriptionConfigId"
+INNER JOIN "SPs" AS s0 ON s."SPId" = s0."SPId"
+WHERE l."StrategySPSubscriptionConfigId" = @__StrategyExchangeId_0
+2022-07-29 21:46:48.763 +00:00 [INF] Opening Balance for BTC from Binance_Exchange is 1.30932600
+2022-07-29 21:46:48.763 +00:00 [INF] Opening Balance for USDT from Binance_Exchange is 3749.31024060
+2022-07-29 21:46:49.912 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:46:49.912 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:46:49.921 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:46:49.921 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:46:51.893 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:46:51.893 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:46:54.839 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:46:55.788 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:46:55.788 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:46:58.792 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:46:58.808 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:46:58.808 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:46:59.793 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:46:59.793 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:46:59.812 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:46:59.816 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:46:59.816 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:00.793 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:00.793 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:00.813 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:00.813 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:01.591 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:01.798 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:01.808 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:01.808 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:02.798 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:02.798 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:02.817 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:02.817 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:03.232 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 21:47:03.806 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:03.806 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:03.806 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:03.835 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:05.806 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:05.806 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:05.835 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:08.792 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:08.792 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:08.818 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:08.818 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:09.825 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:09.847 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:09.847 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:10.871 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:10.871 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:10.897 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:11.838 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:11.838 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:12.828 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:12.853 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:12.854 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:13.794 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:18.229 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 21:47:20.834 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:20.844 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:20.844 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:21.795 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:26.794 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:33.236 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 21:47:33.914 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:33.933 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:33.933 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:33.933 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:33.933 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:34.846 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:34.846 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:34.865 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:34.865 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:35.820 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:35.821 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:35.847 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:35.847 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:36.848 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:36.867 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:36.867 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:37.860 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:37.860 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:37.877 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:37.878 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:38.448 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:38.448 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:38.820 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:38.820 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:38.843 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:38.843 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:39.827 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:39.827 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:39.838 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:39.838 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:40.838 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:42.834 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:43.878 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:44.793 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:44.793 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:44.815 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:44.815 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:45.807 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:45.807 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:45.844 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:47.796 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:48.227 +00:00 [INF] **********************In HandleLongCycle *******************************
+2022-07-29 21:47:48.827 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:48.827 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:48.848 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:48.848 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:51.794 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:52.802 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:53.792 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:53.792 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:53.812 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:54.815 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:57.842 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:57.843 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:47:57.864 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:00.255 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:00.255 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:00.873 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:00.873 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:00.894 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:00.895 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:01.005 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:03.240 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 21:48:06.855 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:06.874 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:06.874 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:07.811 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:07.811 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:07.822 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:07.822 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:08.831 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:08.831 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:08.841 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:08.842 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:09.801 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:09.801 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:09.815 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:09.816 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:10.821 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:10.821 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:10.834 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:10.834 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:11.819 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:11.819 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:11.830 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:11.830 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:12.795 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:12.795 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:12.819 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:12.819 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:13.801 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:13.801 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:13.801 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:13.822 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:13.822 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:14.819 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:14.819 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:14.832 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:14.832 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:15.794 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:15.794 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:15.815 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:15.815 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:16.795 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:16.795 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:16.818 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:16.818 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:17.808 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:17.808 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:17.818 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:17.818 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:18.234 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 21:48:18.809 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:18.809 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:18.819 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:18.819 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:23.799 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:23.800 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:23.812 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:24.798 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:24.798 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:28.796 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:28.796 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:28.818 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:28.818 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:29.801 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:29.802 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:29.802 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:29.822 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:29.822 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:30.818 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:31.692 +00:00 [INF] Received Successful Login to Binance_Exchange
+2022-07-29 21:48:31.695 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:31.695 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:31.878 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:31.892 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:31.892 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:31.892 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:32.794 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:33.233 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 21:48:33.797 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:36.796 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:36.796 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:36.807 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:37.867 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:39.798 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:39.798 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:39.812 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:44.852 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:44.852 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:44.872 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:44.872 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:45.942 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:47.829 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:48.237 +00:00 [INF] **********************In HandleLongCycle *******************************
+2022-07-29 21:48:54.806 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:54.816 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:54.816 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:56.795 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:56.821 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:59.814 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:59.814 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:59.825 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:48:59.825 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:00.798 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:00.810 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:00.810 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:01.694 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:01.818 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:01.818 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:01.823 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:01.831 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:02.801 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:02.801 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:02.828 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:02.828 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:03.228 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 21:49:05.802 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:05.802 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:05.827 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:05.827 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:06.796 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:06.808 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:10.807 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:10.834 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:10.834 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:12.807 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:18.233 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 21:49:22.799 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:22.799 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:22.810 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:22.810 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:23.831 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:23.831 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:23.853 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:23.853 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:24.895 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:24.917 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:24.917 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:25.820 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:25.820 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:25.855 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:25.855 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:26.821 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:26.821 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:26.831 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:26.831 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:27.799 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:27.799 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:27.819 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:27.819 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:28.811 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:28.811 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:28.823 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:28.823 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:29.799 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:29.799 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:29.822 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:29.822 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:30.823 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:30.823 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:30.839 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:30.839 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:31.798 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:31.798 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:33.233 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 21:49:38.800 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:38.800 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:39.172 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:39.172 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:39.172 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:39.172 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:39.172 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:39.172 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:39.176 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:39.176 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:39.176 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:39.176 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:39.176 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:39.176 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:39.176 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:48.230 +00:00 [INF] **********************In HandleLongCycle *******************************
+2022-07-29 21:49:49.802 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:49.802 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:49.829 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:49.829 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:50.802 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:50.830 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:50.830 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:51.799 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:51.800 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:51.830 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:51.830 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:52.809 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:52.809 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:52.839 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:52.839 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:52.839 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:53.803 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:53.803 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:53.823 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:53.824 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:54.802 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:54.802 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:54.802 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:54.838 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:54.838 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:55.185 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:55.185 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:55.185 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:55.185 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:56.800 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:56.800 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:56.813 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:57.819 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:49:57.819 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:02.693 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:03.227 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 21:50:04.874 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:04.874 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:06.896 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:06.920 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:06.920 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:07.864 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:07.864 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:07.875 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:11.854 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:11.885 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:14.443 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:17.804 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:17.809 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:18.230 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 21:50:18.811 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:18.811 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:18.844 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:18.844 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:19.824 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:21.800 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:21.823 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:21.823 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:22.803 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:22.803 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:22.831 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:22.831 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:23.803 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:23.803 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:23.803 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:23.828 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:23.828 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:24.802 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:24.802 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:24.831 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:24.831 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:25.824 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:26.801 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:26.801 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:33.237 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 21:50:33.806 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:33.829 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:33.829 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:33.829 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:34.825 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:34.826 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:34.837 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:34.838 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:35.808 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:35.808 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:35.830 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:35.830 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:36.803 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:36.803 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:36.826 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:36.826 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:37.801 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:37.801 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:37.852 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:37.852 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:38.806 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:38.822 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:38.822 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:38.822 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:39.819 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:40.552 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:48.228 +00:00 [INF] **********************In HandleLongCycle *******************************
+2022-07-29 21:50:49.803 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:51.801 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:50:59.090 +00:00 [ERR] The Binance_Exchange Connector not sending heartbeats - marked as offline
+2022-07-29 21:50:59.091 +00:00 [ERR] ***************** Connector Binance_Exchange is down **********************************
+2022-07-29 21:50:59.091 +00:00 [INF] Binance_Exchange Connector is down
+2022-07-29 21:51:03.227 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 21:51:17.047 +00:00 [INF] ***************** Connector Binance_Exchange is up **********************************
+2022-07-29 21:51:17.047 +00:00 [INF] Binance_Exchange Connector is up
+2022-07-29 21:51:17.855 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:17.855 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:18.228 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 21:51:18.818 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:18.818 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:18.829 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:18.829 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:19.806 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:19.806 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:19.827 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:19.827 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:20.929 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:20.930 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:20.950 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:20.950 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:21.892 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:21.892 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:21.916 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:21.916 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:21.916 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:22.852 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:22.876 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:22.876 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:23.911 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:23.911 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:23.937 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:23.937 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:24.858 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:24.858 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:24.880 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:24.880 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:24.880 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:25.890 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:25.890 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:25.890 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:25.890 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:25.914 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:25.914 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:25.914 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:26.880 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:26.880 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:26.880 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:26.880 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:26.880 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:26.880 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:26.880 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:27.883 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:27.883 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:27.905 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:28.859 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:28.859 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:28.886 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:29.932 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:29.957 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:29.957 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:30.140 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:30.322 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:32.193 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:32.193 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:33.228 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 21:51:34.238 +00:00 [INF] Received Successful Login to Binance_Exchange
+2022-07-29 21:51:34.917 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:34.918 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:34.940 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:35.916 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:36.860 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:36.860 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:39.285 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:39.905 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:39.931 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:39.933 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:40.387 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:40.387 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:40.387 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:40.387 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:40.388 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:40.388 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:40.388 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:40.388 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:40.388 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:40.388 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:40.388 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:40.388 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:40.388 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:40.388 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:41.299 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:43.948 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:43.969 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:45.861 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:48.228 +00:00 [INF] **********************In HandleLongCycle *******************************
+2022-07-29 21:51:54.809 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:54.832 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:54.832 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:55.828 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:55.850 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:55.850 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:56.806 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:56.806 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:56.817 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:56.817 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:57.804 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:57.804 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:57.826 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:57.827 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:58.832 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:58.832 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:58.843 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:51:59.804 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:00.816 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:00.816 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:00.850 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:00.850 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:01.047 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:01.916 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:01.943 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:01.943 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:01.943 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:02.806 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:02.806 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:02.830 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:02.830 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:03.236 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 21:52:03.850 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:03.850 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:04.811 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:04.811 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:04.811 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:04.832 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:04.832 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:05.874 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:05.874 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:05.874 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:06.803 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:06.816 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:06.816 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:09.811 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:09.839 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:09.839 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:10.837 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:10.837 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:10.837 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:10.863 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:10.863 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:11.851 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:11.851 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:11.873 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:11.992 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:11.992 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:12.878 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:12.903 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:12.903 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:13.885 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:13.885 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:13.910 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:13.910 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:13.910 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:14.901 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:14.901 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:14.923 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:14.923 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:15.921 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:15.921 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:15.921 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:15.944 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:15.944 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:15.944 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:16.897 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:16.897 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:16.919 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:16.919 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:17.895 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:17.895 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:17.908 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:17.908 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:18.227 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 21:52:18.854 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:18.854 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:18.854 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:18.877 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:19.899 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:19.899 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:19.910 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:19.911 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:19.911 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:19.911 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:20.863 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:20.863 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:20.863 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:20.873 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:25.913 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:25.934 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:25.934 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:25.934 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:26.942 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:26.963 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:26.963 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:29.028 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:32.833 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:33.233 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 21:52:33.865 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:33.865 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:33.881 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:33.881 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:34.829 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:34.829 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:34.840 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:35.806 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:35.806 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:35.819 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:37.820 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:37.820 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:37.850 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:41.587 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:42.866 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:42.889 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:42.889 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:43.860 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:43.860 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:45.878 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:45.878 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:48.228 +00:00 [INF] **********************In HandleLongCycle *******************************
+2022-07-29 21:52:48.861 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:48.861 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:48.906 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:49.849 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:49.849 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:49.865 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:50.892 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:50.915 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:50.916 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:51.853 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:51.853 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:51.864 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:51.864 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:52.861 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:56.831 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:59.872 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:59.872 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:59.885 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:52:59.885 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:01.001 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:01.001 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:01.032 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:01.032 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:01.915 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:01.915 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:01.934 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:01.940 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:03.238 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 21:53:15.935 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:15.956 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:18.233 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 21:53:19.881 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:19.891 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:23.858 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:23.890 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:23.891 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:24.836 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:24.836 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:24.860 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:24.860 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:25.877 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:25.889 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:25.889 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:25.889 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:26.909 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:26.934 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:26.934 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:26.934 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:27.900 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:27.900 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:27.925 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:27.925 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:28.813 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:33.231 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 21:53:33.810 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:33.811 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:37.877 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:37.877 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:37.905 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:37.905 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:42.892 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:42.892 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:42.913 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:44.811 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:44.811 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:44.822 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:45.815 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:45.842 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:45.842 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:46.821 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:46.821 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:46.832 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:46.832 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:47.809 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:47.809 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:47.830 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:47.830 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:48.232 +00:00 [INF] **********************In HandleLongCycle *******************************
+2022-07-29 21:53:48.810 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:48.810 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:48.833 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:48.834 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:49.811 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:49.811 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:53:49.830 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:54:00.257 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:54:00.257 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:54:01.322 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:54:03.234 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 21:54:04.812 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:54:04.825 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:54:04.825 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:54:05.854 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:54:05.854 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:54:05.867 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:54:05.867 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:54:06.813 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:54:06.813 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:54:06.825 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:54:07.811 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:54:08.810 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:54:08.833 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:54:08.833 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders
+2022-07-29 21:54:09.810 +00:00 [INF] Not received open orders response fromm Binance_Exchange - not placing orders

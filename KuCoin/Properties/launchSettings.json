@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "KuCoin": {
+      "commandName": "Project",
+      "commandLineArgs": "Exchange=KuCoin_Exchange"
+    }
+  }
+}

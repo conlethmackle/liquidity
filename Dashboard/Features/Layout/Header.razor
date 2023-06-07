@@ -1,0 +1,41 @@
+﻿
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
+  <div class="container">
+    <a class="navbar-brand" href="#">
+      <img src="/images/HIM.png" alt="..." height="36">
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="#">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Configuration</a>
+        </li>
+        <li class="nav-item dropdown" data-toggle="dropdown">
+          <Dropdown TItem="string" OnSelected="OnSelected" >
+  <InitialTip>Menu</InitialTip>
+                <ChildContent>
+                    <DropdownListItem Item="@list[0]">Config</DropdownListItem>
+                    <DropdownListItem Item="@list[1]">Strategies</DropdownListItem>        
+                    <DropdownListItem Item="@list[2]">Settings</DropdownListItem>
+                </ChildContent>
+            </Dropdown>
+          </li>
+          </ul>
+    
+    </div>
+  </div>
+</nav>
+
+@code {
+    static List<string> list = new List<string>{ "Config", "Strategies","Settings"};
+    private void OnSelected(string selection)
+      {
+         Console.WriteLine(selection);
+      }
+   }
+}

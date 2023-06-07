@@ -1,0 +1,109 @@
+﻿@page "/list-manual-order-loading-config"
+@attribute [Authorize]
+@inject NavigationManager NavigationManager
+@inject PortfolioHttpClient PortfolioHttpClient
+
+@if (_config == null)
+{
+    <p>Loading ...</p>
+}
+else
+{
+    <h2 style="color: white">Manual Order Loading Config</h2>
+
+    <br/>
+    <div id="ControlRegion">
+        <SfCard Orientation="CardOrientation.Vertical">
+            <CardHeader>
+                <div class="CustomHeader">Manual Order Loading Config</div></CardHeader>
+
+            <SfButton @ref="AddNewButton" @onclick="OnAddNewInstance" CssClass="e-flat" IsPrimary="true" Content="Add New Auto Order Sizes Config"></SfButton>
+            <SfGrid ID="Grid" DataSource="@_config" @ref="Grid" AllowSelection="true"
+                    Toolbar="@(new List<string>() { "Edit", "Delete", "Cancel", "Update" })" Height="315" Width="900">
+                <GridEditSettings AllowEditOnDblClick="true" AllowAdding="true" AllowEditing="true" AllowDeleting="true" Mode="EditMode.Dialog"></GridEditSettings>
+                <GridPageSettings PageSizes="true"></GridPageSettings>
+                <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Single"></GridSelectionSettings>
+
+                <GridPageSettings PageSizes="true"></GridPageSettings>
+                <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Single"></GridSelectionSettings>
+                <GridEvents OnActionBegin="OnActionBegin" TValue="LiquidationManualOrderLoadingDTO"></GridEvents>
+                <GridColumns>
+                    <GridColumn Field=@nameof(LiquidationManualOrderLoadingDTO.Id) HeaderText="Id" ValidationRules="@(new ValidationRules { Required = true })" TextAlign="TextAlign.Left" Width="150"></GridColumn>
+                    <GridColumn Field="StrategyInstance.SP.Name" HeaderText="Portfolio Name" ValidationRules="@(new ValidationRules { Required = true })" TextAlign="TextAlign.Left" Width="150"></GridColumn>
+                    <GridColumn Field=StrategyInstance.ConfigName HeaderText="Strategy Instance Name" ValidationRules="@(new ValidationRules { Required = true })" TextAlign="TextAlign.Left" Width="150"></GridColumn>
+                    <GridColumn Field=@nameof(LiquidationManualOrderLoadingDTO.OrderNo) HeaderText="Order No" ValidationRules="@(new ValidationRules { Required = true })" TextAlign="TextAlign.Left" Width="150"></GridColumn>
+                    <GridColumn Field=@nameof(LiquidationManualOrderLoadingDTO.Percentage) HeaderText="Percentage of Max Order Size" ValidationRules="@(new ValidationRules { Required = true })" TextAlign="TextAlign.Left" Width="150"></GridColumn>
+
+                    <GridColumn HeaderText="Manage" Width="100" HeaderTextAlign="TextAlign.Right">
+                        <GridCommandColumns>
+                            <GridCommandColumn Type="CommandButtonType.Save" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-save", CssClass = "e-flat" })"></GridCommandColumn>
+                            <GridCommandColumn Type="CommandButtonType.Cancel" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-cancel", CssClass = "e-flat" })"></GridCommandColumn>
+                            <GridCommandColumn Type="CommandButtonType.Edit" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-edit", CssClass = "e-flat" })"></GridCommandColumn>
+                            <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-delete", CssClass = "e-flat" })"></GridCommandColumn>
+                        </GridCommandColumns>
+                    </GridColumn>
+                </GridColumns>
+            </SfGrid>
+
+        </SfCard>
+    </div>
+}
+
+
+@code {
+
+    List<LiquidationManualOrderLoadingDTO> _config = new();
+    SfGrid<LiquidationManualOrderLoadingDTO> Grid { get; set; }
+    SfButton AddNewButton;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _config = await PortfolioHttpClient.GetLiquidationManualOrderLoading();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+    public void OnAddNewInstance(MouseEventArgs args)
+    {
+        NavigationManager.NavigateTo($"create-manual-liquidation-order-loading-config");
+    }
+    
+    public async  Task OnActionBegin(ActionEventArgs<LiquidationManualOrderLoadingDTO> args)
+    {
+        if (args == null)
+        {
+            Console.WriteLine("OnActionBegin args is null");
+            return;
+        }
+        if (args.Data == null)
+        {
+            Console.WriteLine("OnActionBegin args.Data is null");
+            return;
+        }
+  
+        if (args.RequestType.Equals((Syncfusion.Blazor.Grids.Action.Save)))
+        {
+            if (args.Action == "Edit")
+            {
+                Console.WriteLine("Got an edit");
+                await PortfolioHttpClient.UpdateLiquidationManualOrderLoadingConfiguration(args.Data);
+            }
+        }
+        else if (args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Delete))
+        {
+           
+            if (args.Action == "Delete")
+            {
+                await PortfolioHttpClient.DeleteLiquidationManualOrderLoadingConfiguration(args.Data.Id);
+            }
+        }
+
+        _config = await PortfolioHttpClient.GetLiquidationManualOrderLoading();
+        await Grid?.Refresh();
+    }
+}

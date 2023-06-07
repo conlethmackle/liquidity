@@ -1,0 +1,68 @@
+﻿@page "/create-command-to-user"
+@attribute [Authorize]
+@using Syncfusion.Blazor.Navigations
+@using Syncfusion.Blazor.Inputs
+@using Common.Models.DTOs
+@using Syncfusion.Blazor.Buttons
+@using System.Text.Json
+@using BlazorLiquidity.Shared
+@inject PortfolioHttpClient PortfolioHttpClient
+@inject NavigationManager NavigationManager
+@using Microsoft.AspNetCore.Components.Forms
+@using Syncfusion.Blazor.Inputs
+
+<EditForm Model="@_commandToUser" OnValidSubmit="@HandleValidSubmit" >
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <label for="Command" >Command Name</label>
+                               
+    <InputSelect id="Command" @bind-Value="_commandToUser.TelegramCommandId">
+        <option value="">Select a Command</option>
+        @foreach (var c  in _commands)
+        {
+            <option value="@c.TelegramCommandId">@c.TelegramCommandText</option>
+        }
+    </InputSelect>
+    
+    <label for="User" >User Name</label>
+                               
+    <InputSelect id="User" @bind-Value="_commandToUser.TelegramUserId">
+        <option value="">Select a User</option>
+        @foreach (var c  in _users)
+        {
+            <option value="@c.Id">@c.UserName</option>
+        }
+    </InputSelect>
+    <InputSelect id="AuthorizedState" @bind-Value="_commandToUser.IsAuthorised">
+        <option value="">Set the Authorized State</option>
+        <option value=true>Enable</option>
+        <option value=false>Disable</option>
+
+    </InputSelect>
+
+    
+    <SfButton Type="submit">OK</SfButton>
+                   
+</EditForm>
+
+@code {
+   
+    private TelegramCommandToUserDTO _commandToUser = new ();
+    private List<TelegramUserDTO> _users = new () ;
+    private List<TelegramCommandDTO> _commands = new List<TelegramCommandDTO>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _users = await PortfolioHttpClient.GetTelegramUsers();
+        _commands = await PortfolioHttpClient.GetTelegramCommands();
+    }
+
+
+    public async Task HandleValidSubmit()
+    {
+        await PortfolioHttpClient.CreateTelegramCommandToUser(_commandToUser);
+        NavigationManager.NavigateTo("list-telegram-commands-to-users");
+    }
+}
+

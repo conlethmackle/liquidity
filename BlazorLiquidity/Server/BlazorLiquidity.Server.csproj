@@ -1,0 +1,55 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  
+  
+
+  
+  <ItemGroup>
+    <PackageReference Include="AWSSDK.SecretsManager" Version="3.7.101.10" />
+
+    <PackageReference Include="Kralizek.Extensions.Configuration.AWSSecretsManager" Version="1.7.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.0" />
+    <PackageReference Include="AWSSDK.SecretsManager" Version="3.7.101.10" />
+    <PackageReference Include="Kralizek.Extensions.Configuration.AWSSecretsManager" Version="1.7.0" />
+    <PackageReference Include="AutoMapper" Version="11.0.1" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="6.0.6" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Common" Version="6.0.8" />
+    <PackageReference Include="Serilog" Version="2.11.0" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+
+   
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Serilog.Sinks.Console" Version="4.0.1" />
+
+    
+ 
+  </ItemGroup>
+
+ 
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\AccountBalanceManager\AccountBalanceManager.csproj" />
+    <ProjectReference Include="..\..\ConnectorStatus\ConnectorStatus.csproj" />
+    <ProjectReference Include="..\..\DataStore\DataStore.csproj" />
+    <ProjectReference Include="..\..\FairValueProcessing\FairValueProcessing.csproj" />
+    <ProjectReference Include="..\..\MessageBroker\MessageBroker.csproj" />
+    
+    <ProjectReference Include="..\..\OrderAndTradeProcessing\OrderAndTradeProcessing.csproj" />
+    <ProjectReference Include="..\..\OrderBookProcessing\OrderBookProcessing.csproj" />
+    <ProjectReference Include="..\..\StrategyRunner\StrategyRunner.csproj" />
+    <ProjectReference Include="..\..\BlazorLiquidity\Client\BlazorLiquidity.Client.csproj" />
+    <ProjectReference Include="..\..\BlazorLiquidity\Shared\BlazorLiquidity.Shared.csproj" />
+  </ItemGroup>
+
+
+</Project>

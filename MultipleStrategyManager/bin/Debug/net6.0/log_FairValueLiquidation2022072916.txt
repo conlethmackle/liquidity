@@ -1,0 +1,143 @@
+2022-07-29 16:40:54.857 +00:00 [INF] In StrategyManager ...
+2022-07-29 16:40:56.173 +00:00 [INF] Entity Framework Core 6.0.5 initialized 'LiquidityDbContext' using provider 'Npgsql.EntityFrameworkCore.PostgreSQL:6.0.5+9d79af6e2586d5d28da253ac075706a5575a1743' with options: None
+2022-07-29 16:40:56.673 +00:00 [INF] Executed DbCommand (66ms) [Parameters=[@__Name_0='?'], CommandType='"Text"', CommandTimeout='3600']
+SELECT c."ConfigSettingId", c."Description", c."Name", c."Value"
+FROM "ConfigSettings" AS c
+WHERE c."Name" = @__Name_0
+2022-07-29 16:40:56.789 +00:00 [INF] In StrategyManager.InitialiseWithStrategy ...
+2022-07-29 16:40:56.797 +00:00 [INF] Entity Framework Core 6.0.5 initialized 'LiquidityDbContext' using provider 'Npgsql.EntityFrameworkCore.PostgreSQL:6.0.5+9d79af6e2586d5d28da253ac075706a5575a1743' with options: None
+2022-07-29 16:40:56.910 +00:00 [INF] Executed DbCommand (11ms) [Parameters=[@__configName_0='?'], CommandType='"Text"', CommandTimeout='3600']
+SELECT s."StrategySPSubscriptionConfigId", s."ConfigName", s."SPId", s."StrategyId", s0."SPId", s1."StrategyId", t."ExchangeDetailsId", t."ApiKeyId", t."CoinPairs", t."DateCreated", t."IsEnabled", t."Name", t."SPId", t."StrategySPSubscriptionConfigId", t."VenueId", t."ApiKeyId0", t."DateCreated0", t."Key", t."PassPhrase", t."Secret", t."VenueId0", t."VenueName", s0."DateCreated", s0."IsEnabled", s0."Name", s1."StrategyName"
+FROM "StrategySPSubscriptionConfigs" AS s
+INNER JOIN "SPs" AS s0 ON s."SPId" = s0."SPId"
+INNER JOIN "Strategies" AS s1 ON s."StrategyId" = s1."StrategyId"
+LEFT JOIN (
+    SELECT e."ExchangeDetailsId", e."ApiKeyId", e."CoinPairs", e."DateCreated", e."IsEnabled", e."Name", e."SPId", e."StrategySPSubscriptionConfigId", e."VenueId", a."ApiKeyId" AS "ApiKeyId0", a."DateCreated" AS "DateCreated0", a."Key", a."PassPhrase", a."Secret", v."VenueId" AS "VenueId0", v."VenueName"
+    FROM "ExchangeDetails" AS e
+    INNER JOIN "ApiKeys" AS a ON e."ApiKeyId" = a."ApiKeyId"
+    INNER JOIN "Venues" AS v ON e."VenueId" = v."VenueId"
+) AS t ON s."StrategySPSubscriptionConfigId" = t."StrategySPSubscriptionConfigId"
+WHERE s."ConfigName" = @__configName_0
+ORDER BY s."StrategySPSubscriptionConfigId", s0."SPId", s1."StrategyId", t."ExchangeDetailsId", t."ApiKeyId0"
+2022-07-29 16:40:56.938 +00:00 [INF] Creating Exchange for VetFairValueConfig.orderbooks
+2022-07-29 16:40:56.949 +00:00 [INF] Creating Exchange for VetLiquidationTest.VetFairValueConfig.balances
+2022-07-29 16:40:56.952 +00:00 [INF] Creating Exchange for VetLiquidationTest.VetFairValueConfig.status
+2022-07-29 16:40:56.954 +00:00 [INF] Creating Exchange for VetLiquidationTest.VetFairValueConfig.orders
+2022-07-29 16:40:56.958 +00:00 [INF] Creating Exchange for VetLiquidationTest.VetFairValueConfig.trades
+2022-07-29 16:40:57.009 +00:00 [INF] Entity Framework Core 6.0.5 initialized 'LiquidityDbContext' using provider 'Npgsql.EntityFrameworkCore.PostgreSQL:6.0.5+9d79af6e2586d5d28da253ac075706a5575a1743' with options: None
+2022-07-29 16:40:57.013 +00:00 [INF] Executed DbCommand (2ms) [Parameters=[@__configName_0='?'], CommandType='"Text"', CommandTimeout='3600']
+SELECT s."StrategySPSubscriptionConfigId", s."ConfigName", s."SPId", s."StrategyId", s0."SPId", s1."StrategyId", t."ExchangeDetailsId", t."ApiKeyId", t."CoinPairs", t."DateCreated", t."IsEnabled", t."Name", t."SPId", t."StrategySPSubscriptionConfigId", t."VenueId", t."ApiKeyId0", t."DateCreated0", t."Key", t."PassPhrase", t."Secret", t."VenueId0", t."VenueName", s0."DateCreated", s0."IsEnabled", s0."Name", s1."StrategyName"
+FROM "StrategySPSubscriptionConfigs" AS s
+INNER JOIN "SPs" AS s0 ON s."SPId" = s0."SPId"
+INNER JOIN "Strategies" AS s1 ON s."StrategyId" = s1."StrategyId"
+LEFT JOIN (
+    SELECT e."ExchangeDetailsId", e."ApiKeyId", e."CoinPairs", e."DateCreated", e."IsEnabled", e."Name", e."SPId", e."StrategySPSubscriptionConfigId", e."VenueId", a."ApiKeyId" AS "ApiKeyId0", a."DateCreated" AS "DateCreated0", a."Key", a."PassPhrase", a."Secret", v."VenueId" AS "VenueId0", v."VenueName"
+    FROM "ExchangeDetails" AS e
+    INNER JOIN "ApiKeys" AS a ON e."ApiKeyId" = a."ApiKeyId"
+    INNER JOIN "Venues" AS v ON e."VenueId" = v."VenueId"
+) AS t ON s."StrategySPSubscriptionConfigId" = t."StrategySPSubscriptionConfigId"
+WHERE s."ConfigName" = @__configName_0
+ORDER BY s."StrategySPSubscriptionConfigId", s0."SPId", s1."StrategyId", t."ExchangeDetailsId", t."ApiKeyId0"
+2022-07-29 16:40:57.015 +00:00 [INF] Creating Exchange for BTC/USDT.Binance_Exchange.orderbooks
+2022-07-29 16:40:57.018 +00:00 [INF] Creating Exchange for BTC/USDT.Binance_Exchange.last_traded
+2022-07-29 16:40:57.021 +00:00 [INF] Creating Exchange for connectorAlive.Binance_Exchange
+2022-07-29 16:40:57.252 +00:00 [INF] Entity Framework Core 6.0.5 initialized 'LiquidityDbContext' using provider 'Npgsql.EntityFrameworkCore.PostgreSQL:6.0.5+9d79af6e2586d5d28da253ac075706a5575a1743' with options: None
+2022-07-29 16:40:57.254 +00:00 [INF] Executed DbCommand (2ms) [Parameters=[@__configName_0='?'], CommandType='"Text"', CommandTimeout='3600']
+SELECT s."StrategySPSubscriptionConfigId", s."ConfigName", s."SPId", s."StrategyId", s0."SPId", s1."StrategyId", t."ExchangeDetailsId", t."ApiKeyId", t."CoinPairs", t."DateCreated", t."IsEnabled", t."Name", t."SPId", t."StrategySPSubscriptionConfigId", t."VenueId", t."ApiKeyId0", t."DateCreated0", t."Key", t."PassPhrase", t."Secret", t."VenueId0", t."VenueName", s0."DateCreated", s0."IsEnabled", s0."Name", s1."StrategyName"
+FROM "StrategySPSubscriptionConfigs" AS s
+INNER JOIN "SPs" AS s0 ON s."SPId" = s0."SPId"
+INNER JOIN "Strategies" AS s1 ON s."StrategyId" = s1."StrategyId"
+LEFT JOIN (
+    SELECT e."ExchangeDetailsId", e."ApiKeyId", e."CoinPairs", e."DateCreated", e."IsEnabled", e."Name", e."SPId", e."StrategySPSubscriptionConfigId", e."VenueId", a."ApiKeyId" AS "ApiKeyId0", a."DateCreated" AS "DateCreated0", a."Key", a."PassPhrase", a."Secret", v."VenueId" AS "VenueId0", v."VenueName"
+    FROM "ExchangeDetails" AS e
+    INNER JOIN "ApiKeys" AS a ON e."ApiKeyId" = a."ApiKeyId"
+    INNER JOIN "Venues" AS v ON e."VenueId" = v."VenueId"
+) AS t ON s."StrategySPSubscriptionConfigId" = t."StrategySPSubscriptionConfigId"
+WHERE s."ConfigName" = @__configName_0
+ORDER BY s."StrategySPSubscriptionConfigId", s0."SPId", s1."StrategyId", t."ExchangeDetailsId", t."ApiKeyId0"
+2022-07-29 16:40:57.259 +00:00 [INF] Entity Framework Core 6.0.5 initialized 'LiquidityDbContext' using provider 'Npgsql.EntityFrameworkCore.PostgreSQL:6.0.5+9d79af6e2586d5d28da253ac075706a5575a1743' with options: None
+2022-07-29 16:40:57.284 +00:00 [INF] Executed DbCommand (6ms) [Parameters=[@__StrategyExchangeId_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='3600']
+SELECT l."Id", l."AmountDecimals", l."BatchSize", l."CancellationPolicyOnStart", l."CoinPairId", l."DateCreated", l."LongTimeInterval", l."NumberOfCoins", l."OrderSize", l."PercentageSpreadFromFV", l."PercentageSpreadLowerThreshold", l."PriceDecimals", l."ShortTimeInterval", l."StrategySPSubscriptionConfigId", l."SubscriptionPrice", l."Symbol", l."Venue", c."CoinPairId", c."Name", c."PCoinId", c."SCoinId", c0."CoinId", c0."Name", c1."CoinId", c1."Name", s."StrategySPSubscriptionConfigId", s."ConfigName", s."SPId", s."StrategyId", s0."SPId", s0."DateCreated", s0."IsEnabled", s0."Name"
+FROM "LiquidationStrategyConfigs" AS l
+INNER JOIN "CoinPairs" AS c ON l."CoinPairId" = c."CoinPairId"
+INNER JOIN "Coins" AS c0 ON c."PCoinId" = c0."CoinId"
+INNER JOIN "Coins" AS c1 ON c."SCoinId" = c1."CoinId"
+INNER JOIN "StrategySPSubscriptionConfigs" AS s ON l."StrategySPSubscriptionConfigId" = s."StrategySPSubscriptionConfigId"
+INNER JOIN "SPs" AS s0 ON s."SPId" = s0."SPId"
+WHERE l."StrategySPSubscriptionConfigId" = @__StrategyExchangeId_0
+2022-07-29 16:41:12.362 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:41:27.354 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:41:42.364 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:41:57.366 +00:00 [INF] **********************In HandleLongCycle *******************************
+2022-07-29 16:42:12.368 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:42:27.363 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:42:42.366 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:42:57.366 +00:00 [INF] **********************In HandleLongCycle *******************************
+2022-07-29 16:43:12.366 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:43:27.365 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:43:42.365 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:43:57.365 +00:00 [INF] **********************In HandleLongCycle *******************************
+2022-07-29 16:44:12.367 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:44:27.365 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:44:42.364 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:44:57.364 +00:00 [INF] **********************In HandleLongCycle *******************************
+2022-07-29 16:45:12.364 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:45:27.365 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:45:42.364 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:45:57.368 +00:00 [INF] **********************In HandleLongCycle *******************************
+2022-07-29 16:46:12.363 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:46:27.366 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:46:42.365 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:46:57.367 +00:00 [INF] **********************In HandleLongCycle *******************************
+2022-07-29 16:47:12.363 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:47:27.363 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:47:42.364 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:47:57.366 +00:00 [INF] **********************In HandleLongCycle *******************************
+2022-07-29 16:48:12.364 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:48:27.366 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:48:42.364 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:48:57.364 +00:00 [INF] **********************In HandleLongCycle *******************************
+2022-07-29 16:49:12.365 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:49:27.364 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:49:42.367 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:49:57.367 +00:00 [INF] **********************In HandleLongCycle *******************************
+2022-07-29 16:50:12.366 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:50:27.366 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:50:42.367 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:50:57.364 +00:00 [INF] **********************In HandleLongCycle *******************************
+2022-07-29 16:51:12.368 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:51:27.364 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:51:42.368 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:51:57.365 +00:00 [INF] **********************In HandleLongCycle *******************************
+2022-07-29 16:52:12.369 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:52:27.364 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:52:42.365 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:52:57.364 +00:00 [INF] **********************In HandleLongCycle *******************************
+2022-07-29 16:53:12.367 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:53:27.366 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:53:42.364 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:53:57.364 +00:00 [INF] **********************In HandleLongCycle *******************************
+2022-07-29 16:54:12.365 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:54:27.364 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:54:42.367 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:54:57.366 +00:00 [INF] **********************In HandleLongCycle *******************************
+2022-07-29 16:55:12.365 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:55:27.365 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:55:42.366 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:55:57.366 +00:00 [INF] **********************In HandleLongCycle *******************************
+2022-07-29 16:56:12.367 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:56:27.365 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:56:42.366 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:56:57.364 +00:00 [INF] **********************In HandleLongCycle *******************************
+2022-07-29 16:57:12.364 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:57:27.365 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:57:42.364 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:57:57.364 +00:00 [INF] **********************In HandleLongCycle *******************************
+2022-07-29 16:58:12.365 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:58:27.364 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:58:42.367 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:58:57.364 +00:00 [INF] **********************In HandleLongCycle *******************************
+2022-07-29 16:59:12.369 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:59:27.364 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:59:42.365 +00:00 [INF] **********************In HandleShortCycle *******************************
+2022-07-29 16:59:57.364 +00:00 [INF] **********************In HandleLongCycle *******************************

@@ -1,0 +1,156 @@
+﻿@page "/list-fairValueConfigs"
+@attribute [Authorize]
+@using BlazorLiquidity.Shared
+@using Common.Models.DTOs
+@inject PortfolioHttpClient PortfolioHttpClient
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Cards
+@using Syncfusion.Blazor.Buttons
+@inject NavigationManager NavigationManager
+
+
+@if (_fairValueConfigs == null)
+{
+    <p>Loading ...</p>
+}
+else
+{
+    <h2 style="color: white">Fair Value Config</h2>
+
+    <br/>
+    <div id="ControlRegion">
+        <SfCard Orientation="CardOrientation.Vertical">
+            <CardHeader>
+                <div class="CustomHeader">Fair Value Config</div></CardHeader>
+
+            <SfButton @ref="AddNewButton" @onclick="OnAddNewInstance" CssClass="e-flat" IsPrimary="true" Content="Add New Exchange CoinPair"></SfButton>
+            <SfGrid ID="Grid" DataSource="@_fairValueConfigs" @ref="Grid" AllowSelection="true"
+                    Toolbar="@(new List<string>() { "Edit", "Delete", "Cancel", "Update" })" Height="315" Width="900">
+                <GridEditSettings AllowEditOnDblClick="true" AllowAdding="true" AllowEditing="true" AllowDeleting="true" Mode="EditMode.Dialog"></GridEditSettings>
+                <GridPageSettings PageSizes="true"></GridPageSettings>
+                <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Single"></GridSelectionSettings>
+
+                <GridPageSettings PageSizes="true"></GridPageSettings>
+                <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Single"></GridSelectionSettings>
+                <GridEvents OnActionBegin="OnActionBegin" TValue="FairValueConfigForUiDTO"></GridEvents>
+                <GridColumns>
+                    <GridColumn Field=Venue.VenueName HeaderText="Exchange" ValidationRules="@(new ValidationRules { Required = true })" Width="150"></GridColumn>
+                    <GridColumn Field="CoinPair.Name" HeaderText="Coin Pair" ValidationRules="@(new ValidationRules { Required = true })" TextAlign="TextAlign.Left" Width="150"></GridColumn>
+                    <GridColumn Field=@nameof(FairValueConfigForUiDTO.UpdateIntervalSecs) HeaderText="Update Interval" ValidationRules="@(new ValidationRules { Required = true })" TextAlign="TextAlign.Left" Width="150"></GridColumn>
+                    <GridColumn HeaderText="Manage" Width="100" HeaderTextAlign="TextAlign.Right">
+                        <GridCommandColumns>
+                            <GridCommandColumn Type="CommandButtonType.Save" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-save", CssClass = "e-flat" })"></GridCommandColumn>
+                            <GridCommandColumn Type="CommandButtonType.Cancel" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-cancel", CssClass = "e-flat" })"></GridCommandColumn>
+                            <GridCommandColumn Type="CommandButtonType.Edit" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-edit", CssClass = "e-flat" })"></GridCommandColumn>
+                            <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-delete", CssClass = "e-flat" })"></GridCommandColumn>
+                        </GridCommandColumns>
+                    </GridColumn>
+                </GridColumns>
+            </SfGrid>
+
+        </SfCard>
+    </div>
+}
+
+<style> 
+    .CustomHeader, 
+    .e-card .e-card-header .e-card-header-caption:first-child { 
+        padding-left: 0%; 
+        
+    } 
+
+ 
+    .lower {
+        background-color: red;
+    }
+
+    .higher {
+        background-color: green;
+    }
+
+    .same {
+        background-color: orange
+    }
+
+    .e-grid .e-headercell { 
+        background-color: #36486b; 
+    } 
+  
+    .e-headercell {         
+        color: white; 
+        font-size: 1.5rem; 
+        font-weight: bold; 
+    }
+    
+    .e-custom {
+        border-radius: 0;
+        height: 30px;
+        width: 80px;
+    }
+
+    .e-custom, .e-custom:hover, .e-custom:focus, .e-custom:active {
+        background-color: #ff6e40;
+        color: #fff;
+        font-size: 1.0rem; 
+        font-weight: bold;
+    }
+
+</style>
+
+@code
+{
+
+    List<FairValueConfigForUiDTO> _fairValueConfigs { get; set; }
+    SfGrid<FairValueConfigForUiDTO > Grid { get; set; }
+    SfButton AddNewButton;
+    protected override async Task OnInitializedAsync()
+    {
+        _fairValueConfigs = await PortfolioHttpClient.GetFairValueConfigs();
+    }
+
+    public void OnAddNewInstance(MouseEventArgs args)
+    {
+        NavigationManager.NavigateTo($"create-fairValueConfig");
+    }
+
+    
+
+    public async  Task OnActionBegin(ActionEventArgs<FairValueConfigForUiDTO> args)
+    {
+        if (args == null)
+        {
+            Console.WriteLine("OnActionBegin args is null");
+            return;
+        }
+        if (args.Data == null)
+        {
+            Console.WriteLine("OnActionBegin args.Data is null");
+            return;
+        }
+  
+        if (args.RequestType.Equals((Syncfusion.Blazor.Grids.Action.Save)))
+        {
+            if (args.Action == "Edit")
+            {
+          
+                await PortfolioHttpClient.UpdateFairValueConfig(args.Data);
+            }
+         
+        }
+        else if (args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Delete))
+        {
+          
+            if (args.Action == "Delete")
+            {
+                
+               await PortfolioHttpClient.DeleteFairValueConfig(args.Data.Id);
+               
+            }
+        }
+     
+
+        _fairValueConfigs = await PortfolioHttpClient.GetFairValueConfigs();
+        await Grid?.Refresh();
+    }
+}
+

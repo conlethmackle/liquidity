@@ -1,0 +1,67 @@
+﻿<div class="drawer-wrapper @(_isOpen ? "slide" : "")">
+    <div class="drawer-mask"></div>
+    <div class="drawer">
+        @if (_activeSp is not null)
+        {
+            <div class="drawer-content">
+                
+                <div class="trail-details">
+                    <h3>@_activeSp.Name</h3>               
+                </div>
+                <div class="mt-4">
+                    @_activeSp.Description
+                </div>
+                <div>
+                  
+                    <table class="table table-striped">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Currency</th>
+                            <th>Total</th>
+                            <th>Available</th>
+                            <th>Held</th>
+                        </tr>
+                    </thead>
+                        @foreach(var bal in _activeSp.Balances)
+                        {
+                            <tr>
+                                <td>@bal.Currency</td>
+                                <td>@bal.Total</td>
+                                <td>@bal.Available</td>
+                                <td>@bal.Held</td>
+                            </tr>
+                        }
+                    </table>
+                    
+                </div>
+            </div>
+            <div class="drawer-controls">
+                <button class="btn btn-secondary"
+                @onclick="Close">Close</button>
+            </div>
+        }
+    </div>
+</div>
+
+
+@code {
+    private bool _isOpen;
+    private SP _activeSp;
+
+    [Parameter]
+    public SP Sp { get; set; } 
+    protected override void OnParametersSet()
+    {
+        if (Sp != null)
+        {
+            _activeSp = Sp;
+            _isOpen = true;
+        }
+    }
+
+    private void Close()
+    {
+        _activeSp = null;
+        _isOpen = false;
+    }
+}

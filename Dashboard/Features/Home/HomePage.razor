@@ -1,0 +1,20 @@
+﻿@page "/"
+
+@if (_sps == null) 
+{
+<p>Loading Accounts...</p>
+}
+else
+{
+    <AccountDetails Sp="_selectedSP" /> 
+    <div class="grid">
+        @foreach (var sp in _sps) 
+        {
+            <Account SP="sp" OnSelected="HandleAccountSelected"/> 
+        }
+    </div>
+ 
+
+}
+
+

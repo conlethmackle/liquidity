@@ -1,0 +1,135 @@
+﻿@page "/edit-strategy-instance/{StrategySPSubscriptionConfigId:int}"
+@attribute [Authorize]
+@using Common.Models.DTOs
+@using BlazorLiquidity.Shared
+@using Common.Models.Entities
+@using Microsoft.AspNetCore.Components
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Cards
+@inject PortfolioHttpClient PortfolioHttpClient
+@inject NavigationManager NavigationManager
+@using System.Text.Json
+
+<SfCard Orientation="CardOrientation.Vertical">
+    
+    <CardHeader>
+        <div class="CustomHeader">Modify Strategy Instance</div></CardHeader>
+    <p>Portfolio : @_config.SP.Name</p> <p>Strategy Instance: @_config.ConfigName</p>
+    <EditForm Model="@_config" OnValidSubmit="@HandleValidSubmit" >
+        <DataAnnotationsValidator/>
+        <ValidationSummary/>
+
+        <label for="Strategy">Strategy</label>
+
+        <InputSelect id="Strategy" @bind-Value="_config.StrategyId">
+            <option value="@_config.Strategy.StrategyId">@_config.Strategy.StrategyName</option>
+            @foreach (var s  in _strategies)
+            {
+                <option value="@s.StrategyId">@s.StrategyName</option>
+            }
+        </InputSelect>
+
+
+        <SfButton Type="button" @ref="ToggleBtn" @onclick="onToggleClick" CssClass="e-flat" IsPrimary="true" Content="Add Exchange"></SfButton>
+
+        @if (_displayStuff)
+        {
+            <label for="Venue">Venue</label>
+
+            <InputSelect id="Venue" @bind-Value="_exchange.VenueId">
+                @foreach (var v  in _venues)
+                {
+                    <option value="@v.VenueId">@v.VenueName</option>
+                }
+            </InputSelect>
+            <SfTextBox id="exchangeName" Placeholder='Exchange' FloatLabelType='@FloatLabelType.Auto' @bind-Value="_exchange.Name" Width="200" />
+            <SfTextBox id="coinPairs" Placeholder='Coin Pair' FloatLabelType='@FloatLabelType.Auto' @bind-Value="coinPairs" Width="200" />
+            <SfTextBox id="ApiKey" Placeholder='ApiKey' FloatLabelType='@FloatLabelType.Auto' @bind-Value="_exchange.ApiKey.Key" Width="200" />
+            <SfTextBox id="Secret" Placeholder='Secret' FloatLabelType='@FloatLabelType.Auto' @bind-Value="_exchange.ApiKey.Secret" Width="200" />
+            <SfTextBox id="PassPhrase" Placeholder='PassPhrase' FloatLabelType='@FloatLabelType.Auto' @bind-Value="_exchange.ApiKey.PassPhrase" Width="200" />
+            <SfTextBox id="Description" Placeholder='Description' FloatLabelType='@FloatLabelType.Auto' @bind-Value="_exchange.ApiKey.Description" Width="200" />
+            <SfTextBox id="AccountName" Placeholder='Account Name' FloatLabelType='@FloatLabelType.Auto' @bind-Value="_exchange.ApiKey.AccountName" Width="200" />
+            <label for="IsSubAccount">IsSubAccount</label>
+            <InputSelect id="IsSubAccount" @bind-Value="_exchange.ApiKey.IsSubAccount">
+                <option value=true>True</option>
+                <option value=false>False</option>
+            </InputSelect>
+
+            <SfTextBox id="SubAccountName" Placeholder='SubAccount Name' FloatLabelType='@FloatLabelType.Auto' @bind-Value="_exchange.ApiKey.SubAccountName"  Width="200" />
+            <SfTextBox Type="InputType.Password" Placeholder='Password' FloatLabelType='@FloatLabelType.Auto' id="Password" @bind-Value="_exchange.ApiKey.Password" Width="200" />
+            <SfButton Type="button" @ref="ToggleBtn" @onclick="AddExchange" CssClass="e-flat" IsPrimary="true" Content="Add"></SfButton>
+        }
+        <br/>
+        <SfButton Type="submit">OK</SfButton>
+       
+    </EditForm>
+   
+</SfCard>
+
+@code {
+    [Parameter]
+    public int StrategySPSubscriptionConfigId { get; set; }
+
+    private StrategyExchangeConfigDTO _config = new StrategyExchangeConfigDTO();
+    private List<StrategyDTO> _strategies { get; set; } = new List<StrategyDTO>();
+    private List<SPDTO> _portfolios { get; set; } = new List<SPDTO>();
+    private List<VenueDTO> _venues = new List<VenueDTO>();
+    ExchangeDetailsDTO _exchange = null;
+    string coinPairs = null;
+    SfButton ToggleBtn;
+    
+    private bool _displayStuff = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _config = await PortfolioHttpClient.GetStrategyConfigById(StrategySPSubscriptionConfigId);
+        
+        _strategies = await PortfolioHttpClient.GetStrategies();
+        _portfolios = await PortfolioHttpClient.GetPortfolios();
+        _venues = await PortfolioHttpClient.GetVenues();
+    }
+
+    private void onToggleClick(MouseEventArgs args)
+    {
+        _exchange = new ExchangeDetailsDTO();
+        _exchange.ApiKey = new ApiKeyDTO();
+        _displayStuff = true;
+
+    }
+
+    private void AddExchange(MouseEventArgs args)
+    {
+        Console.WriteLine("In AddExchange");
+        _exchange.CoinPairs = coinPairs;
+        _config.ExchangeDetails.Add(_exchange);
+        _displayStuff = false;
+    }
+
+    public async Task HandleValidSubmit()
+    {
+        Console.WriteLine("In HandleValidSubmit");
+        // Need to submit the 
+        StrategyExchangeConfigDTO strategyInstance = new StrategyExchangeConfigDTO();
+        strategyInstance.ExchangeDetails = new List<ExchangeDetailsDTO>();
+        
+        strategyInstance.SPId = _config.SPId;
+        strategyInstance.ConfigName = _config.ConfigName;
+        strategyInstance.StrategyId = _config.StrategyId;
+
+        await PortfolioHttpClient.CreateStrategyInstance(strategyInstance);
+        Console.WriteLine("Created CreateStrategyInstance");
+        var data = await PortfolioHttpClient.GetStrategyConfigData(_config.ConfigName);
+        foreach (var exchange in _config.ExchangeDetails)
+        {
+            exchange.StrategySPSubscriptionConfigId = data.StrategySPSubscriptionConfigId;
+            exchange.SPId = _config.SPId;
+            exchange.DateCreated = DateTime.UtcNow;
+            exchange.ApiKey.DateCreated = exchange.DateCreated;
+            await PortfolioHttpClient.CreateExchangeDetailsEntry(exchange);
+            NavigationManager.NavigateTo("config-start-page");
+            Console.WriteLine("Created CreateExchangeDetailsEntry");
+        }
+    }
+}
+ 

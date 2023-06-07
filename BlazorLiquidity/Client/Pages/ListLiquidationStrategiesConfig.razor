@@ -1,0 +1,142 @@
+﻿@page "/list-liquidstrategies-config"
+@attribute [Authorize]
+@using BlazorLiquidity.Shared
+@using Common.Models.DTOs
+@inject PortfolioHttpClient PortfolioHttpClient
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Cards
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.Popups
+@using Action = Syncfusion.Blazor.Grids.Action
+@inject NavigationManager NavigationManager
+
+
+@if (_strategyConfigs == null)
+{
+    <p>Loading ...</p>
+}
+else {
+    <h2 style="color:white">Liquidation Strategy Configs</h2>
+
+    <br/>
+    <div id="ControlRegion">
+        
+
+        
+        <SfCard Orientation="CardOrientation.Vertical">
+            <CardHeader>
+                <div class="CustomHeader">Liquidation Strategy Configs</div></CardHeader>
+
+            <SfButton @ref="AddNewButton" @onclick="OnAddNewInstance" CssClass="e-flat" IsPrimary="true" Content="Add New Config"></SfButton>
+            <SfGrid ID="Grid" DataSource="@_strategyConfigs" @ref="Grid" AllowSelection="true"
+                    Toolbar="@(new List<string>() { "Edit", "Delete", "Cancel", "Update" })" Height="315" Width="1500">
+                <GridEditSettings AllowEditOnDblClick="true" AllowEditing="true" AllowDeleting="true" ShowConfirmDialog="true" Mode="EditMode.Dialog"></GridEditSettings>
+                <GridPageSettings PageSizes="true"></GridPageSettings>
+                <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Single"></GridSelectionSettings>
+
+                <GridPageSettings PageSizes="true"></GridPageSettings>
+                <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Single"></GridSelectionSettings>
+                <GridEvents OnActionBegin="OnActionBegin" OnActionFailure="ActionFailureHandler" TValue="LiquidationStrategyConfigDTO"></GridEvents>
+                <GridColumns>
+                    <GridColumn Field=@nameof(LiquidationStrategyConfigDTO.ConfigName) HeaderText="Config Name" ValidationRules="@(new ValidationRules { Required = true })" Width="150"></GridColumn>
+                    <GridColumn Field=@nameof(LiquidationStrategyConfigDTO.NumberOfCoins) HeaderText="Number of Coins" ValidationRules="@(new ValidationRules { Required = true })" Width="150"></GridColumn>
+                    <GridColumn Field=@nameof(LiquidationStrategyConfigDTO.PercentageSpreadFromFV) HeaderText="Percentage from FV" ValidationRules="@(new ValidationRules { Required = true })" Width="150"></GridColumn>
+                    <GridColumn Field=@nameof(LiquidationStrategyConfigDTO.AmountDecimals) HeaderText="Amount Decimals" ValidationRules="@(new ValidationRules { Required = true })" Width="150"></GridColumn>
+                    <GridColumn Field=@nameof(LiquidationStrategyConfigDTO.BatchSize) HeaderText="Batch Size" ValidationRules="@(new ValidationRules { Required = true })" Width="150"></GridColumn>
+                    <GridColumn Field=@nameof(LiquidationStrategyConfigDTO.LongTimeInterval) HeaderText="Long Time Interval" ValidationRules="@(new ValidationRules { Required = true })" Width="150"></GridColumn>
+                    <GridColumn Field=@nameof(LiquidationStrategyConfigDTO.ShortTimeInterval) HeaderText="Short Time Interval" ValidationRules="@(new ValidationRules { Required = true })" Width="150"></GridColumn>
+                    <GridColumn Field=@nameof(LiquidationStrategyConfigDTO.PercentageSpreadLowerThreshold) HeaderText="Batch Size" ValidationRules="@(new ValidationRules { Required = true })" Width="150"></GridColumn>
+                    <GridColumn Field=@nameof(LiquidationStrategyConfigDTO.Symbol) HeaderText="Coin Pair" ValidationRules="@(new ValidationRules { Required = true })" Width="150"></GridColumn>
+
+                    <GridColumn HeaderText="Manage" Width="100" HeaderTextAlign="TextAlign.Right">
+                        <GridCommandColumns>
+                            <GridCommandColumn Type="CommandButtonType.Save" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-save", CssClass = "e-flat" })"></GridCommandColumn>
+                            <GridCommandColumn Type="CommandButtonType.Cancel" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-cancel", CssClass = "e-flat" })"></GridCommandColumn>
+                            <GridCommandColumn Type="CommandButtonType.Edit" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-edit", CssClass = "e-flat" })"></GridCommandColumn>
+                            <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-delete", CssClass = "e-flat" })"></GridCommandColumn>
+                        </GridCommandColumns>
+                    </GridColumn>
+                </GridColumns>
+            </SfGrid>
+
+        </SfCard>
+    </div>
+}
+
+
+
+@code {
+    List<LiquidationStrategyConfigDTO> _strategyConfigs { get; set; }
+    SfGrid<LiquidationStrategyConfigDTO>? Grid { get; set; }
+    SfButton AddNewButton;
+
+    
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshData();
+    }
+
+    public async Task OnActionBegin(ActionEventArgs<LiquidationStrategyConfigDTO> args)
+    {
+        if (args == null)
+        {
+            Console.WriteLine("OnActionBegin args is null");
+            return;
+        }
+        if (args.Data == null)
+        {
+            Console.WriteLine("OnActionBegin args.Data is null");
+            return;
+        }
+  
+        if (args.RequestType.Equals((Syncfusion.Blazor.Grids.Action.Save)))
+        {
+           
+            if (args.Action == "Edit")
+            {
+                Console.WriteLine("Got an edit");
+                await PortfolioHttpClient.UpdateLiquidationStrategyConfig(args.Data);
+            }
+         
+        }
+        else if (args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Delete))
+        {
+            if (args.Action == "Delete")
+            {
+                await PortfolioHttpClient.DeleteLiquidationStrategyConfig(args.Data.Id);
+            }
+        }
+       
+        else if (args.RequestType == Action.Cancel)
+        {
+            Console.WriteLine("Cancel captured");
+            return;
+        }
+
+        await RefreshData();
+        await Grid?.Refresh();
+    }
+
+    public void ActionFailureHandler(FailureEventArgs args)
+    {
+        Console.WriteLine($"ActionFailureHandler called {args.Error.Message}");
+    }
+
+    public void OnAddNewInstance(MouseEventArgs args)
+    {
+        NavigationManager.NavigateTo("add-liquidation-strategy-config");
+    }
+
+    private async Task RefreshData()
+    {
+        _strategyConfigs = await PortfolioHttpClient.GetLiquidationStrategyConfigs();
+        foreach (var s in _strategyConfigs)
+        {
+            Console.WriteLine($"OnInitializedAsync - configName = {s.StrategySPSubscriptionConfig.ConfigName}");
+            s.ConfigName = s.StrategySPSubscriptionConfig.ConfigName;
+        }
+    }
+}
+

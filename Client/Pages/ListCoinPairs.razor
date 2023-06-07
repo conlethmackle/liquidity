@@ -1,0 +1,19 @@
+﻿@page "/list-coinpairs"
+@using Common.Models.DTOs
+@inject PortfolioHttpClient PortfolioHttpClient
+@using Syncfusion.Blazor
+@using Syncfusion.Blazor.Grids
+@using SyncfusionLiquidity.Shared
+
+<SfGrid DataSource="@_coinPairs" AllowPaging="true"/>
+
+
+@code {
+    List<CoinPairDTO> _coinPairs { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        _coinPairs = await PortfolioHttpClient.GetCoinPairs();
+    }
+
+   
+}

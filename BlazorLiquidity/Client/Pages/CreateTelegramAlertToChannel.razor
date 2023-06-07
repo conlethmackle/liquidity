@@ -1,0 +1,63 @@
+﻿@page "/create-alert-to-channel"
+@attribute [Authorize]
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.Cards
+@using Microsoft.AspNetCore.Components
+@using Syncfusion.Blazor.Navigations
+@inject PortfolioHttpClient PortfolioHttpClient
+@inject NavigationManager NavigationManager
+
+<SfCard Orientation="CardOrientation.Vertical">
+    <CardHeader>
+        <div class="CustomHeader">Add New Telegram Alert To Channel</div></CardHeader>
+
+    <EditForm Model="@_alertToChannel" OnValidSubmit="@HandleValidSubmit" >
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+ 
+   
+                           
+        <label for="Alert" >Alert Name : </label>
+                               
+        <InputSelect id="Alert" @bind-Value="_alertToChannel.TelegramAlertId" >
+            @foreach (var c  in _alerts)
+            {
+                <option value="@c.TelegramAlertId">@c.AlertName</option>
+            }
+        </InputSelect>
+   
+                    
+        <label for="Channel" >Channel Name : </label>
+                               
+        <InputSelect id="Channel" @bind-Value="_alertToChannel.TelegramChannelId" >
+            @foreach (var c  in _channels)
+            {
+                <option value="@c.TelegramChannelId">@c.ChannelName</option>
+            }
+        </InputSelect>
+    
+        <SfButton Type="submit">OK</SfButton>
+                   
+    </EditForm>
+</SfCard>
+
+@code {
+   
+    private TelegramAlertToChannelDTO _alertToChannel = new TelegramAlertToChannelDTO();
+    private List<TelegramAlertDTO> _alerts = new List<TelegramAlertDTO>();
+    private List<TelegramChannelDTO> _channels = new List<TelegramChannelDTO>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _alerts = await PortfolioHttpClient.GetTelegramAlerts();
+        _channels = await PortfolioHttpClient.GetTelegramChannels();
+    }
+
+
+    public async Task HandleValidSubmit()
+    {
+        await PortfolioHttpClient.CreateTelegramAlertToChannel(_alertToChannel);
+        NavigationManager.NavigateTo("list-telegram-alerts-to-channels");
+    }
+}

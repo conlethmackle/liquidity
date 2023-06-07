@@ -1,0 +1,153 @@
+﻿@using BlazorLiquidity.Shared
+@using Common.Models.DTOs
+@inject PortfolioHttpClient PortfolioHttpClient
+@using Syncfusion.Blazor
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Cards
+@using Syncfusion
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Navigations
+@inject NavigationManager NavigationManager
+@using Syncfusion.Blazor.Layouts
+
+
+<AuthorizeView>
+   
+    <Authorized>
+    @if (_funds == null)
+    {
+        <p>Loading ...</p>
+    }
+    else {
+  
+
+        <br/>
+       
+        <div id="ControlRegion">
+           
+            <div class="h2"><h2>Select A Fund</h2></div>
+
+            <SfGrid ID="Grid" DataSource="@_funds" @ref="Grid" AllowSelection="true" AllowResizing="true" 
+                    Height="@_height.ToString()" Width="1153">
+                    
+                <GridPageSettings PageSizes="true"></GridPageSettings>
+                <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Single"></GridSelectionSettings>
+                <GridPageSettings PageSizes="true"></GridPageSettings>
+           
+                <GridEvents TValue="FundDTO" OnRecordDoubleClick="OnRecordDoubleClick"></GridEvents>
+                <GridColumns>
+                    <GridColumn Field=@nameof(FundDTO.FundName) TextAlign="TextAlign.Left" HeaderText="Name" ValidationRules="@(new ValidationRules { Required = true })"   Width="900"></GridColumn>
+                    <GridColumn Field="Location.LocationName" TextAlign="TextAlign.Left" HeaderText="Location" ValidationRules="@(new ValidationRules { Required = true })" Width="250"></GridColumn>
+               
+                </GridColumns>
+            </SfGrid>
+            </div>
+
+    }
+    </Authorized>
+    <NotAuthorized>
+        <div class="barred">Hard Luck Mate - you're not allowed to see this</div></NotAuthorized>
+</AuthorizeView>
+<style>
+    .barred {
+        color: white;
+    }
+   
+    background_colour {
+        background-color: lightgray;
+    }
+    body  {
+        background-image: url("/images/background.jpg");
+        background-color: black;
+        color: white;
+    }
+   
+    #Grid.e-grid .e-gridheader .e-columnheader
+    { 
+        display: none; 
+    } 
+    .e-card {
+        opacity: 1.0;
+        
+    }
+
+
+    .CustomHeader, 
+    .e-card .e-card-header .e-card-header-caption:first-child { 
+        padding-left: 0%;
+        align-content: center;
+        background-color: black;
+        color: #ffdf00;
+        font-weight: bold;
+        font-size: 30px;
+    } 
+
+    .e-grid .e-table .e-row .e-rowcell { 
+        font-size:26px;
+        font-family: cambria;
+        font-weight: bolder;
+        padding-bottom: 40px;
+        padding-top: 40px;
+        color: white;
+        border-color: black;
+        outline-color: black;
+        background-color: black;
+        opacity: 0.2;
+        
+    }
+
+    .e-headercelldiv {
+        padding-bottom: 10px;
+        padding-top: 10px;
+        background-color: black;
+        opacity: 0.0;
+    }
+
+    .h2 {
+        font-family: cambria;
+        font-weight: bold;
+        color: #ffdf00;
+        background: black;
+        opacity: 0.5;
+        font-size: 35px;
+        text-align: left;
+    }
+</style> 
+
+
+
+@code {
+    private List<FundDTO> _funds { get; set; }
+    SfButton SPSelectButton;
+    SfGrid<FundDTO>? Grid { get; set; }
+
+    int _height = 300;
+   
+    // Specify the value of Sidebar component state. It indicates whether the sidebar component is in an open/close state.
+    public bool SidebarToggle = false;
+    // Specifies the value of Sidebar HTMLAttribute property.
+    Dictionary<string, object> HtmlAttribute = new Dictionary<string, object>()
+    {
+        {"class", "sidebar-menu" }
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _funds = await PortfolioHttpClient.GetFunds();
+            _height = 100 * _funds.Count + 16;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Error getting Funds - {e.StackTrace}");
+        }
+
+    }
+
+    public void OnRecordDoubleClick(Syncfusion.Blazor.Grids.RecordDoubleClickEventArgs<FundDTO> args)
+    {
+        NavigationManager.NavigateTo($"list-subfunds-by-fund/{args.RowData.FundId}");
+    }
+
+}

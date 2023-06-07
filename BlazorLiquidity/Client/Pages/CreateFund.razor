@@ -1,0 +1,134 @@
+﻿@page "/create-fund"
+@attribute [Authorize]
+@using Syncfusion.Blazor.Navigations
+@using Syncfusion.Blazor.Inputs
+@using Common.Models.DTOs
+@using Syncfusion.Blazor.Buttons
+@using System.Text.Json
+@using BlazorLiquidity.Shared
+@inject PortfolioHttpClient PortfolioHttpClient
+@inject NavigationManager NavigationManager
+@using Microsoft.AspNetCore.Components.Forms
+@using Syncfusion.Blazor.Inputs
+
+<SfCard Orientation="CardOrientation.Vertical">
+    
+<CardHeader>
+    <div class="CustomHeader">Create Fund</div></CardHeader>
+<EditForm Model="@_fund" OnValidSubmit="@HandleValidSubmit" >
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+ 
+    <SfTextBox id="FundName" Placeholder='FundName' FloatLabelType='@FloatLabelType.Auto'  @bind-Value="_fund.FundName"  />
+                           
+    <label class="label" for="Location" >Location</label>
+                               
+    <InputSelect id="Location" @bind-Value="_fund.LocationId">
+        <option value="">Choose a Location</option>
+        @foreach (var c  in _locations)
+        {
+            <option value="@c.LocationId">@c.LocationName</option>
+        }
+    </InputSelect>
+    <br/>
+    <br/>
+                    
+   
+    <br/>
+    <br/>
+    <SfButton Type="submit">OK</SfButton>
+                   
+</EditForm>
+</SfCard>
+
+<style  type="text/css" class="cssStyles"> 
+    .label {
+        background-color: lightgrey;
+        color: black;
+    }
+    .e-grid .e-altrow {
+        background-color: #aaaaaa;
+    }
+    .CustomHeader, 
+    .e-card .e-card-header .e-card-header-caption:first-child { 
+        padding-left: 0%; 
+        
+    } 
+
+    
+ 
+    .lower {
+        background-color: red;
+    }
+
+    .higher {
+        background-color: green;
+    }
+
+    .same {
+        background-color: orange
+    }
+
+    .e-grid .e-headercell { 
+        background-color: #36486b; 
+    } 
+  
+    .e-headercell {         
+        color: white;
+        background-color: black;
+        
+        font-size: 40px;
+        font-weight: bold; 
+    }
+
+    .e-grid .e-rowcell {
+        font-size: 26px;
+        padding-bottom: 3px;
+        padding-top: 3px;
+    }
+
+    .e-headercelldiv {
+        font-size: 40px;
+        font-weight: bold;
+        padding-bottom: 6px;
+        padding-top: 6px;
+        background-color: black;
+    }
+    
+    .e-custom {
+        border-radius: 0;
+        height: 30px;
+        width: 80px;
+    }
+
+    .e-custom, .e-custom:hover, .e-custom:focus, .e-custom:active {
+        background-color: #ff6e40;
+        color: #fff;
+        font-size: 1.0rem; 
+        font-weight: bold;
+    }
+
+</style>
+
+@code {
+   
+    private FundDTO _fund = new FundDTO();
+
+    string coinPairs = null;
+    SfButton ToggleBtn;
+    
+    private bool _displayStuff = false;
+    private List<LocationDTO> _locations = new List<LocationDTO>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _locations = await PortfolioHttpClient.GetLocations();
+    }
+
+
+    public async Task HandleValidSubmit()
+    {
+        await PortfolioHttpClient.CreateFund(_fund);
+        NavigationManager.NavigateTo("list-funds");
+    }
+}

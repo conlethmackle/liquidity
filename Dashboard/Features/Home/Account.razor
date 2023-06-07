@@ -1,0 +1,17 @@
+﻿<div class="card shadow" style="width: 18rem;">
+
+    <div class="p-3 mb-2 bg-info text-white">    
+        @SP.Name
+    </div>
+    <button class="btn btn-primary" title="View"
+         @onclick="@(async () => await OnSelected.InvokeAsync(SP))"> 
+        <i class="bi bi-binoculars"></i>
+    </button>
+</div>
+@code {
+   [Parameter]
+   public SP SP { get; set; } = default!;
+   [Parameter]
+   public EventCallback<SP> OnSelected { get; set; }
+   
+}

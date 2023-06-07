@@ -1,0 +1,45 @@
+﻿@page "/load-portfolio/{SPName}"
+@using SyncfusionLiquidity.Shared
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.Extensions.Logging
+@using Common.Models.DTOs;
+@inject PortfolioHttpClient PortfolioHttpClient
+@inject NavigationManager NavigationManager
+@inject ILogger<LoadPortfolio> Logger
+<h3>LoadPortfolio</h3>
+<p>The parameter passed is @SPName</p>
+<div class="row row-cols-1 row-cols-md-2">
+    @foreach (var p in _configs)
+    {
+      <div class="col mb-4">
+        <div class="card">
+          <div class="card-body">    
+               <h5 class="card-title">@p.ConfigName</h5>
+               <h5 class="card-text">Id = @p.SPId</h5>
+               <h5 class="card=text">StrategyConfigId=@p.StrategySPSubscriptionConfigId</h5>
+               <button class="btn btn-primary mb-4" @onclick="(() => LoadStrategyInstance(p.StrategySPSubscriptionConfigId))"> @p.ConfigName</button>
+           
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+@code
+{
+    [Parameter]
+    public string SPName { get; set; }
+
+    private List<StrategyExchangeConfigDTO> _configs = new List<StrategyExchangeConfigDTO>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _configs = await PortfolioHttpClient.GetStrategyConfigsForSP(SPName);
+    }
+
+    public void LoadStrategyInstance(int StrategyConfigId)
+    {
+        NavigationManager.NavigateTo($"strategyinstance/{StrategyConfigId}");
+    }
+
+}

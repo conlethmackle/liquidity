@@ -1,0 +1,608 @@
+﻿@page "/dashboard"
+@using Syncfusion.Blazor.Navigations
+@using System.Collections.ObjectModel
+@using Common.Models
+@layout DashboardLayout
+
+
+<SfDashboardLayout Columns="10" CellSpacing="@(new double[]{10,10})" MediaQuery="max-width:700px">
+    <DashboardLayoutPanels >
+        <DashboardLayoutPanel Column="0" Row="0" SizeX="1" SizeY="1" >
+            <HeaderTemplate>Coin Amount (BTC)</HeaderTemplate>
+            <ContentTemplate>
+               
+                <p class="income-container">1000</p>
+                     
+            </ContentTemplate>
+        </DashboardLayoutPanel>
+
+        <DashboardLayoutPanel Column="1" Row="0" SizeX="1" SizeY="1">
+            <HeaderTemplate>Total Liquidated (BTC)</HeaderTemplate>
+            <ContentTemplate>
+                
+                <p class="expense-container">100</p>
+                       
+            </ContentTemplate>
+        </DashboardLayoutPanel>
+
+        <DashboardLayoutPanel Column="2" Row="0" SizeX="1" SizeY="1">
+            <HeaderTemplate>Total Fills</HeaderTemplate>
+            <ContentTemplate>
+                
+                <p class="expense-container">100</p>
+                       
+            </ContentTemplate>
+        </DashboardLayoutPanel>
+
+        <DashboardLayoutPanel Column="3" Row="0" SizeX="1" SizeY="1">
+            <HeaderTemplate>Days Remaining</HeaderTemplate>
+            <ContentTemplate>
+                <p class="expense-container">100</p>
+            </ContentTemplate>
+        </DashboardLayoutPanel>
+		
+        
+        <DashboardLayoutPanel Column="5" Row="0" SizeX="1" SizeY="1">
+            <HeaderTemplate>Connectivity</HeaderTemplate>
+            <ContentTemplate>
+                
+
+            </ContentTemplate>
+        </DashboardLayoutPanel>
+		
+        <DashboardLayoutPanel Column="1" Row="1" SizeX="1" SizeY="1">
+            <HeaderTemplate>Daily Liquidated (BTC)</HeaderTemplate>
+            <ContentTemplate>
+                <p class="expense-container">100</p>
+            </ContentTemplate>
+        </DashboardLayoutPanel>
+        <DashboardLayoutPanel Column="2" Row="1" SizeX="1" SizeY="1">
+            <HeaderTemplate>Daily Fills</HeaderTemplate>
+            <ContentTemplate>
+                <p class="expense-container">100</p>
+            </ContentTemplate>
+        </DashboardLayoutPanel>
+        <DashboardLayoutPanel Column="5" Row="1" SizeX="1" SizeY="1">
+            <HeaderTemplate>Fair Value</HeaderTemplate>
+            <ContentTemplate>
+                <table>
+                    <tr>
+                        <td>
+                            <p class="expense-container">Binance</p>
+                        </td>
+                        <td>
+                            <p class="expense-container">  24,401.54</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <p class="expense-container">Bitfinex</p>
+                        </td>
+                        <td>
+                            <p class="expense-container">  24,358.31</p>
+                        </td>
+                    </tr>
+
+                </table>
+            </ContentTemplate>
+        </DashboardLayoutPanel>
+        <DashboardLayoutPanel Column="0" Row="2" SizeX="10" SizeY="5">
+          
+            <ContentTemplate>
+                <SfTab Width="1000">
+                    <TabEvents Selected="OnTabSelected" Selecting="OnTabSelecting"></TabEvents> 
+
+                    <TabItems>
+                        <TabItem>
+                            <HeaderTemplate>
+                                <div class="sftabs">Positions</div>
+                            </HeaderTemplate>
+                            <ContentTemplate>
+                                
+                                <SfGrid ID="_balanceGrid" DataSource="@_balances" @ref="_balanceGrid" AllowSelection="true" AllowResizing="true" AllowTextWrap="true" GridLines="GridLine.Both" 
+                                        Height="100%"  Width="2400" >
+                                    <GridEditSettings AllowEditOnDblClick="false" AllowAdding="false" AllowEditing="false" AllowDeleting="true" Mode="EditMode.Dialog" ShowDeleteConfirmDialog="true" ShowConfirmDialog="true"></GridEditSettings>
+                                    <GridPageSettings PageSizes="true"></GridPageSettings>
+                                    <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Single"></GridSelectionSettings>
+
+                                    <GridTextWrapSettings WrapMode="WrapMode.Both"></GridTextWrapSettings>
+                                    <GridColumns>
+                                        <GridColumn Field=@nameof(DifferentBalances.Account) HeaderText="Account Name" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })" Width="40"></GridColumn>
+                                        <GridColumn Field=@nameof(DifferentBalances.Instance) HeaderText="Strategy Instance" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })" Width="35"></GridColumn>
+                                        <GridColumn Field=@nameof(DifferentBalances.Venue) HeaderText="Exchange" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })" TextAlign="TextAlign.Left" Width="20"></GridColumn>
+                                        <GridColumn Field=@nameof(DifferentBalances.FromCoinName) HeaderText="Liquidated Coin" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })" TextAlign="TextAlign.Left" Width="20"></GridColumn>
+                                        <GridColumn Field=@nameof(DifferentBalances.TotalLiqudationFrom) HeaderText="Total Liquidated" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })" Width="20"></GridColumn>
+                                        <GridColumn Field=@nameof(DifferentBalances.DayLiquidationFrom) HeaderText="Liquidated Today" ValidationRules="@(new ValidationRules { Required = true })" Width="20"></GridColumn>
+                                        <GridColumn Field=@nameof(DifferentBalances.ToStableCoinName) HeaderText="Stable Coin" ValidationRules="@(new ValidationRules { Required = true })" Width="20"></GridColumn>
+                                        <GridColumn Field=@nameof(DifferentBalances.TotalLiqudationTo) HeaderText="Total Liquidated" ValidationRules="@(new ValidationRules { Required = true })" Width="20"></GridColumn>
+                                        <GridColumn Field=@nameof(DifferentBalances.DayLiquidationTo) HeaderText="Liquidated Today" ValidationRules="@(new ValidationRules { Required = true })" Width="20"></GridColumn>
+
+                                    </GridColumns>
+                                </SfGrid>
+                            </ContentTemplate>
+                        </TabItem>
+                        <TabItem>
+                            <HeaderTemplate>
+                                <div class="sftabs">Fills</div>
+                            </HeaderTemplate>
+                            <ContentTemplate>
+                                <SfGrid ID="_fillsGrid" DataSource="@_fills" @ref="_fillsGrid" AllowSelection="true" AllowResizing="true" AllowTextWrap="true" GridLines="GridLine.Both" 
+                                        Height="100%"  Width="2400" >
+                                    <GridEditSettings AllowEditOnDblClick="false" AllowAdding="false" AllowEditing="false" AllowDeleting="true" Mode="EditMode.Dialog" ShowDeleteConfirmDialog="true" ShowConfirmDialog="true"></GridEditSettings>
+                                    <GridPageSettings PageSizes="true"></GridPageSettings>
+                                    <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Single"></GridSelectionSettings>
+
+                                    <GridTextWrapSettings WrapMode="WrapMode.Both"></GridTextWrapSettings>
+                                    <GridColumns>
+                                        <GridColumn Field=@nameof(DifferentFills.Account) HeaderText="Account Name" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })" Width="40"></GridColumn>
+                                        <GridColumn Field=@nameof(DifferentFills.Instance) HeaderText="Strategy Instance" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })" Width="35"></GridColumn>
+                                        <GridColumn Field=@nameof(DifferentFills.Venue) HeaderText="Exchange" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })" TextAlign="TextAlign.Left" Width="20"></GridColumn>
+                                        <GridColumn Field=@nameof(DifferentFills.Total) HeaderText="Total Fills" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })"  TextAlign="TextAlign.Left" Width="20"></GridColumn>
+                                        <GridColumn Field=@nameof(DifferentFills.DayTotal) HeaderText="Fills Today" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })" TextAlign="TextAlign.Left" Width="20"></GridColumn>
+                                      
+                                    </GridColumns>
+                                </SfGrid>
+                            </ContentTemplate>
+                        </TabItem>
+                        <TabItem>
+                            <HeaderTemplate>
+                                <div class="sftabs">Open Orders</div>
+                            </HeaderTemplate>
+                            <ContentTemplate>
+                                 <SfGrid ID="_openOrdersGrid" DataSource="@_openOrders" @ref="_openOrdersGrid" AllowSelection="true" AllowResizing="true" AllowTextWrap="true" GridLines="GridLine.Both" 
+                                        Height="100%"  Width="2400" >
+                                    <GridEditSettings AllowEditOnDblClick="false" AllowAdding="false" AllowEditing="false" AllowDeleting="true" Mode="EditMode.Dialog" ShowDeleteConfirmDialog="true" ShowConfirmDialog="true"></GridEditSettings>
+                                    <GridPageSettings PageSizes="true"></GridPageSettings>
+                                    <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Single"></GridSelectionSettings>
+
+                                    <GridTextWrapSettings WrapMode="WrapMode.Both"></GridTextWrapSettings>
+                                    <GridColumns>
+                                        <GridColumn Field=@nameof(OwnOrderChange.OrderId) HeaderText="OrderId" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })" Width="40"></GridColumn>
+                                        <GridColumn Field=@nameof(OwnOrderChange.Symbol) HeaderText="Coin Pair" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })" Width="35"></GridColumn>
+                                        <GridColumn Field=@nameof(OwnOrderChange.Venue) HeaderText="Exchange" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })" TextAlign="TextAlign.Left" Width="20"></GridColumn>
+                                        <GridColumn Field=@nameof(OwnOrderChange.IsBuy) HeaderText="IsBuy" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })"  TextAlign="TextAlign.Left" Width="20"></GridColumn>
+                                        <GridColumn Field=@nameof(OwnOrderChange.Price) HeaderText="Fills Today" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })" TextAlign="TextAlign.Left" Width="20"></GridColumn>
+                                        <GridColumn Field=@nameof(OwnOrderChange.FilledQuantity) HeaderText="Filled Quantity" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })" TextAlign="TextAlign.Left" Width="20"></GridColumn>
+                                        <GridColumn Field=@nameof(OwnOrderChange.RemainingQuantity) HeaderText="Remaining Quantity" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })" TextAlign="TextAlign.Left" Width="20"></GridColumn>
+                                        <GridColumn Field=@nameof(OwnOrderChange.Status) HeaderText="Order Status" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })" TextAlign="TextAlign.Left" Width="20"></GridColumn>
+                                        <GridColumn Field=@nameof(OwnOrderChange.OrderTime) HeaderText="Order Time" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })" TextAlign="TextAlign.Left" Width="20"></GridColumn>
+
+                                    </GridColumns>
+                                </SfGrid>
+                            </ContentTemplate>
+                        </TabItem>
+                        <TabItem>
+                            <HeaderTemplate>
+                                <div class="sftabs">Recent Trades</div>
+                            </HeaderTemplate>
+                            <ContentTemplate>
+                                <SfGrid ID="_fillsGrid" DataSource="@_fills" @ref="_fillsGrid" AllowSelection="true" AllowResizing="true" AllowTextWrap="true" GridLines="GridLine.Both" 
+                                        Height="100%"  Width="2400" >
+                                    <GridEditSettings AllowEditOnDblClick="false" AllowAdding="false" AllowEditing="false" AllowDeleting="true" Mode="EditMode.Dialog" ShowDeleteConfirmDialog="true" ShowConfirmDialog="true"></GridEditSettings>
+                                    <GridPageSettings PageSizes="true"></GridPageSettings>
+                                    <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Single"></GridSelectionSettings>
+
+                                    <GridTextWrapSettings WrapMode="WrapMode.Both"></GridTextWrapSettings>
+                                    <GridColumns>
+                                        <GridColumn Field=@nameof(DifferentFills.Account) HeaderText="Account Name" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })" Width="40"></GridColumn>
+                                        <GridColumn Field=@nameof(DifferentFills.Instance) HeaderText="Strategy Instance" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })" Width="35"></GridColumn>
+                                        <GridColumn Field=@nameof(DifferentFills.Venue) HeaderText="Exchange" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })" TextAlign="TextAlign.Left" Width="20"></GridColumn>
+                                        <GridColumn Field=@nameof(DifferentFills.Total) HeaderText="Total Fills" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })"  TextAlign="TextAlign.Left" Width="20"></GridColumn>
+                                        <GridColumn Field=@nameof(DifferentFills.DayTotal) HeaderText="Fills Today" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })" TextAlign="TextAlign.Left" Width="20"></GridColumn>
+                                      
+                                    </GridColumns>
+                                </SfGrid>
+                            </ContentTemplate>
+                        </TabItem>
+                    </TabItems>
+                </SfTab>
+            </ContentTemplate>
+        </DashboardLayoutPanel>
+        <DashboardLayoutPanel Column="6" Row="1" SizeX="3" SizeY="2">
+            <ContentTemplate>
+                <SfChart   @ref=@Chart  Title="BTC/USDT FairValue " Background="black">
+                        <ChartArea><ChartAreaBorder Width="0"></ChartAreaBorder></ChartArea>
+                        <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category" Interval="10" >
+                            <ChartAxisMajorGridLines Width="0"></ChartAxisMajorGridLines>
+                            <ChartAxisMinorGridLines Width="0"></ChartAxisMinorGridLines>
+                            <ChartAxisMajorTickLines Width="0"></ChartAxisMajorTickLines>
+                            <ChartAxisMinorTickLines Width="0"></ChartAxisMinorTickLines>
+                            <ChartAxisLineStyle Width="0"></ChartAxisLineStyle>
+                        </ChartPrimaryXAxis>
+                        <ChartPrimaryYAxis LabelFormat="{value}" Interval="100" Minimum="23000" Maximum="24500">
+                            <ChartAxisMajorGridLines Width="0"></ChartAxisMajorGridLines>
+                            <ChartAxisMinorGridLines Width="0"></ChartAxisMinorGridLines>
+                            <ChartAxisMajorTickLines Width="0"></ChartAxisMajorTickLines>
+                            <ChartAxisMinorTickLines Width="0"></ChartAxisMinorTickLines>
+                            <ChartAxisLineStyle Width="0"></ChartAxisLineStyle>
+                        </ChartPrimaryYAxis>
+                        <ChartTooltipSettings Enable="true"></ChartTooltipSettings>
+                        <ChartLegendSettings EnableHighlight="true"></ChartLegendSettings>
+                        
+                    <ChartSeriesCollection >
+                           
+                        <ChartSeries Fill="green" Width="3" Name="Bitfinex" Type="ChartSeriesType.Line"  DataSource="@_BitfinexValueChartData"
+                                     XName="Time" YName="Value">
+                            <ChartMarker IsFilled="true" Visible="true" Height="7" Width="7" Shape="ChartShape.Diamond">
+                            </ChartMarker>
+                            <ChartSeriesAnimation Enable="false"></ChartSeriesAnimation>
+
+                        </ChartSeries>
+                        <ChartSeries Fill="red" Width="3" Name="Binance" Type="ChartSeriesType.Line"  DataSource="@_BinanceValueChartData"
+                                     XName="Time" YName="Value">
+
+                            <ChartMarker IsFilled="true" Visible="true" Height="7" Width="7" Shape="ChartShape.Circle">
+                            </ChartMarker>
+                            <ChartSeriesAnimation Enable="false"></ChartSeriesAnimation>
+
+                        </ChartSeries>
+                    </ChartSeriesCollection>
+                </SfChart>
+
+                                              
+            </ContentTemplate>
+        </DashboardLayoutPanel>
+    </DashboardLayoutPanels>     
+</SfDashboardLayout>
+
+
+@code{
+    SfChart Chart = new SfChart();
+    public ObservableCollection<FairValueChartData> _BinanceValueChartData { get; set; } = new();
+    public ObservableCollection<FairValueChartData> _BitfinexValueChartData { get; set; } = new();
+
+    private List<DifferentBalances> _balances { get; set; } = new();
+    private List<DifferentFills> _fills { get; set; } = new();
+    private List<OwnOrderChange> _openOrders { get; set; } = new();
+    SfGrid<DifferentBalances> _balanceGrid { get; set; }
+    SfGrid<DifferentFills> _fillsGrid { get; set; }
+    SfGrid<OwnOrderChange> _openOrdersGrid { get; set; }
+    private PeriodicTimer _chartTimer;
+    private CancellationTokenSource _cts;
+    private int _dataLength = 50;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _balances = new List<DifferentBalances>()
+        {
+            new DifferentBalances()
+            {
+                Account = "Hamilton VE Fund",
+                Instance = "Liquidation SP and a bit more",
+                Venue = "Binance",
+                FromCoinName = "BTC",
+                TotalLiqudationFrom = 100m,
+                DayLiquidationFrom = 6,
+                ToStableCoinName = "USDT",
+                TotalLiqudationTo = 124638.22m,
+                DayLiquidationTo = 6234.78m
+
+            },
+            new DifferentBalances()
+            {
+                Account = "Hamilton VE Fund",
+                Instance = "Liquidation SP and a bit more",
+                Venue = "Bitfinex",
+                FromCoinName = "BTC",
+                TotalLiqudationFrom = 100m,
+                DayLiquidationFrom = 6,
+                ToStableCoinName = "USDT",
+                TotalLiqudationTo = 12463.22m,
+                DayLiquidationTo = 624.78m
+            }
+        };
+
+        _fills = new List<DifferentFills>()
+        {
+            new DifferentFills()
+            {
+                Account = "Hamilton VE Fund",
+                Instance = "Liquidation SP and a bit more",
+                Venue = "Binance",
+                Total = 48,
+                DayTotal = 6
+            },
+            new DifferentFills()
+            {
+                Account = "Hamilton VE Fund",
+                Instance = "Liquidation SP and a bit more",
+                Venue = "Bitfinex",
+                Total = 48,
+                DayTotal = 4
+            }
+        };
+
+        _openOrders = new List<OwnOrderChange>()
+        {
+            new OwnOrderChange()
+            {
+                OrderId = "78279975",
+                Symbol = "BTC/USDT",
+                Price = 23026.77m,
+                Quantity = 0.2m,
+                FilledQuantity = 0.2m,
+                RemainingQuantity = 0.1m,
+                Status = "Partially Filled",
+                OrderTime = DateTime.UtcNow
+
+            },
+            new OwnOrderChange()
+            {
+                OrderId = "78279975",
+                Symbol = "BTC/USDT",
+                Price = 23026.77m,
+                Quantity = 0.2m,
+                FilledQuantity = 0.2m,
+                RemainingQuantity = 0.1m,
+                Status = "Partially Filled",
+                OrderTime = DateTime.UtcNow
+
+            },
+            new OwnOrderChange()
+            {
+                OrderId = "78279975",
+                Symbol = "BTC/USDT",
+                Price = 23026.77m,
+                Quantity = 0.2m,
+                FilledQuantity = 0.2m,
+                RemainingQuantity = 0.1m,
+                Status = "Partially Filled",
+                OrderTime = DateTime.UtcNow
+
+            },
+            new OwnOrderChange()
+            {
+                OrderId = "78279975",
+                Symbol = "BTC/USDT",
+                Price = 23026.77m,
+                Quantity = 0.2m,
+                FilledQuantity = 0.2m,
+                RemainingQuantity = 0.1m,
+                Status = "Partially Filled",
+                OrderTime = DateTime.UtcNow
+
+            },
+            new OwnOrderChange()
+            {
+                OrderId = "78279975",
+                Symbol = "BTC/USDT",
+                Price = 23026.77m,
+                Quantity = 0.2m,
+                FilledQuantity = 0.2m,
+                RemainingQuantity = 0.1m,
+                Status = "Partially Filled",
+                OrderTime = DateTime.UtcNow
+
+            },
+            new OwnOrderChange()
+            {
+                OrderId = "78279975",
+                Symbol = "BTC/USDT",
+                Price = 23026.77m,
+                Quantity = 0.2m,
+                FilledQuantity = 0.2m,
+                RemainingQuantity = 0.1m,
+                Status = "Partially Filled",
+                OrderTime = DateTime.UtcNow
+
+            },
+            new OwnOrderChange()
+            {
+                OrderId = "78279975",
+                Symbol = "BTC/USDT",
+                Price = 23026.77m,
+                Quantity = 0.2m,
+                FilledQuantity = 0.2m,
+                RemainingQuantity = 0.1m,
+                Status = "Partially Filled",
+                OrderTime = DateTime.UtcNow
+
+            },
+            new OwnOrderChange()
+            {
+                OrderId = "78279975",
+                Symbol = "BTC/USDT",
+                Price = 23026.77m,
+                Quantity = 0.2m,
+                FilledQuantity = 0.2m,
+                RemainingQuantity = 0.1m,
+                Status = "Partially Filled",
+                OrderTime = DateTime.UtcNow
+
+            },
+            new OwnOrderChange()
+            {
+                OrderId = "78279975",
+                Symbol = "BTC/USDT",
+                Price = 23026.77m,
+                Quantity = 0.2m,
+                FilledQuantity = 0.2m,
+                RemainingQuantity = 0.1m,
+                Status = "Partially Filled",
+                OrderTime = DateTime.UtcNow
+
+            },
+            new OwnOrderChange()
+            {
+                OrderId = "78279975",
+                Symbol = "BTC/USDT",
+                Price = 23026.77m,
+                Quantity = 0.2m,
+                FilledQuantity = 0.2m,
+                RemainingQuantity = 0.1m,
+                Status = "Partially Filled",
+                OrderTime = DateTime.UtcNow
+
+            },
+        };
+        _cts = new CancellationTokenSource();
+        _chartTimer = new PeriodicTimer(TimeSpan.FromSeconds(1));
+        await ChartTimerExpired();
+    }
+
+    private async Task ChartTimerExpired()
+    {
+        try
+        {
+            Console.WriteLine($"In ChartTimerExpired0");
+            while (await _chartTimer.WaitForNextTickAsync(_cts.Token))
+            {
+                Console.WriteLine($"In ChartTimerExpired1");
+
+                decimal price1 = 23500m;
+                decimal price2 = 23490m;
+                var r = new Random(2345);
+                var r1 = new Random(1000);
+                var rand = (decimal)r.Next(0, 3)/5000;
+                var rand2 = (decimal)r.Next(0, 2)/4000;
+                var rsign = r.Next(9, 10);
+                var rsign2 = r1.Next(3, 4);
+                if (_BinanceValueChartData.Count > 0)
+                {
+                    price1 = _BinanceValueChartData[_BinanceValueChartData.Count - 1].Value;
+                    if (rsign == 9)
+                    {
+                         price1 = price1 + price1 * rand;
+                    }
+                    else if (rsign > 9)
+                    {
+                        price1 = price1 - price1 * rand;
+                    }
+                     
+                }
+                
+             
+               
+                if (_BitfinexValueChartData.Count > 0)
+                {
+                    price2 = _BitfinexValueChartData[_BitfinexValueChartData.Count - 1].Value;
+                    if (rsign2 == 3)
+                    {
+                        price2 = price2 + price2 * rand2;
+                    }
+                    else if (rsign2 > 3)
+                    {
+                        price2 = price2 - price2 * rand2;
+                    }
+                     
+                }
+
+
+                if (_BinanceValueChartData.Count > _dataLength)
+                {
+                    _BinanceValueChartData.RemoveAt(0);
+                }
+                _BinanceValueChartData.Add(new FairValueChartData()
+                {
+                    Value = price1 ,
+                    Time = DateTime.UtcNow
+                });
+                
+                if (_BitfinexValueChartData.Count > _dataLength)
+                {
+                    _BitfinexValueChartData.RemoveAt(0);
+                }
+                _BitfinexValueChartData.Add(new FairValueChartData()
+                {
+                    Value = price2 ,
+                    Time = DateTime.UtcNow
+                });
+    
+
+             StateHasChanged();
+            }
+        }
+        catch (Exception e)
+        {
+    //Handle the exception but don't propagate it
+            Console.WriteLine($"Error in Strategy periodic timer {e.Message}");
+        }
+    }
+
+    public void OnTabSelected(SelectEventArgs args) 
+     { 
+         Console.WriteLine($"In OnTabSelected with args.Name {args.Name}");
+     } 
+
+     public void OnTabSelecting(SelectingEventArgs args) 
+     { 
+         Console.WriteLine($"In OnTabSelecting with args.Name {args.Name}");
+     } 
+ }
+<style>
+    .e-panel-header
+    {
+        text-align : center;
+        background-color: grey;
+    }
+
+    .e-panel-content
+    {
+        text-align: center;
+       
+    }
+    .income-container
+    {
+        font-size:x-large;
+        color: #17a00e ;
+        margin-top:14px;
+    }
+    .expense-container
+    {
+        color: #ca765a;
+        font-size:x-large;
+        margin-top: 0px;
+    }
+    .in-container {
+        font-size: x-large;
+        color: #17a00e;
+        margin-top: 14px;
+        padding: 15px;
+    }
+    .ex-container
+    {
+        color: #ca765a;
+        font-size:x-large;
+        margin-top: 14px;
+        padding:15px;
+    }
+
+    .e-dashboardlayout.e-control .e-panel .e-panel-container .e-panel-header {
+        color: white;
+        font-family: cambria;
+        background-color: black;
+        text-align: center;
+        opacity: 0.3;
+        font-weight: bold;
+    }
+
+    .e-panel-content {
+        color: white;
+        font-family: cambria;
+        font-weight: bold;
+        background: black;
+        opacity: 0.6;
+    }
+
+    .sftabs {
+        color: white;
+        font-family: cambria;
+        font-weight: bolder;
+        font-size: 1.5rem;
+        background: black;
+        opacity: 0.5;
+    }
+
+    .e-grid .e-rowcell {
+        font-size: 1.1rem;
+        font-family: cambria;
+        font-weight: bold;
+    }
+
+</style>
+<style type="text/css" media="screen and (max-width:700px)">
+    .media-css
+    {
+        margin-left:170px !important;
+    }
+</style>

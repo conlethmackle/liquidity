@@ -1,0 +1,1942 @@
+﻿@page "/portfolio-instance-list8/{SPName}"
+@attribute [Authorize]
+@using Microsoft.AspNetCore.SignalR.Client
+@inject PortfolioHttpClient PortfolioHttpClient
+@inject ILogger<PortfolioInstanceList2> Logger
+@using Syncfusion.Blazor.Navigations
+@using System.Text.Json
+@using Common.Messages
+@using Common.Models
+@using System.Collections.ObjectModel
+@inject NavigationManager NavigationManager
+@inject HubConnection HubConnection
+
+
+@if (_configs == null)
+{
+    <p>Loading ...</p>
+}
+else {
+    <h2 style="color:white">Liquidation Strategy Instances for @_spName</h2>
+
+    <br/>
+    <div id="ControlRegion2">
+        <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-4"></div>
+            <div class="col-md-4">
+                <div class="table-responsive">
+                    <table class="table table-dark table-bordered table-hover table-">
+                        <thead bgcolor="black"><tr><th>Exchange</th><th>Symbol</th><th>Price</th></tr></thead>
+                        @foreach (var live in _livePriceGrid)
+                        {
+                            <tr bgcolor="black"><td>@live.Venue</td><td>@live.CoinPair</td><td>@live.Price</td></tr>
+                        }
+
+                    </table>
+               
+                </div>
+            </div>
+            <div class="col-md-4">
+               
+                    <SfGrid ID="ConnectorStatusGrid" AllowResizing="true" DataSource="@_connectorStatus" @ref="ConnectorStatusGrid" GridLines="GridLine.Both" Width="500"  Height="100%"  >
+                        <GridEvents TValue="ConnectorStatus" QueryCellInfo="CustomizeConnectorStatus"></GridEvents>
+                        <GridColumns>
+                            <GridColumn Field=@nameof(ConnectorStatus.Name) IsPrimaryKey="true" HeaderText="Connector" TextAlign="TextAlign.Center" Width="70"></GridColumn>
+                            <GridColumn Field=@nameof(ConnectorStatus.Status)  HeaderText="Status" TextAlign="TextAlign.Center" Width="20"></GridColumn>
+                        </GridColumns>
+                    </SfGrid>
+               
+            </div>
+        </div>
+            <div class="row">
+                    <div class="col-md-12">
+                        <!--SfButton @ref="AddNewButton" @onclick="OnAddNewInstance" CssClass="e-flat" IsPrimary="true" Content="Add New Instance"></!--SfButton-->
+                            <SfGrid ID="Grid" DataSource="@_configs" @ref="Grid" AllowSelection="true" AllowResizing="true" AllowTextWrap="true" GridLines="GridLine.Both" 
+                                     Height="100%"  Width="2400" >
+                                <GridEditSettings AllowEditOnDblClick="true" AllowAdding="true" AllowEditing="true" AllowDeleting="true" Mode="EditMode.Dialog" ShowDeleteConfirmDialog="true" ShowConfirmDialog="true"></GridEditSettings>
+                                <GridPageSettings PageSizes="true"></GridPageSettings>
+                                <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Single"></GridSelectionSettings>
+
+                                <GridEvents OnToolbarClick="ToolbarClick" OnActionBegin="OnActionBegin" OnRecordDoubleClick="OnRecordDoubleClick" 
+                                            TValue="LiquidationConfigurationDTO"  QueryCellInfo="CustomizeLivePriceCell" RowDataBound="RowBound"></GridEvents>
+                                <GridTextWrapSettings WrapMode="WrapMode.Both"></GridTextWrapSettings>
+                                <GridColumns>
+                                    <GridColumn Field=SP.Name HeaderText="Account Name" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })" Width="40"></GridColumn>
+                                    <GridColumn Field=StrategySPSubscriptionConfig.ConfigName HeaderText="Strategy Instance" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })" Width="35"></GridColumn>
+                                    <GridColumn Field="Strategy.StrategyName" HeaderText="Strategy" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })" TextAlign="TextAlign.Left" Width="35"></GridColumn>
+                                    <GridColumn Field=@nameof(LiquidationConfigurationDTO.StrategySPSubscriptionConfigId) IsPrimaryKey="true" Visible="false" HeaderText="Strategy" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })" TextAlign="TextAlign.Left" Width="40"></GridColumn>
+                                    <GridColumn Field=@nameof(LiquidationConfigurationDTO.Exchanges) HeaderText="Exchanges" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })" Width="26"></GridColumn>
+                                    <GridColumn Field=@nameof(LiquidationConfigurationDTO.SubscriptionPrice) HeaderText="Subscription Price" ValidationRules="@(new ValidationRules { Required = true })" Width="30"></GridColumn>
+                                    <GridColumn Field=@nameof(LiquidationConfigurationDTO.OrderSize) HeaderText="Maximum Order Size" ValidationRules="@(new ValidationRules { Required = true })" Width="20"></GridColumn>
+                                    <GridColumn Field=@nameof(LiquidationConfigurationDTO.NumDaysRemaining) HeaderText="Days Left" ValidationRules="@(new ValidationRules { Required = true })" Width="21"></GridColumn>
+                                    <GridColumn Field=@nameof(LiquidationConfigurationDTO.Side) HeaderText="Side" ValidationRules="@(new ValidationRules { Required = true })" Width="13"></GridColumn>
+                                    <GridColumn Field=@nameof(LiquidationConfigurationDTO.PercentageSpreadFromFV) HeaderText="% Spread from FairValue" ValidationRules="@(new ValidationRules { Required = true })" Width="20"></GridColumn>
+                                    <GridColumn Field=@nameof(LiquidationConfigurationDTO.PercentageSpreadLowerThreshold) HeaderText="Lower Threshold for FairValue" ValidationRules="@(new ValidationRules { Required = true })" Width="20"></GridColumn>
+                                    <GridColumn Field=@nameof(LiquidationConfigurationDTO.BatchSize) HeaderText="Order Batch Size" ValidationRules="@(new ValidationRules { Required = true })" Width="20"></GridColumn>
+                                    <GridColumn Field="CoinPair.Name" HeaderText="Coin Pair" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })" TextAlign="TextAlign.Left" Width="25"></GridColumn>
+                                    <GridColumn Field=@nameof(LiquidationConfigurationDTO.CoinAmount) HeaderText="Total Coin To Liquidate" ValidationRules="@(new ValidationRules { Required = true })" Width="20"></GridColumn>
+  
+                                    <GridColumn Field=@nameof(LiquidationConfigurationDTO.DailyLiquidationTarget) HeaderText="Daily Coin Target To Liquidate" ValidationRules="@(new ValidationRules { Required = true })" Width="20"></GridColumn>
+                                    <GridColumn Field=@nameof(LiquidationConfigurationDTO.BalanceLiquidationFrom) HeaderText="Total Liquidated" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })" Width="20"></GridColumn>
+                                    <GridColumn Field=@nameof(LiquidationConfigurationDTO.DailyLiquidationFrom) HeaderText="Total Liquidated Today" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })" Width="20"></GridColumn>
+
+                                    <GridColumn Field=@nameof(LiquidationConfigurationDTO.BalanceLiquidationTo) HeaderText="Liquidated Amount" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })" Width="30"></GridColumn>
+                                    <GridColumn Field=@nameof(LiquidationConfigurationDTO.DailyLiquidationTo) HeaderText="Todays Liquidated Amount" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })" Width="30"></GridColumn>
+                                    <GridColumn Field=@nameof(LiquidationConfigurationDTO.TotalFills) HeaderText="Total Fills" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })" Width="18"></GridColumn>
+                                    <GridColumn Field=@nameof(LiquidationConfigurationDTO.DailyFills) HeaderText="Todays Fills" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })" Width="18"></GridColumn>
+                                    <GridColumn Field=@nameof(LiquidationConfigurationDTO.StrategyState) HeaderText="Strategy State" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })" Width="18"></GridColumn>
+                                    <GridColumn Field=@nameof(LiquidationConfigurationDTO.MakerMode).ToString() HeaderText="Strategy Mode" AllowEditing="false" ValidationRules="@(new ValidationRules { Required = true })" Width="18"></GridColumn>
+                                <GridColumn HeaderText="Strategy Control" Width="26">
+                                    <Template>
+                                        @{
+                                            var row = (context as LiquidationConfigurationDTO);
+                                                <SfButton CssClass="e-custom" @onclick="@((args) => StrategyOnOffEvent(args, row))" IsToggle="true">Strategy<br/> Control</SfButton>
+                                                            <br/>
+                                        }
+                                    </Template>
+                                </GridColumn>
+                                    <GridColumn HeaderText="DashBoard" Width="26">
+                                        <Template>
+                                            @{
+                                                var row = (context as LiquidationConfigurationDTO);
+                                                    <SfButton CssClass="e-custom" @ref="DashBoardButton" @onclick="@((args) => GoToDashBoard(args, row))" IsToggle="true">DashBoard</SfButton>
+                                                    <br/>
+                                            }
+                                        </Template>
+                                    </GridColumn>
+                                    <GridColumn HeaderText="Maker/Taker" Width="30">
+                                        <Template>
+                                            @{
+                                                var row = (context as LiquidationConfigurationDTO);
+                                                    <SfButton CssClass="e-custom" @ref="SwitchMakerTakerButton" @onclick="@((args) => SwitchMakerTakerMode(args, row))" IsToggle="true">Change Mode</SfButton>
+                                                    <br/>
+                                            }
+                                        </Template>
+                                    </GridColumn>
+                                    <GridColumn HeaderText="Mkt Order" Width="24">
+                                        <Template>
+                                            @{
+                                                var row = (context as LiquidationConfigurationDTO);
+                                                                <SfButton CssClass="e-custom" @ref="DashBoardButton" @onclick="@((args) => PlaceMarketOrder(args, row))" IsToggle="true" IsPrimary="false">Mkt Order</SfButton>
+                                                                <br/>
+                                            }
+                                        </Template>
+                                    </GridColumn>
+
+                                    <GridColumn HeaderText="Manage" Width="25" HeaderTextAlign="TextAlign.Right">
+                                        <GridCommandColumns>
+                                            <GridCommandColumn Type="CommandButtonType.Save" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-save", CssClass = "e-flat" })"></GridCommandColumn>
+                                            <GridCommandColumn Type="CommandButtonType.Cancel" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-cancel", CssClass = "e-flat" })"></GridCommandColumn>
+                                            <GridCommandColumn Type="CommandButtonType.Edit" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-edit", CssClass = "e-flat" })"></GridCommandColumn>
+                                            <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-delete", CssClass = "e-flat" })"></GridCommandColumn>
+                                        </GridCommandColumns>
+                                    </GridColumn>
+                                </GridColumns>
+                            </SfGrid>
+                    </div>
+
+
+                </div>
+              
+                <div class="row">
+                    <div class="col-lg-12">
+                        @if (_displayDashboard)
+                        {
+                              
+                            <SfTab Width="1800">
+                                <TabEvents Selected="OnTabSelected" Selecting="OnTabSelecting"></TabEvents> 
+
+                                <TabItems>
+                                    <TabItem>
+                                        <HeaderTemplate>
+                                            <div class="tabs">Fills and Balances</div>
+                                        </HeaderTemplate>
+                                        <ContentTemplate>
+
+                                            <div class="col-lg-6">
+
+                                                <div class="card">
+                                                    <div class="card text-white bg-black mb-3">
+                                                        <div class="card-header">
+                                                            <div class="text-center">
+                                                                <h4>Balances and Fills</h4></div></div></div>
+
+                                                    <div class="card-body">
+                                                        <div class="text-center">
+
+                                                            <div class="table-responsive">
+
+                                                                <h3>Balances</h3>
+                                                                <table class="table table-light table-bordered table-striped table-hover">
+                                                                    <thead><tr><th>Exchange</th><th>Instance</th><th>From</th><th>To</th><th>Daily From</th><th>Daily To</th></tr></thead>
+                                                                    @foreach (var balance in _chosenBalanceList)
+                                                                    {
+                                                                        <tr class="boldedText"><td>@balance.Venue</td><td>@balance.Instance</td><td>@balance.TotalLiqudationFrom</td><td>@balance.TotalLiqudationTo</td><td>@balance.DayLiquidationFrom</td><td>@balance.DayLiquidationTo</td></tr>
+                                                                    }
+
+                                                                </table>
+
+                                                            </div>
+                                                            <div class="table-responsive">
+
+                                                                <h3>Fills</h3>
+                                                                <table class="table table-light table-bordered table-striped table-hover">
+                                                                    <thead><tr><th>Exchange</th><th>Instance</th><th>Total</th><th>DayTotal</th></tr></thead>
+                                                                    @foreach (var fill in _chosenFillsList)
+                                                                    {
+                                                                        <tr class="boldedText"><td>@fill.Venue</td><td>@fill.Instance</td><td>@fill.Total</td><td>@fill.DayTotal</td></tr>
+
+                                                                    }
+
+                                                                </table>
+                                                            </div>
+
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </ContentTemplate>
+
+                                    </TabItem>
+                                    <TabItem>
+                                        <HeaderTemplate>
+                                            <div class="tabs">Open Orders</div>
+                                        </HeaderTemplate>
+                                        <ContentTemplate>
+                                            <div class="card">
+                                                <div class="card text-white bg-black mb-3">
+                                                    <div class="card-header">
+                                                        <div class="text-center">
+                                                            <h4>Open Orders</h4></div></div></div>
+
+                                                <div class="card-body">
+                                                    <div class="text-center">
+
+                                                        <div class="table-responsive">
+                                                            <table class="table table-light table-bordered table-striped table-hover">
+                                                                <thead><tr><th>Id</th><th>Symbol</th><th>Exchange</th><th>Price</th><th>Filled</th><th>Remaining</th><th>IsBuy</th><th>Status</th><th>Time</th></tr></thead>
+                                                                @foreach (var order in _openOrderList)
+                                                                {
+                                                                    if (!order.IsBuy)
+                                                                    {
+                                                                        <tr class="openOrdersRed"><td>@order.OrderId</td><td>@order.Symbol</td><td>@order.Venue</td><td>@order.Price</td><td>@order.FilledQuantity</td><td>@order.RemainingQuantity</td><td>@order.IsBuy</td><td>@order.Status</td><td>@order.OrderTime.ToShortTimeString()</td></tr>
+
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <tr class="openOrdersGreen"><td>@order.OrderId</td><td>@order.Symbol</td><td>@order.Venue</td><td>@order.Price</td><td>@order.FilledQuantity</td><td>@order.RemainingQuantity</td><td>@order.IsBuy</td><td>@order.Status</td><td>@order.OrderTime.ToShortTimeString()</td></tr>
+                                                                    }
+                                                                }
+
+                                                            </table>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+
+
+                                            </div>
+                                        </ContentTemplate>
+
+
+                                    </TabItem>
+                                    <TabItem>
+                                        <HeaderTemplate>
+                                            <div class="tabs">Trades</div>
+                                        </HeaderTemplate>
+                                        <ContentTemplate>
+                                            <div class="card">
+                                                <div class="card text-white bg-black mb-3">
+                                                    <div class="card-header">
+                                                        <div class="text-center">
+                                                            <h3>Trades</h3></div></div></div>
+
+                                                <div class="card-body">
+                                                    <div class="text-center">
+                                                        <div class="table-responsive">
+                                                            <table class="table table-dark table-bordered table-striped table-hover">
+                                                                <thead><tr class="border-bottom"><th>TradeId</th><th>OrderId</th><th >Symbol</th><th >Exchange</th><th>Price</th><th >Quantity</th><th >Filled Quantity</th><th >Remaining Quantity</th><th>IsBuy</th><th>Time</th></tr></thead>
+                                                                @foreach (var trade in @_tradeList)
+                                                                {
+                                                                    if (!trade.IsBuy)
+                                                                    {
+                                                                        <tr class="openOrdersRed"><td>@trade.TradeId</td><td>@trade.OrderId</td><td>@trade.Symbol</td><td>@trade.Venue</td><td>@trade.Price</td><td>@trade.Quantity</td><td>@trade.FilledQuantity</td><td>@trade.RemainingQuantity</td><td>@trade.IsBuy</td><td>@trade.Status</td><td>@trade.Timestamp.ToString()</td></tr>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <tr class="openOrdersGreen"><td>@trade.TradeId</td><td>@trade.OrderId</td><td>@trade.Symbol</td><td>@trade.Venue</td><td>@trade.Price</td><td>@trade.Quantity</td><td>@trade.FilledQuantity</td><td>@trade.RemainingQuantity</td><td>@trade.IsBuy</td><td>@trade.Status</td><td>@trade.Timestamp.ToString()</td></tr>
+                                                                    }
+                                                                }
+
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </ContentTemplate>
+
+                                    </TabItem>
+                                    <TabItem>
+                                        <HeaderTemplate>
+                                            <div class="tabs">Charts</div>
+                                        </HeaderTemplate>
+                                        <ContentTemplate>
+                                            <div class="card">
+                                                <div class="card text-white bg-black mb-3">
+                                                    <div class="card-header">
+                                                        <div class="text-center">
+                                                            <h4>Charts</h4></div></div></div>
+
+                                                <div class="card-body">
+                                                    <div class="text-center">
+
+                                                        <SfChart   @ref=@Chart  Title="BTC/USDT FairValue " >
+                                                            <ChartArea><ChartAreaBorder Width="0"></ChartAreaBorder></ChartArea>
+                                                            <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category" Interval="10" >
+                                                                <ChartAxisMajorGridLines Width="0"></ChartAxisMajorGridLines>
+                                                                <ChartAxisMinorGridLines Width="0"></ChartAxisMinorGridLines>
+                                                                <ChartAxisMajorTickLines Width="0"></ChartAxisMajorTickLines>
+                                                                <ChartAxisMinorTickLines Width="0"></ChartAxisMinorTickLines>
+                                                                <ChartAxisLineStyle Width="0"></ChartAxisLineStyle>
+                                                            </ChartPrimaryXAxis>
+                                                            <ChartPrimaryYAxis LabelFormat="{value}" Interval="100" Minimum="24000" Maximum="25000">
+                                                                <ChartAxisMajorGridLines Width="0"></ChartAxisMajorGridLines>
+                                                                <ChartAxisMinorGridLines Width="0"></ChartAxisMinorGridLines>
+                                                                <ChartAxisMajorTickLines Width="0"></ChartAxisMajorTickLines>
+                                                                <ChartAxisMinorTickLines Width="0"></ChartAxisMinorTickLines>
+                                                                <ChartAxisLineStyle Width="0"></ChartAxisLineStyle>
+                                                            </ChartPrimaryYAxis>
+                                                            <ChartTooltipSettings Enable="true"></ChartTooltipSettings>
+                                                            <ChartLegendSettings EnableHighlight="true"></ChartLegendSettings>
+                                                            
+                                                            <ChartSeriesCollection >
+                                                               
+                                                                <ChartSeries Fill="green" Width="3" Name="Bitfinex" Type="ChartSeriesType.Line"  DataSource="@_BitfinexValueChartData"
+                                                                             XName="Time" YName="Value">
+                                                                    <ChartMarker IsFilled="true" Visible="true" Height="7" Width="7" Shape="ChartShape.Diamond">
+                                                                    </ChartMarker>
+                                                                    <ChartSeriesAnimation Enable="false"></ChartSeriesAnimation>
+
+                                                                </ChartSeries>
+                                                                <ChartSeries Fill="red" Width="3" Name="Binance" Type="ChartSeriesType.Line"  DataSource="@_BinanceValueChartData"
+                                                                             XName="Time" YName="Value">
+
+                                                                    <ChartMarker IsFilled="true" Visible="true" Height="7" Width="7" Shape="ChartShape.Circle">
+                                                                    </ChartMarker>
+                                                                    <ChartSeriesAnimation Enable="false"></ChartSeriesAnimation>
+
+                                                                </ChartSeries>
+                                                            </ChartSeriesCollection>
+                                                        </SfChart>
+
+                                                    </div>
+                                                </div>
+
+
+                                            </div>
+                                        </ContentTemplate>
+
+
+                                    </TabItem>
+                                </TabItems>
+                            </SfTab>
+                        }
+                    </div>
+                </div>
+        </div>
+    </div>
+}
+
+<style> 
+    
+    body  {
+        background-image: url("/images/background.jpg");
+        background-color: #cccccc;
+    }
+    .e-custom {
+        border-radius: 0;
+        height: 30px;
+        width: 80px;
+    }
+
+    .tabs {
+        color: white;
+    }
+    .e-grid .e-table .e-rowcell.e-selectionbackground { 
+        background-color: lightgrey !important; 
+    } 
+    .e-custom, .e-custom:hover, .e-custom:focus, .e-custom:active {
+        background-color: #ff6e40;
+        color: #fff;
+        font-size: 1.0rem; 
+        font-weight: bold;
+    }
+   
+    .CustomHeader, 
+    .e-card .e-card-header .e-card-header-caption:first-child { 
+        padding-left: 0%; 
+        
+    } 
+    .CustomHeader, 
+    .e-card .e-card-header .e-card-header-caption:first-child { 
+        padding-left: 0%; 
+        
+    } 
+ 
+    .e-grid .e-headercell {
+        background-color: black; 
+    } 
+  
+    .e-headercell {         
+        color: white; 
+        font-size: 1.5rem; 
+        font-weight: bold; 
+    } 
+    .e-headercelldiv {
+        font-size: 40px;
+        font-weight: bold;
+        padding-bottom: 6px;
+        padding-top: 6px;
+        background-color: black;
+    }
+    
+    .openOrdersRed {
+        color: red;
+        font-weight: bold;
+    }
+  
+    .openOrdersGreen {
+        color: green;
+        font-weight: bold;
+    }
+
+    .boldedText {
+        font-weight: bold;
+        font-size: 1.0rem;
+    }
+  
+    .e-grid .e-headercell {         
+        color: white;
+        background-color: black;
+        font-size: 40px;
+        
+        font-weight: bold; 
+    }
+
+    .rowcolor {
+        background-color: @color;
+    }
+
+    .e-grid .e-rowcell {
+        color: @fontcolor !important;
+    }
+    
+    .e-custom {
+        border-radius: 0;
+        height: 30px;
+        width: 80px;
+    }
+
+    .e-custom, .e-custom:hover, .e-custom:focus, .e-custom:active {
+        background-color: #ff6e40;
+        color: #fff;
+        font-size: 1.0rem; 
+        font-weight: bold;
+    }
+
+    .london {
+        color:greenyellow !important;
+    }
+
+    .redmond{
+
+        color:red !important;
+    }
+ 
+    .lower {
+        background-color: red;
+    }
+
+    .higher {
+        background-color: green;
+    }
+
+    .same {
+        background-color: orange
+    }
+</style> 
+
+
+
+
+@code
+{
+    [Parameter]
+    public string? SPName { get; set; }
+
+    public string color { get; set; } = "green";
+    public string fontcolor { get; set; } = "black";
+    private bool _displayDashboard = false;
+    SfGrid<LiquidationConfigurationDTO>? Grid { get; set; }
+    SfGrid<FairValueDisplay>? Grid2 { get; set; }
+    SfGrid<ConnectorStatus>? ConnectorStatusGrid { get; set; }
+    SfGrid<OwnOrderChange> OpenOrdersGrid { get; set; }
+    SfGrid<TradeMsg> TradesGrid { get; set; }
+    SfGrid<DifferentBalances> ExchangeBalancesGrid { get; set; }
+    SfGrid<DifferentFills> ExchangeFillsGrid { get; set; }
+    SfGrid<LivePriceGrid> _GridLivePrice { get; set; }
+    SfButton AddNewButton;
+    SfButton DashBoardButton;
+    SfButton SwitchMakerTakerButton;
+    SfChart Chart;
+    private List<int> _badRowList = new();
+    private List<int> _goodRowList = new();
+
+    private List<LiquidationConfigurationDTO> _configs = new ();
+    private Dictionary<int, LiquidationConfigurationDTO> _configTableForLive = new();
+    private Dictionary<string, int> _instanceToIdTable = new();
+    private Dictionary<int, Dictionary<string, DifferentBalances>> _exchangeBalancesTable = new();
+    private Dictionary<int, List<DifferentBalances>> _masterExchangeBalancesList = new();
+    private List<DifferentBalances> _chosenBalanceList { get; set; } = new();
+
+    private Dictionary<int, Dictionary<string, DifferentFills>> _exchangeFillsTable = new();
+    private Dictionary<int, List<DifferentFills>> _masterExchangeFillsList = new();
+    private List<DifferentFills> _chosenFillsList { get; set; } = new();
+
+    private Dictionary<string, Dictionary<string, OwnOrderChange>> _masterOrderTable { get; set; } = new ();
+    
+    private Dictionary<string, Dictionary<string, TradeMsg>> _masterTradeTable { get; set; } = new ();
+    private Dictionary<string, List<TradeMsg>> _tradeLists { get; set; } = new ();
+    private Dictionary<int, VenueDTO> _venues = new Dictionary<int, VenueDTO>();
+
+    private Dictionary<string, ConnectorStatus> _exchangeStatus = new ();
+
+    private Dictionary<string, bool> _strategyInstanceEnabled = new();
+
+    private static string ConnectorUp = "UP";
+    private static string ConnectorDown = "DOWN";
+    private static string StrategyUp = "e-success";
+    private static string StrategyDown = "e-danger";
+    private CancellationTokenSource _cts;
+    //private List<ExchangeDetailsDTO> _exchangeDetails = new();
+    private string _spName { get; set; }
+
+    private Dictionary<string, Dictionary<string, LivePriceGrid>> _livePriceTable { get; set; } = new();
+    private List<LivePriceGrid> _livePriceGrid { get; set; } = new();
+    private Dictionary<string, Dictionary<string, LivePriceGrid>> _previousLivePriceTable { get; set; } = new(); 
+    private int _livePriceIndexCounter { get; set; } = 0;
+
+    private string _fairValueLiquidationButtonStatus = "badge badge-danger";
+    private decimal _previousPrice = 0;
+
+    private string _strategyStatus = StrategyDown;
+    private Dictionary<string, string> _strategyColorStatus = new();
+    bool? strategyOnOffStatus = null;
+    List<ConnectorStatus> _connectorStatus = new();
+    
+
+    private List<OwnOrderChange> _openOrderList { get; set; } = new List<OwnOrderChange>();
+    private List<TradeMsg> _tradeList { get; set; } = new List<TradeMsg>();
+    private Dictionary<int, Dictionary<string, OpeningExchangeBalanceDTO>> _openingExchangeBalances = new();
+    private string _chosenInstance = "";
+    //private List<FairValueChartData> _fairValueChartData { get; set; } = new();
+    public ObservableCollection<FairValueChartData> _BinanceValueChartData { get; set; } = new();
+    public ObservableCollection<FairValueChartData> _BitfinexValueChartData { get; set; } = new();
+    private int dataLength = 50;
+    private PeriodicTimer _chartTimer;
+    private decimal _lastBinanceFairValue { get; set; }
+    private decimal _lastBitfinexFairValue { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Console.WriteLine("*************Here bla bla ***************************");
+            _cts = new CancellationTokenSource();
+            
+         
+            _connectorStatus.Clear();
+            _exchangeStatus.Clear();
+            _spName = (string)SPName;
+            _configs = await PortfolioHttpClient.GetOpeningLiquidationSubscriptionsForSp(_spName);
+
+            int id = 1;
+           
+            _configTableForLive = _configs.ToDictionary(c => c.StrategySPSubscriptionConfigId, c => c);
+            _configs.ForEach(x =>
+            {
+                _instanceToIdTable.Add(x.StrategySPSubscriptionConfig.ConfigName, x.StrategySPSubscriptionConfigId);
+                if (!_openingExchangeBalances.ContainsKey(x.StrategySPSubscriptionConfigId))
+                    _openingExchangeBalances.Add(x.StrategySPSubscriptionConfigId, new Dictionary<string, OpeningExchangeBalanceDTO>());
+                foreach (var exchange in x.StrategySPSubscriptionConfig.ExchangeDetails)
+                {
+                    var venueOpeningBalances = _openingExchangeBalances[x.StrategySPSubscriptionConfigId];
+                    if (!venueOpeningBalances.ContainsKey(exchange.Venue.VenueName))
+                    {
+                        venueOpeningBalances.Add(exchange.Venue.VenueName, exchange.OpeningExchangeBalance);
+                    }
+                }
+            });
+
+           
+
+            HubConnection.On<MessageQueueData>("RealTimeUpdate", async (data) =>
+            {
+                await HandleMessages(data);
+            });
+
+            var venues = await PortfolioHttpClient.GetVenues();
+            foreach (var venue in venues)
+            {
+                var parts = venue.VenueName.Split("_");
+                var c = new ConnectorStatus()
+                {
+                    Name = parts[0],
+                    Status = ConnectorDown
+                };
+                _connectorStatus.Add(c);
+                _exchangeStatus.Add(parts[0], c);
+            }
+
+            var connectorStatusMsgs = await PortfolioHttpClient.GetAllConnectorStatuses();
+           
+            foreach (var connector in connectorStatusMsgs)
+            {
+                await HandleConnectorStatusMsg(connector.Public.Venue, connector);
+                await HandlePrivateConnectorStatus(connector.Private.Venue, connector);
+            }
+            Console.WriteLine("*************Here 2 ***************************");
+            _venues = venues.ToDictionary(v => v.VenueId, v => v);
+
+            //Console.WriteLine($"Just about to  get open orders etc - {_configs.Count}");
+            foreach (var config in _configs)
+            {
+                config.LiquidatedCoin = config.CoinPair.Name.Split("/")[0];
+                if (!_exchangeBalancesTable.ContainsKey(config.StrategySPSubscriptionConfigId))
+                {
+                    _exchangeBalancesTable.Add(config.StrategySPSubscriptionConfigId, new Dictionary<string, DifferentBalances>());
+                }
+
+                if (config.StrategyState)
+                {
+                    var realTimeUpdateDto = new RealTimeStartDTO()
+                    {
+                        SpName = SPName,
+                        Instance = config.StrategySPSubscriptionConfig.ConfigName,
+                        ConfigId = config.StrategySPSubscriptionConfigId
+                    };
+                    //Console.WriteLine($"Bla Bla Bla 3");
+                    await PortfolioHttpClient.StartRealTimeUpdater(realTimeUpdateDto);
+
+    // Console.WriteLine($"Just about to do exchange stuff count {config.StrategySPSubscriptionConfig.ExchangeDetails.Count}");
+                    foreach (var exchange in config.StrategySPSubscriptionConfig.ExchangeDetails)
+                    {
+                        // Need to request the orderbooks
+                        await PortfolioHttpClient.GetOrderBooks(exchange.Venue.VenueName, exchange.CoinPairs, SPName, config.StrategySPSubscriptionConfig.ConfigName);
+                        await PortfolioHttpClient.GetLastTrades(exchange.Venue.VenueName, exchange.CoinPairs, SPName, config.StrategySPSubscriptionConfig.ConfigName);
+                       // Console.WriteLine($"Just about to do exchange stuff - {exchange.Name}");
+                        //Console.WriteLine($"Calling GetPUblicStatus with venue = {exchange.Venue.VenueName}");
+                        await PortfolioHttpClient.GetPublicStatus(exchange.Venue);
+                        OpenOrdersRequest openOrdersRequest = new OpenOrdersRequest();
+                        openOrdersRequest.Venue = exchange.Venue.VenueName;
+                        openOrdersRequest.InstanceName = config.StrategySPSubscriptionConfig.ConfigName;
+                        openOrdersRequest.PortfolioName = SPName;
+                        openOrdersRequest.CoinPairs = exchange.CoinPairs;
+
+                        Console.WriteLine($"Sending request for Open Orders {openOrdersRequest.Venue}");
+                        await PortfolioHttpClient.GetOpenOrders(openOrdersRequest);
+                        GetBalanceRequest getBalanceRequest = new GetBalanceRequest();
+                        getBalanceRequest.Venue = exchange.Venue.VenueName;
+                        getBalanceRequest.InstanceName = config.StrategySPSubscriptionConfig.ConfigName;
+                        getBalanceRequest.PortfolioName = SPName;
+                        Console.WriteLine($"Sending request for Balances {openOrdersRequest.Venue}");
+                        await PortfolioHttpClient.GetBalancesFromVenue(getBalanceRequest);
+                        Console.WriteLine($"Sending request for Fills {openOrdersRequest.Venue}");
+
+                        var fills = await PortfolioHttpClient.GetFills(config.StrategySPSubscriptionConfig.ConfigName);
+                        await HandleFills(fills, config.StrategySPSubscriptionConfig.ConfigName);
+                        var latestTrades = await PortfolioHttpClient.GetLatestTrades(config.StrategySPSubscriptionConfig.ConfigName);
+                        await HandleLatestTrades(latestTrades);
+                    }
+                }
+            }
+
+            Console.WriteLine($"***************** Setting up the _masterExchangeBalancesList xxxxxx ");
+            foreach (var instance in _exchangeBalancesTable.Keys)
+            {
+                Console.WriteLine($"***************** Setting up the _masterExchangeBalancesList yyyyyyyy ");
+                if (_exchangeBalancesTable.ContainsKey(instance))
+                {
+                    var bals = _exchangeBalancesTable[instance];
+                    var balList = bals.Values.ToList();
+                    if (!_masterExchangeBalancesList.ContainsKey(instance))
+                    {
+                        Console.WriteLine($"***************** Setting up the _masterExchangeBalancesList zzzzzzzzz ");
+                        _masterExchangeBalancesList.Add(instance, balList);
+                    }
+                }
+            }
+
+            StateHasChanged();
+            _chartTimer = new PeriodicTimer(TimeSpan.FromSeconds(5));
+            await ChartTimerExpired();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Error in OnInitializedAsync {e.StackTrace}");
+        }
+    }
+    private async Task ChartTimerExpired()
+    {
+        try
+        {
+            while (await _chartTimer.WaitForNextTickAsync(_cts.Token))
+            {
+                Console.WriteLine($"In ChartTimerExpired");
+                Console.WriteLine($"***************************Adding price {_lastBinanceFairValue}");
+
+               // _lastBitfinexFairValue = _lastBinanceFairValue + 1.2m;
+              //  var newData = new FairValueChartData(_lastBinanceFairValue, _lastBitfinexFairValue);
+                
+             //   if (_FairValueChartData.Count > dataLength)
+             //       _FairValueChartData.RemoveAt(0);
+             //   _FairValueChartData.Add(newData);
+                
+               // StateHasChanged();
+            }
+        }
+        catch (Exception e)
+        {
+    //Handle the exception but don't propagate it
+            Console.WriteLine($"Error in Strategy periodic timer {e.Message}");
+        }
+    }
+    public void LoadStrategyInstance(int StrategyConfigId)
+    {
+        NavigationManager.NavigateTo($"strategyinstance/{StrategyConfigId}");
+    }
+
+    public void ToolbarClick(Syncfusion.Blazor.Navigations.ClickEventArgs args)
+    {
+        Console.WriteLine("In toolbarclick");
+    }
+
+    public void OnRecordDoubleClick(Syncfusion.Blazor.Grids.RecordDoubleClickEventArgs<LiquidationConfigurationDTO> args)
+    {
+        // NavigationManager.NavigateTo($"portfolio-instance-list/{args.RowData.}");
+        var rowData = args.RowData;
+        NavigationManager.NavigateTo($"strategy-instance-configure/{args.RowData.StrategySPSubscriptionConfig.ConfigName}");
+        Console.WriteLine("In doubleclick");
+    }
+
+    public async Task OnActionBegin(ActionEventArgs<LiquidationConfigurationDTO> args)
+    {
+        if (args == null)
+        {
+            Console.WriteLine("OnActionBegin args is null");
+            return;
+        }
+        if (args.Data == null)
+        {
+            Console.WriteLine("OnActionBegin args.Data is null");
+            return;
+        }
+
+        if (args.RequestType.Equals((Syncfusion.Blazor.Grids.Action.Save)))
+        {
+            if (args.Action == "Edit")
+            {
+                Console.WriteLine("Got an edit");
+                await PortfolioHttpClient.UpdateOpeningLiquidationSubscription(args.Data);
+            }
+
+        }
+        else if (args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Delete))
+        {
+            Console.WriteLine("Deleting a record");
+            if (args.Action == "Delete")
+            {
+                await PortfolioHttpClient.DeleteOpeningLiquidationSubscription(args.Data.Id);
+            }
+        }
+
+        _configs = await PortfolioHttpClient.GetOpeningLiquidationSubscriptionsForSp(_spName);
+        _configTableForLive = _configs.ToDictionary(c => c.StrategySPSubscriptionConfigId, c => c);
+        await Grid?.Refresh();
+    }
+
+    public void OnAddNewInstance(MouseEventArgs args)
+    {
+        NavigationManager.NavigateTo($"create-strategy-instance");
+    }
+
+    public async Task GoToDashBoard(MouseEventArgs args, LiquidationConfigurationDTO? instance)
+    {
+        try
+        {
+           /* _chosenInstance = instance.StrategySPSubscriptionConfig.ConfigName;
+            if (!_instanceToIdTable.ContainsKey(_chosenInstance))
+            {
+                Console.WriteLine($"WTF - why is this happening!!!!!!!!!");
+                return;
+            }
+            var id = _instanceToIdTable[_chosenInstance];
+            _chosenBalanceList.Clear();
+            if (_masterExchangeBalancesList.ContainsKey(id))
+                _chosenBalanceList = _masterExchangeBalancesList[id];
+            else
+            {
+                Console.WriteLine($"_masterExchangeBalancesList does not have entry for {_chosenInstance} and id={id}");
+            }
+            Dictionary<string, TradeMsg> xxx = null;
+            if (!_masterTradeTable.ContainsKey(_chosenInstance))
+            {
+                xxx = new Dictionary<string, TradeMsg>();
+                _masterTradeTable[_chosenInstance] = xxx;
+            }
+            else
+            {
+                xxx = _masterTradeTable[_chosenInstance];
+            }
+            
+            var l = xxx.Values.ToList();
+            _tradeList.Clear();
+            _tradeList =  l.OrderByDescending(o => o.OrderTime).Take(20).ToList();
+            if (!_displayDashboard)
+            {
+                if (instance.StrategySPSubscriptionConfig == null)
+                {
+                    Console.WriteLine("StrategySPSubscriptionConfig is null");
+                    return;
+                }
+
+                if (instance.StrategySPSubscriptionConfig.ExchangeDetails == null)
+                {
+                    Console.WriteLine("ExchangeDetails are null");
+                    return;
+                }
+
+                foreach (var exchange in instance.StrategySPSubscriptionConfig.ExchangeDetails)
+                {
+                    OpenOrdersRequest openOrdersRequest = new OpenOrdersRequest();
+                    openOrdersRequest.Venue = exchange.Venue.VenueName;
+                    openOrdersRequest.InstanceName = instance.StrategySPSubscriptionConfig.ConfigName;
+                    openOrdersRequest.PortfolioName = SPName;
+                    openOrdersRequest.CoinPairs = exchange.CoinPairs;
+                    await PortfolioHttpClient.GetOpenOrders(openOrdersRequest);
+                    GetBalanceRequest getBalanceRequest = new GetBalanceRequest();
+                    getBalanceRequest.Venue = exchange.Venue.VenueName;
+                    getBalanceRequest.InstanceName = instance.StrategySPSubscriptionConfig.ConfigName;
+                    getBalanceRequest.PortfolioName = SPName;
+                    await PortfolioHttpClient.GetBalancesFromVenue(getBalanceRequest);
+                    
+                    var fills = await PortfolioHttpClient.GetFills(instance.StrategySPSubscriptionConfig.ConfigName);
+                    await HandleFills(fills, instance.StrategySPSubscriptionConfig.ConfigName);
+                //    var latestTrades = await PortfolioHttpClient.GetLatestTrades(instance.StrategySPSubscriptionConfig.ConfigName);
+                  //  await HandleLatestTrades(latestTrades);
+                } 
+                //_chosenFillsList.Clear();
+                // Exchange fills code goes here
+                if (_exchangeFillsTable.ContainsKey(id))
+                {
+                    Console.WriteLine($"_exchangeFillsTable contains id={id}");
+                    if (!_masterExchangeFillsList.ContainsKey(id))
+                    {
+                        var instanceFills = _exchangeFillsTable[id];
+                        _masterExchangeFillsList.Add(id, instanceFills.Values.ToList());
+                        _chosenFillsList = _masterExchangeFillsList[id];
+                    }
+                    else
+                    {
+                        Console.WriteLine($"_chosenFillsList =  _masterExchangeFillsList={id} - contains {_chosenFillsList.Count} entries");
+                        _chosenFillsList = _masterExchangeFillsList[id];
+                    }
+
+                    if (_masterTradeTable.ContainsKey(_chosenInstance))
+                    {
+                        var tradeTable = _masterTradeTable[_chosenInstance];
+                        foreach (var trade in tradeTable.Values)
+                        {
+                            Console.WriteLine($"Trying to get the fills in the dashboard ");
+                            var venue = trade.Venue;
+                            var parts = venue.Split("_");
+                            var data = _configTableForLive[id];
+                            var differingFills = CreateOrGetFills(id, venue);
+                            if (trade.Instance.Equals(_chosenInstance))
+                            {
+                                if (_masterExchangeFillsList.ContainsKey(id))
+                                {
+                                    _chosenFillsList = _masterExchangeFillsList[id];
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"No entry for {id} in _exchangeFillsTable");
+                } 
+                _displayDashboard = true;
+            }
+            else
+            {
+                _displayDashboard = false;
+                _chosenInstance = "";
+            }
+            StateHasChanged();
+        //    Console.WriteLine("************************** End In Dashboard *******************************************"); */
+            NavigationManager.NavigateTo($"dashboard2/{instance.StrategySPSubscriptionConfigId}");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Error in GoToDashboard error Message is {e.Message} and StackTrace {e.StackTrace}");
+        }
+    }
+
+    public async Task SwitchMakerTakerMode(MouseEventArgs args, LiquidationConfigurationDTO? instance)
+    {
+        if (instance?.MakerMode == StratgeyMode.MAKER)
+        {
+            instance.MakerMode = StratgeyMode.TAKER;
+        }
+        else if (instance?.MakerMode == StratgeyMode.TAKER)
+        {
+            instance.MakerMode = StratgeyMode.MAKER;
+        }
+        await PortfolioHttpClient.UpdateOpeningLiquidationSubscription(instance);
+        _configs = await PortfolioHttpClient.GetOpeningLiquidationSubscriptionsForSp(_spName);
+        _configTableForLive = _configs.ToDictionary(c => c.StrategySPSubscriptionConfigId, c => c);
+        foreach (var exchange in instance.StrategySPSubscriptionConfig.ExchangeDetails)
+        {
+            GetBalanceRequest getBalanceRequest = new GetBalanceRequest();
+            getBalanceRequest.Venue = exchange.Venue.VenueName;
+            getBalanceRequest.InstanceName = instance.StrategySPSubscriptionConfig.ConfigName;
+            getBalanceRequest.PortfolioName = SPName;
+            await PortfolioHttpClient.GetBalancesFromVenue(getBalanceRequest);
+
+            var fills = await PortfolioHttpClient.GetFills(instance.StrategySPSubscriptionConfig.ConfigName);
+            await HandleFills(fills, instance.StrategySPSubscriptionConfig.ConfigName);
+        }
+        await Grid?.Refresh();
+    }
+
+    public void PlaceMarketOrder(MouseEventArgs args, LiquidationConfigurationDTO? instance)
+    {
+        Console.WriteLine($"Selected the Config Instance for {instance.Id} and config name {instance.StrategySPSubscriptionConfig.ConfigName}");
+        NavigationManager.NavigateTo($"market-order/{instance.StrategySPSubscriptionConfigId}");
+    }
+
+    private async Task HandleMessages(MessageQueueData msg)
+    {
+        switch (msg.MessageType)
+        {
+            case QueueMsgTypes.FAIRVALUEUPDATE:
+                var fairValueData = JsonSerializer.Deserialize<FairValueData>(msg.Data);
+                await HandleFairValueUpdate(fairValueData);
+                break;
+            case QueueMsgTypes.BALANCEUPDATE:
+            case QueueMsgTypes.OPENINGBALANCE:
+                var balanceUpdate = JsonSerializer.Deserialize<BalanceUpdate>(msg.Data);
+                await HandleBalanceUpdate(msg.Venue, balanceUpdate);
+                break;
+            case QueueMsgTypes.START_OF_DAY:
+                UpdateBalances();
+                UpdateFills();
+                break;
+
+            case QueueMsgTypes.NEWORDER:
+                var orderData = JsonSerializer.Deserialize<OwnOrderChange>(msg.Data);
+                await HandleOwnOrderChanges(msg.Venue, orderData);
+                break;
+            case QueueMsgTypes.CANCELLEDORDER:
+                var cancelledData = JsonSerializer.Deserialize<OwnOrderChange>(msg.Data);
+                await HandleCancelledOrder(msg.Venue, cancelledData);
+                break;
+            case QueueMsgTypes.PARTIALLYFILLEDORDER:
+                var partiallyFilledData = JsonSerializer.Deserialize<OwnOrderChange>(msg.Data);
+                await HandlePartiallyFilledOrder(msg.Venue, partiallyFilledData);
+                break;
+            case QueueMsgTypes.FILLEDORDER:
+                var filledData = JsonSerializer.Deserialize<OwnOrderChange>(msg.Data);
+                await HandleFilledOrder(msg.Venue, filledData);
+                break;
+            case QueueMsgTypes.TRADE:
+                var trade = JsonSerializer.Deserialize<TradeMsg>(msg.Data);
+                await HandleTrade(msg.Venue, trade);
+                break;
+            case QueueMsgTypes.OPEN_ORDERS_RESPONSE:
+                var openOrders = JsonSerializer.Deserialize<List<OwnOrderChange>>(msg.Data);
+                await HandleOpenOrders(msg.Venue, openOrders);
+                break;
+            case QueueMsgTypes.STRATEGY_ALIVE_PING:
+                var strategyAliveData = JsonSerializer.Deserialize<StrategyInstanceConnectionStatus>(msg.Data);
+                HandleStrategyAlive(strategyAliveData);
+                break;
+            case QueueMsgTypes.STRATEGY_CONTROL_MSG:
+                var strategyControlData = JsonSerializer.Deserialize<StrategyControlResponse>(msg.Data);
+                HandleStrategyControlMsg(strategyControlData);
+                break;
+            case QueueMsgTypes.CONNECTOR_STATUS:
+                var connectorStatus = JsonSerializer.Deserialize<ConnectorStatusMsg>(msg.Data);
+                if (connectorStatus != null)
+                {
+                    if (msg.IsPublic)
+                        await HandleConnectorStatusMsg(msg.Venue, connectorStatus);
+                    else
+                        await HandlePrivateConnectorStatus(msg.Venue, connectorStatus);
+                }
+                break;
+            default:
+                Logger.LogInformation("Unhandled Message - {MessageType}", msg.MessageType.ToString());
+                break;
+        }
+    }
+
+    private async Task HandleFairValueUpdate(FairValueData? fairValueData)
+    {
+        if (fairValueData != null)
+        {
+            
+            if (fairValueData.Venue.Contains("Binance")) // Get shot of this - oh this is the charting stuff
+            {
+                if (_BinanceValueChartData.Count > dataLength)
+                   _BinanceValueChartData.RemoveAt(0);
+                _BinanceValueChartData.Add(new FairValueChartData()
+                {
+                    Value = fairValueData.Price,
+                    Time = DateTime.UtcNow
+                });
+                Console.WriteLine($"In FairValue for {fairValueData.Venue} value = {fairValueData.Price}");
+             
+            }
+
+            if (fairValueData.Venue.Contains("Bitfinex"))
+            {
+                if (_BitfinexValueChartData.Count > dataLength)
+                    _BitfinexValueChartData.RemoveAt(0);
+                _BitfinexValueChartData.Add(new FairValueChartData()
+                {
+                    Value = fairValueData.Price,
+                    Time = DateTime.UtcNow
+                });
+                Console.WriteLine($"In FairValue for {fairValueData.Venue} value = {fairValueData.Price}");
+             
+            }
+
+            Dictionary<string, LivePriceGrid> entry = null;
+            LivePriceGrid gridEntry = null;
+            if (_livePriceTable.ContainsKey((fairValueData.Venue)))
+            {
+                entry = _livePriceTable[fairValueData.Venue];
+            }
+            else
+            {
+                entry = new Dictionary<string, LivePriceGrid>();
+                _livePriceTable.Add(fairValueData.Venue, entry);
+            }
+
+            if (entry.ContainsKey(fairValueData.Symbol))
+                gridEntry = entry[fairValueData.Symbol];
+            else
+            {
+                gridEntry = new LivePriceGrid();
+               
+               // _livePriceGrid.Add(gridEntry);
+                entry.Add(fairValueData.Symbol, gridEntry);
+               
+                _livePriceIndexCounter++;
+                gridEntry.Id = _livePriceIndexCounter;
+             //   Console.WriteLine($"*****************************************Adding gridEntry with Id={gridEntry.Id}");
+                gridEntry.CoinPair = fairValueData.Symbol;
+                gridEntry.Venue = fairValueData.Venue;
+
+            }
+          //  Console.WriteLine($"Update of price {gridEntry.Price} with Id={gridEntry.Id} size of list = {_livePriceGrid.Count}");
+            gridEntry.Price = Math.Round(fairValueData.Price, 2, MidpointRounding.ToEven);
+            _livePriceGrid.Clear();
+            foreach (var x in _livePriceTable.Values)
+            {
+                _livePriceGrid.AddRange(x.Values.ToList());
+            }
+          //  await _GridLivePrice.SetRowDataAsync(gridEntry.Id, _livePriceGrid[gridEntry.Id-1]);
+         //   HandlePreviousPrice(fairValueData);
+            StateHasChanged();
+        }
+    }
+
+    private void HandlePreviousPrice(FairValueData? fairValueData)
+    {
+        if (fairValueData != null)
+        {
+            Dictionary<string, LivePriceGrid> entry = null;
+            LivePriceGrid gridEntry = null;
+            if (_previousLivePriceTable.ContainsKey((fairValueData.Venue)))
+            {
+                entry = _previousLivePriceTable[fairValueData.Venue];
+            }
+            else
+            {
+                entry = new Dictionary<string, LivePriceGrid>();
+                _previousLivePriceTable.Add(fairValueData.Venue, entry);
+            }
+
+            if (entry.ContainsKey(fairValueData.Symbol))
+                gridEntry = entry[fairValueData.Symbol];
+            else
+            {
+                gridEntry = new LivePriceGrid();
+                entry.Add(fairValueData.Symbol, gridEntry);
+                gridEntry.Id = _livePriceIndexCounter;
+                gridEntry.CoinPair = fairValueData.Symbol;
+                gridEntry.Venue = fairValueData.Venue;
+
+            }
+            gridEntry.Price = Math.Round(fairValueData.Price, 2, MidpointRounding.ToEven);
+        }
+    }
+
+    private async Task HandleBalanceUpdate(string venue, BalanceUpdate balance)
+    {
+        try
+        {
+            var parts = venue.Split("_");
+            var instance = balance.Balance.Instance;
+            var id = _instanceToIdTable[balance.Balance.Instance];
+            var data = _configTableForLive[id];
+            var differingBalances = CreateOrGetBalance(id, data, venue);
+            differingBalances.Instance = balance.Balance.Instance;
+            differingBalances.Account = balance.Balance.Account;
+            differingBalances.Venue = parts[0];
+       //     Console.WriteLine($"In HandleBalanceUpdate chosen instance = {_chosenInstance} ");
+            if (_instanceToIdTable.ContainsKey(balance.Balance.Instance))
+            {
+                if (balance.Currency.Equals(data.CurrencyLiquidatedFrom))
+                {
+                    differingBalances.FromCoinName = balance.Currency;
+               //     Console.WriteLine($"Handling BTC - {balance.Balance.Available}");
+                   // differingBalances.DayLiquidationFrom = Math.Round(balance.Balance.Available, data.AmountDecimals, MidpointRounding.ToEven);
+                    differingBalances.TotalLiqudationFrom = Math.Round(differingBalances.OpeningBalanceForLiquidatedCoin -  balance.Balance.Available, 
+                                                                        data.AmountDecimals, MidpointRounding.ToEven);
+                    differingBalances.CurrentAvailableCoinBalance = balance.Balance.Available;
+                    differingBalances.DayLiquidationFrom = Math.Round(differingBalances.StartOfDayBalanceForLiquidationCoin - balance.Balance.Available, 
+                                                                        data.AmountDecimals, MidpointRounding.ToEven); 
+                    //differingBalances.OpeningBalanceForLiquidatedCoin
+                    var totals = SumTotalBalances(id);
+                    data.BalanceLiquidationFrom = Math.Round(totals.Item4, data.PriceDecimals, MidpointRounding.ToEven);
+                    data.DailyLiquidationFrom = Math.Round(totals.Item3, data.PriceDecimals, MidpointRounding.ToEven);
+                    
+                    Console.WriteLine($"1. Attempting to update grid for id={id} {differingBalances.Venue} from={data.BalanceLiquidationFrom} ");
+                    await Grid.SetRowDataAsync(id, data);
+                }
+                else if (balance.Currency.Equals(data.CurrencyLiquidatedTo))
+                {
+                    differingBalances.ToStableCoinName = balance.Currency;
+               //     Console.WriteLine($"Handling USDT - {balance.Balance.Available}");
+                    differingBalances.DayLiquidationTo = Math.Round(balance.Balance.Available, data.PriceDecimals, MidpointRounding.ToEven);
+                    differingBalances.TotalLiqudationTo = Math.Round(balance.Balance.Available, data.AmountDecimals, MidpointRounding.ToEven);
+                    differingBalances.CurrentAvailableStableBalance = balance.Balance.Available;
+                    var totals = SumTotalBalances(id);
+                    data.BalanceLiquidationTo = Math.Round(totals.Item2, data.PriceDecimals, MidpointRounding.ToEven);
+                    data.DailyLiquidationTo = Math.Round(totals.Item1, data.AmountDecimals, MidpointRounding.ToEven);
+                    Console.WriteLine($"2. Attempting to update grid for id={id} {differingBalances.Venue} froTom={data.BalanceLiquidationTo} ");
+                    await Grid.SetRowDataAsync(id, data);
+                }
+                if (!string.IsNullOrEmpty(_chosenInstance))
+                {
+                    if (balance.Balance.Instance.Equals(_chosenInstance))
+                    {
+                        if (_masterExchangeBalancesList.ContainsKey(id))
+                        {
+                            _chosenBalanceList = _masterExchangeBalancesList[id];
+                            if (!_chosenBalanceList.Any())
+                            {
+                                if (_exchangeBalancesTable.ContainsKey(id))
+                                {
+                                    var bals = _exchangeBalancesTable[id];
+                                    var balList = bals.Values.ToList();
+                                    _masterExchangeBalancesList[id] = balList;
+                                    _chosenBalanceList = _masterExchangeBalancesList[id];
+                                }
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine($"No entry in _masterExchangeBalancesList for {id}");
+                        }
+                    }
+                }
+                StateHasChanged();
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Error in HandleBalanceUpdate - {e.Message}");
+        }
+    }
+
+    private DifferentBalances CreateOrGetBalance(int id, LiquidationConfigurationDTO data, string venue)
+    {
+
+        Dictionary<string, DifferentBalances> venueBalances = null;
+        DifferentBalances differingBalances = null;
+        if (_exchangeBalancesTable.ContainsKey(id))
+        {
+            venueBalances = _exchangeBalancesTable[id];
+            if (venueBalances.ContainsKey(venue))
+            {
+                differingBalances = venueBalances[venue];
+            }
+            else
+            {
+                var openingBalances = GetOpeningBalance(id, venue);
+
+                if (openingBalances != null)
+                {
+                    differingBalances = new DifferentBalances()
+                    {
+                        Id = venueBalances.Count,
+                        OpeningBalanceForLiquidatedCoin = openingBalances.LiquidatingFromOpeningBalance,
+                        OpeningBalanceForLiquidatedToCurrency = openingBalances.LiquidatingToOpeningBalance
+                    };
+
+                    venueBalances[venue] = differingBalances;
+                    differingBalances.Id = venueBalances.Count;
+                }
+            }
+        }
+        else
+        {
+            var openingBalances = GetOpeningBalance(id, venue);
+            differingBalances = new DifferentBalances()
+            {
+                Id = venueBalances.Count,
+                OpeningBalanceForLiquidatedCoin = openingBalances.LiquidatingFromOpeningBalance,
+                OpeningBalanceForLiquidatedToCurrency = openingBalances.LiquidatingToOpeningBalance
+            };
+            venueBalances = new Dictionary<string, DifferentBalances>();
+            venueBalances[venue] = differingBalances;
+            
+            _exchangeBalancesTable.Add(id, venueBalances);
+
+        }
+        return differingBalances;
+    }
+
+    private OpeningExchangeBalanceDTO GetOpeningBalance(int id, string venue)
+    {
+        if (_openingExchangeBalances.ContainsKey(id))
+        {
+            var venueOpeningBalancesForInstance = _openingExchangeBalances[id];
+            if (venueOpeningBalancesForInstance.ContainsKey(venue))
+            {
+                var openingBalances = venueOpeningBalancesForInstance[venue];
+                return openingBalances;
+            }
+        }
+        return null;
+    }
+
+    private Tuple<decimal, decimal, decimal, decimal> SumTotalBalances(int id)
+    {
+        if (_exchangeBalancesTable.ContainsKey(id))
+        {
+            var venueBalances = _exchangeBalancesTable[id];
+            decimal dayToTotal = 0;
+            decimal toTotal = 0;
+            decimal dayFromTotal = 0;
+            decimal fromTotal = 0;
+            var venueBalanceList = venueBalances.Values.ToList();
+            venueBalanceList.ForEach(v =>
+            {
+                dayToTotal += v.DayLiquidationTo;
+                toTotal += v.TotalLiqudationTo;
+                dayFromTotal += v.DayLiquidationFrom;
+                fromTotal += v.TotalLiqudationFrom;
+            });
+
+            return  Tuple.Create(dayToTotal, toTotal, dayFromTotal, fromTotal);
+        }
+        throw new Exception($"SumTotalBalances - no entry in exchange balance table for {id}");
+
+    }
+
+    private DifferentFills CreateOrGetFills(int id,  string venue)
+    {
+
+        Dictionary<string, DifferentFills> venueFills = null;
+        DifferentFills differingFills = null;
+   
+        if (_exchangeFillsTable.ContainsKey(id))
+        {
+            venueFills = _exchangeFillsTable[id];
+            if (venueFills.ContainsKey(venue))
+            {
+                differingFills = venueFills[venue];
+            }
+            else
+            {
+                differingFills = new DifferentFills();
+                venueFills[venue] = differingFills;
+                differingFills.Id = venueFills.Count;
+            }
+        }
+        else
+        {
+            differingFills = new DifferentFills();
+            venueFills = new Dictionary<string, DifferentFills>();
+            venueFills[venue] = differingFills;
+            differingFills.Id = venueFills.Count;
+            _exchangeFillsTable.Add(id, venueFills);
+      
+        }
+        return differingFills;
+    }
+
+    private Tuple<int, int> SumTotalFills(int id)
+    {
+        if (_exchangeFillsTable.ContainsKey(id))
+        {
+            var venueFills = _exchangeFillsTable[id];
+            int dayTotal = 0;
+            int Total = 0;
+           
+            var venueFillsList = venueFills.Values.ToList();
+            venueFillsList.ForEach(v =>
+            {
+                dayTotal += v.DayTotal;
+                Total += v.Total;
+            });
+
+            return  Tuple.Create(dayTotal, Total);
+        }
+        throw new Exception($"SumTotalFills - no entry in exchange fills table for {id}");
+    }
+
+    public void CustomizeLivePriceCell(QueryCellInfoEventArgs<LiquidationConfigurationDTO> args)
+    {
+        if (args.Column.Field == "BalanceLiquidationFrom" || args.Column.Field == "BalanceLiquidationTo" || args.Column.Field == "DailyLiquidationFrom" || args.Column.Field == "DailyLiquidationTo")
+        {
+            //args.Cell.AddClass(new string[] { "same" });
+            args.Cell.AddStyle(new string[] { "background-color:" + "lightblue" + ";" }); 
+        }
+        else if (args.Column.Field == "StrategyState")
+        {
+            Console.WriteLine($"In CustomizeLivePriceCell with a change in strategy state");
+            if (args.Data.StrategyState)
+                args.Cell.AddStyle(new string[] { "background-color:" + "green" + ";" }); 
+               // args.Cell.AddClass((new string[] {"london"}));
+            else
+                args.Cell.AddStyle(new string[] { "background-color:" + "red" + ";" });
+                //args.Cell.AddClass((new string[] {"redmond"}));
+        }
+      
+    }
+
+    public void CustomizeConnectorStatus(QueryCellInfoEventArgs<ConnectorStatus> args)
+    {
+        Console.WriteLine($"In CustomizeConnectorStatus with a change in  state");
+        if (args.Column.Field == "Status")
+        {
+            if (args.Data.Status == ConnectorDown)
+            {
+                Console.WriteLine($"In CustomizeConnectorStatus should be red");
+                
+                //args.Cell.AddClass(new string[] { "redmond" });
+                args.Cell.AddStyle(new string[] { "background-color:" + "red" + ";" }); 
+            }
+            else if (args.Data.Status == ConnectorUp)
+            {
+                Console.WriteLine($"In CustomizeConnectorStatus should be green");
+                args.Cell.AddStyle(new string[] { "background-color:" + "green" + ";" }); 
+            }
+        }
+
+    }
+
+    public void CustomizeCell(QueryCellInfoEventArgs<LivePriceGrid> args)
+    {
+        Console.WriteLine("In CustomizeCell");
+        if (args.Column.Field == "Price")
+        {
+            if (_previousLivePriceTable.ContainsKey(args.Data.Venue))
+            {
+                var entry = _previousLivePriceTable[args.Data.Venue];
+                if (entry.ContainsKey(args.Data.CoinPair))
+                {
+                    var data = entry[args.Data.CoinPair];
+                    if (args.Data.Price < data.Price)
+                    {
+                        args.Cell.AddClass(new string[] { "redmond" });
+                        args.Cell.AddStyle(new string[] { "background-color:" + "red" + ";" }); 
+                    }
+                    else if (args.Data.Price > data.Price)
+                    {
+                        args.Cell.AddClass(new string[] { "london" });
+                        args.Cell.AddStyle(new string[] { "background-color:" + "green" + ";" }); 
+                    }
+                    else
+                    {
+                        args.Cell.AddClass(new string[] { "same" });
+                        args.Cell.AddStyle(new string[] { "background-color:" + "lightorange" + ";" });
+                    }
+                }
+                else
+                {
+                   // args.Cell.AddClass(new string[] { "london" });
+                    args.Cell.AddStyle(new string[] { "background-color:" + "green" + ";" });
+                }
+            }
+            else
+            {
+                ///args.Cell.AddClass(new string[] { "london" });
+                args.Cell.AddStyle(new string[] { "background-color:" + "green" + ";" });
+            }
+        }
+    }
+
+    private void UpdateBalances()
+    {
+        foreach (var venueBalances in _masterExchangeBalancesList.Values)
+        {
+            foreach (var bal in venueBalances)
+            {
+                bal.StartOfDayBalanceForLiquidationCoin = bal.CurrentAvailableCoinBalance;
+                bal.DayLiquidationTo = bal.CurrentAvailableStableBalance;
+            }
+        }
+    }
+
+    private void UpdateFills()
+    {
+
+    }
+
+    private async Task HandleFills(List<FillsInfoForInstance> fills, string instance)
+    {
+        var id = _instanceToIdTable[instance];
+        foreach (var venueFill in fills)
+        {
+            if (_venues.ContainsKey(venueFill.VenueId))
+            {
+                var venue = _venues[venueFill.VenueId].VenueName.Split("_")[0];
+                var fillsInstance = CreateOrGetFills(id, venue);
+                fillsInstance.Instance = instance;
+                fillsInstance.Account = venueFill.Account;
+                fillsInstance.Venue = venue;
+                fillsInstance.DayTotal = venueFill.DailyFills;
+                fillsInstance.Total = venueFill.TotalFills;
+            }
+        }
+      //  var parts = venue.Split("_");
+        
+        var data = _configTableForLive[id];
+       // var totals = SumTotalFills(id);
+        data.DailyFills = fills.Sum(f => f.DailyFills);
+        data.TotalFills = fills.Sum(f => f.TotalFills);
+        //await Grid.SetRowDataAsync(id, data);
+    }
+
+    private void FormatDecimals(List<OwnOrderChange> ownOrderChanges)
+    {
+        ownOrderChanges.ForEach(o =>
+        {
+            o.Price =  Math.Round(o.Price, 3, MidpointRounding.ToEven);
+            o.Quantity = Math.Round(o.Quantity, 3, MidpointRounding.ToEven);
+            o.FilledQuantity = Math.Round(o.FilledQuantity, 5, MidpointRounding.ToEven);
+            o.RemainingQuantity = Math.Round(o.RemainingQuantity, 5, MidpointRounding.ToEven);
+            switch(o.Status)
+            {
+                case "OPEN":
+                    o.Status = "Open";
+                    break;
+                case "ORDER_PARTIALLY_FILLED":
+                    o.Status = "Partially Filled";
+                    break;
+                case "PENDING":
+                    o.Status = "Pending";
+                    break;
+            }
+        });
+    }
+
+    private void FormatDecimals(List<TradeMsg> trades)
+    {
+        trades.ForEach(o =>
+        {
+            o.Price =  Math.Round(o.Price, 3, MidpointRounding.ToEven);
+            o.Quantity = Math.Round(o.Quantity, 3, MidpointRounding.ToEven);
+            o.FilledQuantity = Math.Round(o.FilledQuantity, 5, MidpointRounding.ToEven);
+            o.RemainingQuantity = Math.Round(o.RemainingQuantity, 5, MidpointRounding.ToEven);
+            switch(o.Status)
+            {
+                case "OPEN":
+                    o.Status = "Open";
+                    break;
+                case "ORDER_PARTIALLY_FILLED":
+                    o.Status = "Partially Filled";
+                    break;
+                case "PENDING":
+                    o.Status = "Pending";
+                    break;
+            }
+        });
+    }
+
+    private void HandleStrategyAlive(StrategyInstanceConnectionStatus status)
+    {
+        if (status.Status)
+        {
+            if (!_strategyColorStatus.ContainsKey(status.InstanceName))
+                _strategyColorStatus[status.InstanceName] = StrategyUp;
+            else if (_strategyColorStatus[status.InstanceName] == StrategyDown)
+            {
+                
+                _strategyColorStatus[status.InstanceName] = StrategyUp;
+                StateHasChanged();
+              
+            }
+        }
+        else
+        {
+            if (!_strategyColorStatus.ContainsKey(status.InstanceName))
+                _strategyColorStatus[status.InstanceName] = StrategyDown;
+            else if (_strategyColorStatus[status.InstanceName] == StrategyUp)
+            {
+                _strategyColorStatus[status.InstanceName] = StrategyDown;
+                StateHasChanged();
+            }
+        }
+    }
+
+    private void HandleStrategyControlMsg(StrategyControlResponse strategyControlData)
+    {
+        Console.WriteLine("**************** In HandleStrategyControlMsg ***************************");
+        if (strategyControlData.State == StrategyProcessStatus.STARTED)
+        {
+            if (_strategyStatus == StrategyDown)
+            {
+                _strategyStatus = StrategyUp;
+                StateHasChanged();
+            }
+        }
+        else if (strategyControlData.State == StrategyProcessStatus.STOPPED ||
+                 strategyControlData.State == StrategyProcessStatus.EXITED || 
+                 strategyControlData.State == StrategyProcessStatus.UNEXPECTED_STOP)
+        {
+            if (_strategyStatus == StrategyUp)
+            {
+                _strategyStatus = StrategyDown;
+                StateHasChanged();
+            }
+        }
+    }
+
+    private async Task HandleConnectorStatusMsg(string venue, ConnectorStatusMsg statusMsg)
+    {
+        Console.WriteLine($"In HandleConnectorStatusMsg with Status = {statusMsg.Public.IsConnected}");
+        var parts = venue.Split("_");
+        ConnectorStatus connector = null;
+        if (!statusMsg.Public.IsConnected) 
+        {
+            if (_exchangeStatus.ContainsKey(parts[0]))
+            {
+                Console.WriteLine($"Connector status for {parts[0]} is down");
+                connector = _exchangeStatus[parts[0]];
+                connector.Status = ConnectorDown;
+            }
+        }
+        else
+        {
+            if (_exchangeStatus.ContainsKey(parts[0]))
+            {
+                Console.WriteLine($"Connector status for {parts[0]} is up");
+                connector = _exchangeStatus[parts[0]];
+                connector.Status = ConnectorUp;
+            }
+        }
+        _connectorStatus = _exchangeStatus.Values.ToList();
+        await ConnectorStatusGrid?.SetRowDataAsync(connector.Name, connector);
+        StateHasChanged();
+    }
+
+    private async Task HandlePrivateConnectorStatus(string venue, ConnectorStatusMsg statusMsg)
+    {
+        if (statusMsg.Instance == null) return;
+        // Get the instance
+        if (_instanceToIdTable.ContainsKey(statusMsg.Instance))
+        {
+            Console.WriteLine($"In HandlePrivateConnectorStatus *******");
+            var id = _instanceToIdTable[statusMsg.Instance];
+            if (!statusMsg.Private.IsConnected)
+            {
+                if (!_badRowList.Contains(id))
+                {
+                    _badRowList.Add(id);
+                }
+            }
+            else
+            {
+                if (!_goodRowList.Contains(id))
+                {
+                    _goodRowList.Add(id);
+                }
+            }
+        }
+    }
+
+    public void RowBound(RowDataBoundEventArgs<LiquidationConfigurationDTO> args)
+    {
+        Console.WriteLine($"In RowBound with {args.Data.StrategySPSubscriptionConfig.ConfigName}");
+        if (_badRowList.Contains(args.Data.StrategySPSubscriptionConfigId))
+        {
+            Console.WriteLine($"In RowBound with {args.Data.StrategySPSubscriptionConfig.ConfigName} 2");
+            //args.Row.AddClass(new string[] { "rowcolor" });
+        }
+    }
+
+    private async Task HandleOpenOrders(string venue, List<OwnOrderChange> openOrders)
+    {
+        try
+        {
+            var instance = "";
+            if (openOrders.Any())
+            {
+                instance = openOrders[0].Instance;
+            }
+            else
+            {
+                Console.WriteLine($"HandleOpenOrders - no open orders from {venue}");
+                return;
+            }
+
+            Console.WriteLine($"*************************in HandleOpenOrders _chosenInstance = {_chosenInstance}");
+            if (_masterOrderTable.ContainsKey(instance))
+            {
+                var orderTable = _masterOrderTable[instance];
+                foreach (var order in openOrders)
+                {
+                    if (order.Instance.Equals(_chosenInstance))
+                    {
+                        orderTable[order.ClientOid] = order;
+                        order.Venue = venue;
+                        if (order.RemainingQuantity == 0)
+                        {
+                            orderTable.Remove(order.ClientOid);
+                        }
+                    }
+                }
+                if (_chosenInstance.Equals(instance))
+                {
+                    var l = orderTable.Values.ToList();
+                    _openOrderList.Clear();
+                    _openOrderList = l.OrderByDescending(o => o.OrderTime).ToList();
+                    FormatDecimals(_openOrderList);
+                    Console.WriteLine($"****************************   Open Order List Size = {_openOrderList.Count}");
+                    StateHasChanged();
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Error in HandleOpenOrders {e.Message}");
+        }
+    }
+
+    private async Task HandleTrade(string venue, TradeMsg? trade, bool ignoreFills=false )
+    {
+        try
+        {
+            if (trade != null)
+            {
+                if (!trade.IsBuy)
+                {
+                    if (!ignoreFills)
+                    {
+                        var parts = venue.Split("_");
+
+                        var id = _instanceToIdTable[trade.Instance];
+                        Console.WriteLine($"The id being used is {id}");
+                        var data = _configTableForLive[id];
+                        var differingFills = CreateOrGetFills(id, venue);
+                        differingFills.Instance = trade.Instance;
+                        differingFills.Account = trade.Account;
+                        differingFills.Venue = parts[0];
+                        if (trade.Timestamp.Date == DateTime.UtcNow.Date)
+                            differingFills.DayTotal++;
+                        differingFills.Total++;
+                        var totals = SumTotalFills(id);
+                        data.DailyFills = totals.Item1;
+                        data.TotalFills = totals.Item2;
+                        //await Grid.SetRowDataAsync(id, data);
+
+                        if (trade.Instance.Equals(_chosenInstance))
+                        {
+                            if (_masterExchangeFillsList.ContainsKey(id))
+                            {
+                                _chosenFillsList = _masterExchangeFillsList[id];
+    
+                            }
+                        }
+                    }
+                }
+                Dictionary<string, TradeMsg> tradeTable = null;
+                if (_masterTradeTable.ContainsKey(trade.Instance))
+                    tradeTable = _masterTradeTable[trade.Instance];
+                else
+                {
+                    tradeTable = new Dictionary<string, TradeMsg>();
+                    _masterTradeTable[trade.Instance] = tradeTable;
+                }
+                Console.WriteLine($"In HandleTrade");
+                trade.Venue = venue;
+                if (!tradeTable.ContainsKey(trade.TradeId))
+                {
+                    tradeTable.Add(trade.TradeId, trade);
+                    if (trade.Instance.Equals(_chosenInstance))
+                    {
+                        var l = tradeTable.Values.ToList();
+                        _tradeList.Clear();
+                        _tradeList = l.OrderByDescending(o => o.OrderTime).Take(15).ToList();
+                        FormatDecimals(_tradeList);
+                        StateHasChanged();
+                    }
+                }
+                else
+                {
+                    Logger.LogInformation("Duplicate entry for {TradeId} ", trade.TradeId);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Caught exception in HandleTrade {e.Message} - {e.StackTrace}");
+        }
+    }
+
+    private async Task HandleLatestTrades(List<TradeDTO> latestTrades)
+    {
+        try
+        {
+            foreach (var trade in latestTrades)
+            {
+                if (trade == null)
+                    Console.WriteLine("Problem is that the trade is null");
+
+                var tradeMsg = new TradeMsg()
+                {
+                    TradeId = trade.ExchangeTradeId,
+                    OrderId = trade.OrderId,
+                    Venue = _venues[trade.VenueId].VenueName,
+                    Symbol = trade.CoinPair.Name,
+                    Price = trade.Price,
+                    Quantity = trade.Quantity,
+                    FilledQuantity = trade.Quantity,
+                    RemainingQuantity = trade.LeaveQuantity,
+                    IsBuy = trade.IsBuy,
+                    Timestamp = trade.DateCreated,
+                    Instance =  trade.InstanceName,
+                    Account = trade.SP.Name
+                };
+                await HandleTrade(tradeMsg.Venue, tradeMsg, true);
+            }
+        }
+    
+        catch (Exception e)
+        {
+            Console.WriteLine($"Caught exception in HandleLatestTrades {e.StackTrace}");
+        }
+    }
+
+    private async Task HandleFilledOrder(string venue, OwnOrderChange? order)
+    {
+      
+        if (order != null)
+        {
+            var orderTable = _masterOrderTable[order.Instance];
+          
+            if (orderTable.ContainsKey(order.ClientOid))
+            {
+                orderTable.Remove(order.ClientOid);
+                if (order.Instance.Equals(_chosenInstance))
+                {
+                   
+                    var l = orderTable.Values.ToList();
+                    _openOrderList.Clear();
+                    _openOrderList = l.OrderByDescending(o => o.OrderTime).ToList();
+                    _openOrderList.Remove(order);
+                    FormatDecimals(_openOrderList);
+                    StateHasChanged();
+                }
+            }
+            else
+            {
+                ; // Shouldn't happen
+            }
+            
+        }
+    }
+
+    private async Task HandlePartiallyFilledOrder(string venue, OwnOrderChange? order)
+    {
+        if (order != null)
+        {
+            
+            var orderTable = _masterOrderTable[order.Instance];
+            
+            order.Venue = venue;
+            if (orderTable.ContainsKey(order.ClientOid))
+            {
+                orderTable[order.ClientOid] = order;
+                if (order.RemainingQuantity == 0)
+                    orderTable.Remove(order.ClientOid);
+                if (order.Instance.Equals(_chosenInstance))
+                {
+                    var l = orderTable.Values.ToList();
+                    _openOrderList.Clear();
+                    _openOrderList = l.OrderByDescending(o => o.OrderTime).ToList();
+                    FormatDecimals(_openOrderList);
+                    StateHasChanged();
+                }
+            }
+            else
+            {
+                ; // Shouldn't happen
+            }
+        }
+    }
+
+    private async Task HandleCancelledOrder(string venue, OwnOrderChange? order)
+    {
+        
+        if (order != null)
+        {
+            var orderTable = _masterOrderTable[order.Instance];
+          
+            order.Venue = venue;
+            if (orderTable.ContainsKey(order.ClientOid))
+            {
+                orderTable.Remove(order.ClientOid);
+                if (order.Instance.Equals(_chosenInstance))
+                {
+                    var l = orderTable.Values.ToList();
+                    _openOrderList.Remove(order);
+                    _openOrderList.Clear();
+                    _openOrderList = l.OrderByDescending(o => o.OrderTime).ToList();
+                    FormatDecimals(_openOrderList);
+            
+                    StateHasChanged();
+                }
+            }
+            else
+            {
+                ; // Shouldn't happen
+            }
+        }
+    }
+
+    private async Task HandleOwnOrderChanges(string venue, OwnOrderChange? order)
+    {
+        if (order != null)
+        {
+            Dictionary<string, OwnOrderChange> orderTable = null;
+            if (_masterOrderTable.ContainsKey(order.Instance))
+            {
+                orderTable = _masterOrderTable[order.Instance];
+                
+            }
+            else
+            {
+                orderTable = new Dictionary<string, OwnOrderChange>();
+                _masterOrderTable.Add(order.Instance, orderTable);
+            }
+            
+            order.Venue = venue;
+            if (orderTable.ContainsKey(order.ClientOid))
+            {
+                Console.WriteLine($"In table already - In HandleOwnOrderChanges for {order.OrderId} for instance {order.Instance} and chosen instance = {_chosenInstance}");
+            }
+            else
+            {
+                
+                orderTable[order.ClientOid] = order;
+                if (order.Instance.Equals(_chosenInstance))
+                {
+                    
+                    var l = orderTable.Values.ToList();
+                    _openOrderList.Clear();
+                    _openOrderList = l.Where(o => o.RemainingQuantity > 0).OrderByDescending(o => o.OrderTime).ToList();
+                    FormatDecimals(_openOrderList);
+                    StateHasChanged();
+                }
+                else
+                    Console.WriteLine("In No Match - HandleOwnOrderChanges ");
+            }
+        }
+    }
+
+    private async Task StrategyOnOffEvent(MouseEventArgs args, LiquidationConfigurationDTO row)
+    {
+        StrategyProcessDetails strategyProcessDetails =  new StrategyProcessDetails()
+        {
+            AccountName = SPName,
+            ConfigName = row.StrategySPSubscriptionConfig.ConfigName,           
+            StrategyConfigId = row.StrategySPSubscriptionConfigId
+        };
+
+      //  Console.WriteLine("We got here anyways");
+        if (row.StrategyState)
+        {
+            strategyProcessDetails.Enable = false;
+            row.StrategyState = false;
+        }
+        else
+        {
+            strategyProcessDetails.Enable = true;
+            row.StrategyState = true;
+        }
+        Console.WriteLine("Calling SendStrategyProcessCommand");
+        await PortfolioHttpClient.SendStrategyProcessCommand(strategyProcessDetails);
+        var realTimeUpdateDto = new RealTimeStartDTO()
+        {
+            SpName = SPName,
+            Instance = row.StrategySPSubscriptionConfig.ConfigName,
+            ConfigId = row.StrategySPSubscriptionConfigId
+        };
+        await PortfolioHttpClient.StartRealTimeUpdater(realTimeUpdateDto);
+        await PortfolioHttpClient.UpdateOpeningLiquidationSubscription(row);
+        
+      //  Console.WriteLine("Called SendStrategyProcessCommand");
+        foreach (var exchange in row.StrategySPSubscriptionConfig.ExchangeDetails)
+        {
+            OpenOrdersRequest openOrdersRequest = new OpenOrdersRequest();
+            openOrdersRequest.Venue = exchange.Venue.VenueName;
+            openOrdersRequest.InstanceName = row.StrategySPSubscriptionConfig.ConfigName;
+            openOrdersRequest.PortfolioName = SPName;
+            openOrdersRequest.CoinPairs = exchange.CoinPairs;
+        //    Console.WriteLine("Sending open Orders request to {openOrdersRequest.Venue}");
+            await PortfolioHttpClient.GetOpenOrders(openOrdersRequest);
+            GetBalanceRequest getBalanceRequest = new GetBalanceRequest();
+            getBalanceRequest.Venue = exchange.Venue.VenueName;
+            getBalanceRequest.InstanceName = row.StrategySPSubscriptionConfig.ConfigName;
+            getBalanceRequest.PortfolioName = SPName;
+            await PortfolioHttpClient.GetBalancesFromVenue(getBalanceRequest);
+            await PortfolioHttpClient.GetOrderBooks(exchange.Venue.VenueName, exchange.CoinPairs, SPName, row.StrategySPSubscriptionConfig.ConfigName);
+            await PortfolioHttpClient.GetLastTrades(exchange.Venue.VenueName, exchange.CoinPairs, SPName, row.StrategySPSubscriptionConfig.ConfigName);
+        }
+        var latestTrades = await PortfolioHttpClient.GetLatestTrades(row.StrategySPSubscriptionConfig.ConfigName);
+        await HandleLatestTrades(latestTrades);
+    }
+
+    public void OnTabSelected(SelectEventArgs args) 
+    { 
+        Console.WriteLine($"In OnTabSelected with args.Name {args.Name}");
+    } 
+
+    public void OnTabSelecting(SelectingEventArgs args) 
+    { 
+        Console.WriteLine($"In OnTabSelecting with args.Name {args.Name}");
+    } 
+
+ } 
